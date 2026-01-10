@@ -20,5 +20,8 @@ onMounted(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+
+    <!-- Global toast notifications -->
+    <BaseToastContainer />
   </div>
 </template>

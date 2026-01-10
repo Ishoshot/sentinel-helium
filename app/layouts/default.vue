@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
+import { useNotifications } from '~/composables/useNotifications'
 
 /**
  * Default layout - full app shell with sidebar and header
@@ -9,6 +10,26 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
 const route = useRoute()
+
+// Notifications
+const {
+  notifications,
+  unreadCount,
+  isLoading: isLoadingNotifications,
+  isMarkingRead,
+  fetchNotifications,
+  fetchUnreadCount,
+  markAllAsRead,
+  markAsRead,
+  markAsUnread,
+} = useNotifications()
+
+// Fetch unread count on mount
+onMounted(() => {
+  if (userStore.isAuthenticated) {
+    fetchUnreadCount()
+  }
+})
 
 // Main navigation items
 const mainNavItems = computed(() => {
@@ -46,6 +67,11 @@ const workspaceNavItems = computed(() => {
       icon: 'lucide:users',
     },
     {
+      label: 'Integrations',
+      to: `/${workspace}/settings/integrations`,
+      icon: 'lucide:plug',
+    },
+    {
       label: 'Settings',
       to: `/${workspace}/settings`,
       icon: 'lucide:settings',
@@ -55,7 +81,12 @@ const workspaceNavItems = computed(() => {
 
 // Check if nav item is active
 function isActive(path: string): boolean {
-  return route.path === path
+  // Exact match for most routes
+  if (route.path === path) return true
+  // For settings, only highlight if on exact settings page (not sub-pages like integrations)
+  if (path.endsWith('/settings') && route.path.includes('/settings/')) return false
+  // For integrations, match the exact route
+  return false
 }
 
 // Breadcrumb items
@@ -66,18 +97,21 @@ const breadcrumbs = computed(() => {
   const segments = route.path.split('/').filter(Boolean)
   const items = [{ label: workspace.name, to: `/${workspace.slug}` }]
 
-  if (segments.length > 1) {
-    const pageMap: Record<string, string> = {
-      members: 'Members',
-      settings: 'Settings',
-      repositories: 'Repositories',
-      reviews: 'Code Reviews',
-    }
-    const segment = segments[1]
-    const pageName = segment ? (pageMap[segment] || segment) : ''
-    if (pageName) {
-      items.push({ label: pageName, to: route.path })
-    }
+  const pageMap: Record<string, string> = {
+    members: 'Members',
+    settings: 'Settings',
+    repositories: 'Repositories',
+    reviews: 'Code Reviews',
+    integrations: 'Integrations',
+  }
+
+  // Build breadcrumbs for each segment after workspace
+  for (let i = 1; i < segments.length; i++) {
+    const segment = segments[i]
+    if (!segment) continue
+    const pageName = pageMap[segment] || segment
+    const path = '/' + segments.slice(0, i + 1).join('/')
+    items.push({ label: pageName, to: path })
   }
 
   return items
@@ -102,14 +136,14 @@ const breadcrumbs = computed(() => {
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto px-3 py-6">
+      <nav class="flex-1 overflow-y-auto px-4 py-5">
         <!-- Main Navigation -->
-        <div class="space-y-2">
+        <div class="space-y-3">
           <NuxtLink
             v-for="item in mainNavItems"
             :key="item.to"
             :to="item.to"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-default"
+            class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
             :class="[
               isActive(item.to)
                 ? 'bg-accent/10 text-accent font-medium'
@@ -125,16 +159,16 @@ const breadcrumbs = computed(() => {
         </div>
 
         <!-- Workspace Section -->
-        <div class="mt-10">
-          <p class="px-3 mb-3 text-xs font-medium text-text-muted uppercase tracking-wider">
+        <div class="mt-20">
+          <p class="px-3 mb-4 text-xs font-medium text-text-muted uppercase tracking-wider">
             Workspace
           </p>
-          <div class="space-y-2">
+          <div class="space-y-3">
             <NuxtLink
               v-for="item in workspaceNavItems"
               :key="item.to"
               :to="item.to"
-              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-default"
+              class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
               :class="[
                 isActive(item.to)
                   ? 'bg-accent/10 text-accent font-medium'
@@ -196,7 +230,17 @@ const breadcrumbs = computed(() => {
 
           <!-- Right: Actions -->
           <div class="flex items-center gap-4">
-            <!-- Search can go in here -->
+            <DomainNotificationDropdown
+              v-if="userStore.isAuthenticated"
+              :notifications="notifications"
+              :unread-count="unreadCount"
+              :is-loading="isLoadingNotifications"
+              :is-marking-read="isMarkingRead"
+              @fetch="fetchNotifications"
+              @mark-all-read="markAllAsRead"
+              @mark-read="markAsRead"
+              @mark-unread="markAsUnread"
+            />
           </div>
         </div>
       </header>
