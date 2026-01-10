@@ -1,3 +1,31 @@
+// Re-export enums for convenience
+export {
+  ToastType,
+  EmptyStateVariant,
+  ButtonVariant,
+  ButtonSize,
+  ModalSize,
+  HttpStatus,
+  ErrorCategory,
+  OAuthProvider,
+  MemberRole,
+  ConnectionStatus,
+  InstallationStatus,
+  GitHubAccountType,
+  NotificationType,
+  StorageKey,
+  RouteName,
+} from "./enums";
+
+// Import enums for use in interfaces
+import {
+  MemberRole,
+  ConnectionStatus,
+  InstallationStatus,
+  GitHubAccountType,
+  NotificationType,
+} from "./enums";
+
 // User types
 export interface User {
   id: number;
@@ -28,8 +56,6 @@ export interface Team {
 }
 
 // Team member types
-export type MemberRole = "owner" | "admin" | "member";
-
 export interface TeamMember {
   id: number;
   user_id: number;
@@ -77,9 +103,6 @@ export interface ApiErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-// OAuth provider types
-export type OAuthProvider = "github" | "google";
-
 // Form data types
 export interface CreateWorkspaceData {
   name: string;
@@ -113,4 +136,107 @@ export interface Activity {
   is_system_action: boolean;
   created_at: string;
   updated_at: string;
+}
+
+// GitHub Integration types
+export interface Provider {
+  id: number;
+  type: string;
+  name: string;
+  label: string;
+  icon: string;
+  is_active: boolean;
+}
+
+export interface Installation {
+  id: number;
+  installation_id: number;
+  account_type: "User" | "Organization";
+  account_login: string;
+  account_avatar_url: string;
+  status: InstallationStatus;
+  status_label: string;
+  is_active: boolean;
+  is_organization: boolean;
+  repositories_count?: number;
+  suspended_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Connection {
+  id: number;
+  status: ConnectionStatus;
+  status_label: string;
+  is_active: boolean;
+  provider: Provider;
+  installation: Installation | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RepositorySettings {
+  id: number;
+  auto_review_enabled: boolean;
+  review_rules: Record<string, unknown> | null;
+  updated_at: string;
+}
+
+export interface Repository {
+  id: number;
+  github_id: number;
+  name: string;
+  full_name: string;
+  owner: string;
+  private: boolean;
+  default_branch: string;
+  language: string | null;
+  description: string | null;
+  auto_review_enabled: boolean;
+  settings: RepositorySettings | null;
+  installation?: Installation;
+  created_at: string;
+  updated_at: string;
+}
+
+// GitHub API response types
+export interface ConnectResponse {
+  data: Connection;
+  installation_url?: string;
+  message?: string;
+}
+
+export interface SyncRepositoriesResponse {
+  message: string;
+  summary: {
+    added: number;
+    updated: number;
+    removed: number;
+  };
+}
+
+export interface UpdateRepositoryData {
+  auto_review_enabled?: boolean;
+  review_rules?: Record<string, unknown> | null;
+}
+
+// Notification types
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: Record<string, unknown> | null;
+  read_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationListResponse {
+  data: Notification[];
+  unread_count: number;
+}
+
+export interface UnreadCountResponse {
+  count: number;
 }
