@@ -29,7 +29,10 @@ defineProps<{
           </div>
           <div class="flex-1 flex justify-center">
             <div class="flex items-center gap-2 px-4 py-1.5 bg-white rounded-lg border border-gray-200 text-xs text-gray-500">
-              <Icon name="ph:lock-simple-bold" class="w-3 h-3 text-gray-400" />
+              <Icon
+                name="ph:lock-simple-bold"
+                class="w-3 h-3 text-gray-400"
+              />
               sentinel.dev/acme-corp/reviews
             </div>
           </div>
@@ -40,16 +43,28 @@ defineProps<{
           <!-- Stats row -->
           <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="bg-white rounded-xl p-4 border border-gray-200/80 shadow-sm">
-              <div class="text-2xl font-semibold text-gray-900 tabular-nums">847</div>
-              <div class="text-xs text-gray-500 mt-1">Reviews this month</div>
+              <div class="text-2xl font-semibold text-gray-900 tabular-nums">
+                847
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Reviews this month
+              </div>
             </div>
             <div class="bg-white rounded-xl p-4 border border-gray-200/80 shadow-sm">
-              <div class="text-2xl font-semibold text-green-600 tabular-nums">94%</div>
-              <div class="text-xs text-gray-500 mt-1">Actionable findings</div>
+              <div class="text-2xl font-semibold text-green-600 tabular-nums">
+                94%
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Actionable findings
+              </div>
             </div>
             <div class="bg-white rounded-xl p-4 border border-gray-200/80 shadow-sm">
-              <div class="text-2xl font-semibold text-blue-600 tabular-nums">2.3h</div>
-              <div class="text-xs text-gray-500 mt-1">Avg. time saved</div>
+              <div class="text-2xl font-semibold text-blue-600 tabular-nums">
+                2.3h
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                Avg. time saved
+              </div>
             </div>
           </div>
 
@@ -61,12 +76,19 @@ defineProps<{
                   <span class="text-sm font-semibold text-gray-600">SC</span>
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900">feat: Add user authentication flow</div>
-                  <div class="text-xs text-gray-400 mt-0.5">#1284 opened 12 minutes ago</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    feat: Add user authentication flow
+                  </div>
+                  <div class="text-xs text-gray-400 mt-0.5">
+                    #1284 opened 12 minutes ago
+                  </div>
                 </div>
               </div>
               <div class="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-200/80">
-                <Icon name="ph:warning-bold" class="w-3 h-3" />
+                <Icon
+                  name="ph:warning-bold"
+                  class="w-3 h-3"
+                />
                 3 findings
               </div>
             </div>
@@ -80,8 +102,12 @@ defineProps<{
                   />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-gray-900">Potential SQL injection in user query</div>
-                  <div class="text-xs text-gray-500 mt-0.5 font-mono">src/services/user.ts:47</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    Potential SQL injection in user query
+                  </div>
+                  <div class="text-xs text-gray-500 mt-0.5 font-mono">
+                    src/services/user.ts:47
+                  </div>
                 </div>
                 <span class="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-md">Critical</span>
               </div>
@@ -93,8 +119,12 @@ defineProps<{
                   />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-gray-900">Missing error boundary for async operation</div>
-                  <div class="text-xs text-gray-500 mt-0.5 font-mono">src/hooks/useAuth.ts:23</div>
+                  <div class="text-sm font-medium text-gray-900">
+                    Missing error boundary for async operation
+                  </div>
+                  <div class="text-xs text-gray-500 mt-0.5 font-mono">
+                    src/hooks/useAuth.ts:23
+                  </div>
                 </div>
                 <span class="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-md">Warning</span>
               </div>

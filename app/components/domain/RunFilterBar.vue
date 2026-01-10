@@ -122,10 +122,16 @@ const clearFilters = () => {
             :class="{ 'bg-bg-elevated border-accent text-accent': status }"
           >
             <span class="flex items-center gap-2">
-              <Icon name="lucide:activity" class="w-4 h-4 text-text-muted" />
+              <Icon
+                name="lucide:activity"
+                class="w-4 h-4 text-text-muted"
+              />
               {{ currentStatusLabel }}
             </span>
-            <Icon name="lucide:chevron-down" class="w-4 h-4 text-text-muted ml-2" />
+            <Icon
+              name="lucide:chevron-down"
+              class="w-4 h-4 text-text-muted ml-2"
+            />
           </BaseButton>
         </template>
       </BaseDropdown>
@@ -139,10 +145,16 @@ const clearFilters = () => {
             :class="{ 'bg-bg-elevated border-accent text-accent': risk }"
           >
             <span class="flex items-center gap-2">
-              <Icon name="lucide:shield-alert" class="w-4 h-4 text-text-muted" />
+              <Icon
+                name="lucide:shield-alert"
+                class="w-4 h-4 text-text-muted"
+              />
               {{ currentRiskLabel }}
             </span>
-            <Icon name="lucide:chevron-down" class="w-4 h-4 text-text-muted ml-2" />
+            <Icon
+              name="lucide:chevron-down"
+              class="w-4 h-4 text-text-muted ml-2"
+            />
           </BaseButton>
         </template>
       </BaseDropdown>
@@ -150,11 +162,14 @@ const clearFilters = () => {
       <!-- Clear Filters -->
       <button
         v-if="hasActiveFilters"
-        @click="clearFilters"
         class="text-sm text-text-muted hover:text-text-primary px-2 transition-colors"
         title="Clear filters"
+        @click="clearFilters"
       >
-        <Icon name="lucide:x" class="w-4 h-4" />
+        <Icon
+          name="lucide:x"
+          class="w-4 h-4"
+        />
       </button>
     </div>
   </div>

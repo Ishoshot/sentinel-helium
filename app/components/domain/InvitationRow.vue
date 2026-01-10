@@ -44,7 +44,10 @@ function handleResend(invitationId: number) {
         </span>
         <div class="flex items-center gap-2 text-xs text-text-muted">
           <span>Invited by {{ invitation.invited_by.name }}</span>
-          <span v-if="invitation.is_expired" class="text-warning">Expired</span>
+          <span
+            v-if="invitation.is_expired"
+            class="text-warning"
+          >Expired</span>
         </div>
       </div>
     </div>

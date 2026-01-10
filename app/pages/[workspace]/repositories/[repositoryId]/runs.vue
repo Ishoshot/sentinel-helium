@@ -35,7 +35,7 @@ const {
   filters: {
     // Custom filter for risk level (nested property)
     risk: (run, value) => {
-      const level = run.metadata?.review_summary?.risk_level?.toLowerCase()
+      const level = run.summary?.risk_level?.toLowerCase() ?? run.metadata?.review_summary?.risk_level?.toLowerCase()
       return level === value
     }
   }
@@ -82,10 +82,13 @@ const goBack = () => {
     <div class="mb-8">
       <div class="flex items-center gap-2 mb-2">
         <button 
-          @click="goBack"
           class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 text-sm font-medium"
+          @click="goBack"
         >
-          <Icon name="lucide:arrow-left" class="w-4 h-4" />
+          <Icon
+            name="lucide:arrow-left"
+            class="w-4 h-4"
+          />
           Repositories
         </button>
       </div>
@@ -93,7 +96,10 @@ const goBack = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-semibold text-text-primary flex items-center gap-2">
-            <span v-if="isLoadingRepo" class="w-32 h-8 bg-bg-elevated animate-pulse rounded-md" />
+            <span
+              v-if="isLoadingRepo"
+              class="w-32 h-8 bg-bg-elevated animate-pulse rounded-md"
+            />
             <span v-else>{{ repository?.full_name || 'Repository Runs' }}</span>
           </h1>
           <p class="mt-1 text-text-secondary">
@@ -106,21 +112,38 @@ const goBack = () => {
     <!-- Content -->
     <div class="space-y-6">
       <!-- Loading State -->
-      <div v-if="isLoading" class="space-y-4">
+      <div
+        v-if="isLoading"
+        class="space-y-4"
+      >
         <BaseSkeleton class="h-24 w-full rounded-xl" />
         <BaseSkeleton class="h-24 w-full rounded-xl" />
         <BaseSkeleton class="h-24 w-full rounded-xl" />
       </div>
 
       <!-- Error State -->
-      <BaseCard v-else-if="error" class="bg-error/5 border-error/10">
+      <BaseCard
+        v-else-if="error"
+        class="bg-error/5 border-error/10"
+      >
         <div class="flex flex-col items-center justify-center py-8 text-center">
           <div class="w-10 h-10 rounded-full bg-error/10 text-error flex items-center justify-center mb-3">
-            <Icon name="lucide:alert-circle" class="w-5 h-5" />
+            <Icon
+              name="lucide:alert-circle"
+              class="w-5 h-5"
+            />
           </div>
-          <h3 class="text-base font-semibold text-text-primary mb-1">Failed to load runs</h3>
-          <p class="text-sm text-text-secondary mb-4">{{ error }}</p>
-          <BaseButton variant="secondary" size="sm" @click="fetchRuns(repositoryId)">
+          <h3 class="text-base font-semibold text-text-primary mb-1">
+            Failed to load runs
+          </h3>
+          <p class="text-sm text-text-secondary mb-4">
+            {{ error }}
+          </p>
+          <BaseButton
+            variant="secondary"
+            size="sm"
+            @click="fetchRuns(repositoryId)"
+          >
             Try Again
           </BaseButton>
         </div>
@@ -140,7 +163,10 @@ const goBack = () => {
       </BaseCard>
 
       <!-- Content with Filters -->
-      <div v-else class="space-y-6">
+      <div
+        v-else
+        class="space-y-6"
+      >
         <!-- Filter Bar -->
         <DomainRunFilterBar
           :search="search"
@@ -152,15 +178,25 @@ const goBack = () => {
         />
 
         <!-- Empty State (No Matches) -->
-        <div v-if="filteredRuns.length === 0" class="py-12 text-center">
+        <div
+          v-if="filteredRuns.length === 0"
+          class="py-12 text-center"
+        >
           <div class="w-12 h-12 rounded-full bg-bg-elevated mx-auto flex items-center justify-center mb-3">
-            <Icon name="lucide:search-x" class="w-6 h-6 text-text-muted" />
+            <Icon
+              name="lucide:search-x"
+              class="w-6 h-6 text-text-muted"
+            />
           </div>
-          <h3 class="text-sm font-medium text-text-primary">No matching runs found</h3>
-          <p class="text-sm text-text-secondary mt-1">Try adjusting your search or filters</p>
+          <h3 class="text-sm font-medium text-text-primary">
+            No matching runs found
+          </h3>
+          <p class="text-sm text-text-secondary mt-1">
+            Try adjusting your search or filters
+          </p>
           <button 
-            @click="() => { search = ''; handleStatusChange(null); handleRiskChange(null) }"
             class="mt-3 text-sm text-accent hover:text-accent-hover font-medium"
+            @click="() => { search = ''; handleStatusChange(null); handleRiskChange(null) }"
           >
             Clear all filters
           </button>

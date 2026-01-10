@@ -31,7 +31,10 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.83"
+    "@iconify-json/lucide": "^1.2.83",
+    "@typescript-eslint/parser": "^8.52.0",
+    "eslint-plugin-vue": "^10.6.2",
+    "vue-eslint-parser": "^10.2.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -40,8 +40,12 @@ const menuItems = computed(() => [
           size="sm"
         />
         <div class="flex-1 text-left hidden sm:block">
-          <p class="text-sm font-medium text-text-primary truncate">{{ user.name }}</p>
-          <p class="text-xs text-text-muted truncate">View Profile</p>
+          <p class="text-sm font-medium text-text-primary truncate">
+            {{ user.name }}
+          </p>
+          <p class="text-xs text-text-muted truncate">
+            View Profile
+          </p>
         </div>
         <Icon
           name="lucide:chevron-up"

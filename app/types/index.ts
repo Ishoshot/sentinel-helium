@@ -290,6 +290,31 @@ export interface Finding {
   created_at: string;
 }
 
+// Pull Request Metadata Types
+export interface GitHubUser {
+  login: string;
+  avatar_url: string | null;
+}
+
+export interface Label {
+  name: string;
+  color: string;
+}
+
+export interface PullRequest {
+  number: number;
+  title: string | null;
+  body: string | null;
+  base_branch: string | null;
+  head_branch: string | null;
+  head_sha: string | null;
+  is_draft: boolean;
+  author: GitHubUser;
+  assignees: readonly GitHubUser[];
+  reviewers: readonly GitHubUser[];
+  labels: readonly Label[];
+}
+
 export interface Run {
   id: number;
   repository_id: number;
@@ -313,6 +338,12 @@ export interface Run {
     comment_limits: Record<string, number>;
     ignored_paths: readonly string[];
   } | null;
+  pull_request: PullRequest | null;
+  summary: {
+    overview: string;
+    risk_level: string; // 'low', 'medium', 'high', 'critical'
+    recommendations: readonly string[];
+  } | null;
   metadata: {
     pull_request_number?: number;
     pull_request_title?: string;
@@ -321,6 +352,7 @@ export interface Run {
     head_branch?: string;
     base_branch?: string;
     repository_full_name?: string;
+    /** @deprecated Use run.summary instead */
     review_summary?: {
       overview: string;
       risk_level: string; // 'low', 'medium', 'high', 'critical'

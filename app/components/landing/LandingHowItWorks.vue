@@ -47,7 +47,9 @@ const steps = [
           <div class="text-6xl font-bold text-gray-200/80 mb-4 tabular-nums">
             {{ step.number }}
           </div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ step.title }}</h3>
+          <h3 class="text-xl font-semibold text-gray-900 mb-3">
+            {{ step.title }}
+          </h3>
           <p class="text-gray-500 leading-relaxed">
             {{ step.description }}
           </p>

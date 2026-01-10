@@ -58,16 +58,28 @@ defineProps<{
     <!-- Stats -->
     <div class="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
       <div class="text-center">
-        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">94%</div>
-        <div class="mt-1 text-sm text-gray-500">Actionable</div>
+        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">
+          94%
+        </div>
+        <div class="mt-1 text-sm text-gray-500">
+          Actionable
+        </div>
       </div>
       <div class="text-center">
-        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">2.3h</div>
-        <div class="mt-1 text-sm text-gray-500">Time saved</div>
+        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">
+          2.3h
+        </div>
+        <div class="mt-1 text-sm text-gray-500">
+          Time saved
+        </div>
       </div>
       <div class="text-center">
-        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">&lt;30s</div>
-        <div class="mt-1 text-sm text-gray-500">Review time</div>
+        <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">
+          &lt;30s
+        </div>
+        <div class="mt-1 text-sm text-gray-500">
+          Review time
+        </div>
       </div>
     </div>
   </div>

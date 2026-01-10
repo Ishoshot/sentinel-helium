@@ -56,7 +56,9 @@ const features = [
               class="w-5 h-5 text-gray-700"
             />
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ feature.title }}</h3>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+            {{ feature.title }}
+          </h3>
           <p class="text-gray-500 leading-relaxed text-[15px]">
             {{ feature.description }}
           </p>

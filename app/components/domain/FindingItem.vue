@@ -116,7 +116,10 @@ const location = computed(() => {
           v-if="location"
           class="flex items-center gap-1.5 text-xs text-text-muted font-mono bg-bg-elevated px-2 py-1 rounded w-fit"
         >
-          <Icon name="lucide:file-code" class="w-3 h-3" />
+          <Icon
+            name="lucide:file-code"
+            class="w-3 h-3"
+          />
           {{ location }}
         </div>
       </div>

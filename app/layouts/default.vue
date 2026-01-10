@@ -200,7 +200,7 @@ const breadcrumbs = computed(() => {
       <header class="sticky top-0 h-16 bg-bg-elevated border-b border-border-subtle z-30">
         <div class="h-full px-8 flex items-center justify-between">
           <!-- Left: Breadcrumbs -->
-           <div class="flex items-center gap-10">
+          <div class="flex items-center gap-10">
             <DomainWorkspaceSwitcher v-if="workspaceStore.hasCurrentWorkspace" />
             <nav class="flex items-center gap-2 text-sm">
               <template
@@ -225,7 +225,7 @@ const breadcrumbs = computed(() => {
                 </NuxtLink>
               </template>
             </nav>
-           </div>
+          </div>
 
 
           <!-- Right: Actions -->
