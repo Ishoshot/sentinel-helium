@@ -50,7 +50,9 @@ export function useInvitations(workspaceId: Ref<number | null>) {
       );
 
       // Add to local state
-      invitations.value.push(invitation);
+      if (invitation) {
+        invitations.value.push(invitation);
+      }
 
       return invitation;
     } catch (e) {
@@ -82,7 +84,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
 
       // Update local state
       invitations.value = invitations.value.filter(
-        (i) => i.id !== invitationId
+        (i) => !!i && i.id !== invitationId
       );
 
       return true;
@@ -152,8 +154,10 @@ export function useInvitations(workspaceId: Ref<number | null>) {
       );
 
       // Update local state with refreshed invitation
-      const index = invitations.value.findIndex((i) => i.id === invitationId);
-      if (index !== -1) {
+      const index = invitations.value.findIndex(
+        (i) => !!i && i.id === invitationId
+      );
+      if (index !== -1 && invitation) {
         invitations.value[index] = invitation;
       }
 
@@ -175,7 +179,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
    * Get pending invitations count
    */
   const pendingCount = computed(
-    () => invitations.value.filter((i) => i.is_pending).length
+    () => invitations.value.filter((i) => !!i && i.is_pending).length
   );
 
   // Watch for workspace changes and refetch

@@ -16,10 +16,14 @@ export function useInvitationsService() {
    * List all pending invitations for a workspace
    */
   async function list(workspaceId: number): Promise<Invitation[]> {
-    const response = await $api<ApiListResponse<Invitation>>(
+    const response = await $api<ApiListResponse<Invitation> | Invitation[]>(
       `/workspaces/${workspaceId}/invitations`
     );
-    return response.data;
+    return "data" in response && Array.isArray(response.data)
+      ? response.data
+      : Array.isArray(response)
+      ? response
+      : [];
   }
 
   /**
@@ -29,14 +33,14 @@ export function useInvitationsService() {
     workspaceId: number,
     data: CreateInvitationData
   ): Promise<Invitation> {
-    const response = await $api<ApiResponse<Invitation>>(
+    const response = await $api<ApiResponse<Invitation> | Invitation>(
       `/workspaces/${workspaceId}/invitations`,
       {
         method: "POST",
         body: data,
       }
     );
-    return response.data;
+    return "data" in response ? response.data : response;
   }
 
   /**
@@ -56,11 +60,11 @@ export function useInvitationsService() {
    * Returns the invitation with workspace details on success
    */
   async function accept(token: string): Promise<Invitation> {
-    const response = await $api<ApiResponse<Invitation>>(
+    const response = await $api<ApiResponse<Invitation> | Invitation>(
       `/invitations/${token}/accept`,
       { method: "POST" }
     );
-    return response.data;
+    return "data" in response ? response.data : response;
   }
 
   /**
@@ -70,11 +74,11 @@ export function useInvitationsService() {
     workspaceId: number,
     invitationId: number
   ): Promise<Invitation> {
-    const response = await $api<ApiResponse<Invitation>>(
+    const response = await $api<ApiResponse<Invitation> | Invitation>(
       `/workspaces/${workspaceId}/invitations/${invitationId}/resend`,
       { method: "POST" }
     );
-    return response.data;
+    return "data" in response ? response.data : response;
   }
 
   return {
