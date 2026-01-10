@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAuth } from '~/composables/useAuth'
 import { useInvitations } from '~/composables/useInvitations'
+import { OAuthProvider } from '~/types'
 
 /**
  * Accept invitation page - handles invitation acceptance
@@ -46,7 +47,7 @@ async function tryAccept() {
   }
 }
 
-function handleLogin(provider: 'github' | 'google') {
+function handleLogin(provider: OAuthProvider) {
   // Store the invitation token to process after login
   if (import.meta.client) {
     sessionStorage.setItem('pending_invitation', token.value)
@@ -138,11 +139,11 @@ function handleLogin(provider: 'github' | 'google') {
 
         <div class="space-y-3">
           <DomainOAuthButton
-            provider="github"
+            :provider="OAuthProvider.GitHub"
             @click="handleLogin"
           />
           <DomainOAuthButton
-            provider="google"
+            :provider="OAuthProvider.Google"
             @click="handleLogin"
           />
         </div>

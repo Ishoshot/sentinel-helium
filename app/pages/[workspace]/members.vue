@@ -77,7 +77,7 @@ const stats = computed(() => [
   },
   {
     label: 'Pending',
-    value: invitations.value.filter(i => !i.is_expired).length,
+    value: invitations.value.filter(i => !!i && !i.is_expired).length,
     icon: 'lucide:mail',
     color: 'text-warning',
     bg: 'bg-warning-light',
@@ -86,10 +86,11 @@ const stats = computed(() => [
 
 // Filtered members based on search
 const filteredMembers = computed(() => {
-  if (!searchQuery.value.trim()) return members.value
+  const validMembers = members.value.filter(m => !!m)
+  if (!searchQuery.value.trim()) return validMembers
 
   const query = searchQuery.value.toLowerCase()
-  return members.value.filter(m =>
+  return validMembers.filter(m =>
     m.user.name.toLowerCase().includes(query) ||
     m.user.email.toLowerCase().includes(query)
   )
@@ -107,17 +108,18 @@ const groupedMembers = computed(() => {
 
 // Has any filtered results
 const hasFilteredResults = computed(() =>
-  groupedMembers.value.owner ||
+  !!groupedMembers.value.owner ||
   groupedMembers.value.admins.length > 0 ||
   groupedMembers.value.members.length > 0
 )
 
 // Filtered invitations based on search
 const filteredInvitations = computed(() => {
-  if (!searchQuery.value.trim()) return invitations.value
+  const validInvitations = invitations.value.filter(i => !!i)
+  if (!searchQuery.value.trim()) return validInvitations
 
   const query = searchQuery.value.toLowerCase()
-  return invitations.value.filter(i =>
+  return validInvitations.filter(i =>
     i.email.toLowerCase().includes(query)
   )
 })

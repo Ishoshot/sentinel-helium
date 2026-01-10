@@ -28,7 +28,16 @@ const selectedRole = ref<Exclude<MemberRole, MemberRole.Owner>>(MemberRole.Membe
 const emailTouched = ref(false)
 
 // Role options with rich descriptions
-const roleOptions = [
+const roleOptions: {
+  value: Exclude<MemberRole, MemberRole.Owner>
+  label: string
+  description: string
+  icon: string
+  color: string
+  bg: string
+  selectedBg: string
+  selectedBorder: string
+}[] = [
   {
     value: MemberRole.Member,
     label: 'Member',

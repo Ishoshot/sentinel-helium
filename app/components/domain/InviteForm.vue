@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MemberRole } from '~/types'
+import { MemberRole } from '~/types'
 
 /**
  * InviteForm - Form for inviting new members
@@ -17,16 +17,16 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  submit: [email: string, role: Exclude<MemberRole, 'owner'>]
+  submit: [email: string, role: Exclude<MemberRole, MemberRole.Owner>]
 }>()
 
 const email = ref('')
-const role = ref<Exclude<MemberRole, 'owner'>>('member')
+const role = ref<Exclude<MemberRole, MemberRole.Owner>>(MemberRole.Member)
 
 // Available roles
-const roles: { value: Exclude<MemberRole, 'owner'>; label: string }[] = [
-  { value: 'member', label: 'Member' },
-  { value: 'admin', label: 'Admin' },
+const roles: { value: Exclude<MemberRole, MemberRole.Owner>; label: string }[] = [
+  { value: MemberRole.Member, label: 'Member' },
+  { value: MemberRole.Admin, label: 'Admin' },
 ]
 
 function handleSubmit() {
@@ -37,7 +37,7 @@ function handleSubmit() {
 // Reset form
 function reset() {
   email.value = ''
-  role.value = 'member'
+  role.value = MemberRole.Member
 }
 
 // Expose reset method
