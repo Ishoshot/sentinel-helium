@@ -98,6 +98,7 @@ const recentActivity = computed(() => {
     const icon = activity.type_icon || activityIconFallback[activity.type] || 'activity'
     return {
       id: activity.id,
+      type: activity.type, // Pass type for badge color derivation
       title: activity.type_label,
       actorName: activity.actor?.name || 'System',
       description: activity.description,
@@ -107,6 +108,9 @@ const recentActivity = computed(() => {
     }
   })
 })
+
+// Activity count for header
+const activityCount = computed(() => recentActivity.value.length)
 
 // Team members preview (limit to 5)
 const teamMembers = computed(() => {
@@ -161,18 +165,24 @@ const teamMembers = computed(() => {
       <!-- Left Column - Recent Activity (takes more space) -->
       <div class="xl:col-span-2">
         <BaseCard class="h-full">
-          <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center justify-between mb-2">
             <h2 class="text-base font-semibold text-text-primary">
               Recent Activity
             </h2>
+            <span
+              v-if="activityCount > 0"
+              class="text-sm text-text-muted"
+            >
+              {{ activityCount }} {{ activityCount === 1 ? 'event' : 'events' }}
+            </span>
           </div>
 
           <div
             v-if="recentActivity.length > 0"
-            class="divide-y divide-border-subtle -mx-1"
+            class="mt-4"
           >
             <DomainActivityItem
-              v-for="activity in recentActivity"
+              v-for="(activity, index) in recentActivity"
               :key="activity.id"
               :avatar-name="activity.actorName"
               :avatar-url="activity.avatarUrl"
@@ -181,6 +191,9 @@ const teamMembers = computed(() => {
               :description="activity.description"
               :timestamp="activity.timestamp"
               :icon="activity.icon"
+              :type="activity.type"
+              :is-first="index === 0"
+              :is-last="index === recentActivity.length - 1"
             />
           </div>
           <div

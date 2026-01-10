@@ -49,12 +49,12 @@ const githubUrl = computed(
 </script>
 
 <template>
-  <div class="bg-bg-elevated border border-border-subtle rounded-xl p-5 hover:border-border-muted transition-default">
+  <div class="group bg-bg-elevated border border-border-subtle rounded-xl p-5 hover:border-border-muted hover:shadow-sm transition-all duration-200">
     <div class="flex items-start justify-between gap-6">
       <!-- Repository info -->
       <div class="flex items-start gap-4 flex-1 min-w-0">
         <!-- Icon -->
-        <div class="w-10 h-10 rounded-lg bg-bg-surface flex items-center justify-center shrink-0">
+        <div class="w-10 h-10 rounded-full bg-bg-surface ring-1 ring-border-subtle flex items-center justify-center shrink-0">
           <Icon
             :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
             class="w-5 h-5 text-text-muted"
@@ -64,7 +64,7 @@ const githubUrl = computed(
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-3 mb-1.5 min-w-0">
             <!-- Repository name -->
-            <h3 class="font-medium text-text-primary truncate max-w-[50%]">
+            <h3 class="text-sm font-semibold text-text-primary truncate max-w-[50%] leading-tight">
               {{ repository.full_name }}
             </h3>
 
@@ -74,20 +74,20 @@ const githubUrl = computed(
               class="flex items-center gap-1.5 shrink-0"
             >
               <span
-                class="w-2.5 h-2.5 rounded-full"
+                class="w-2 h-2 rounded-full ring-1 ring-inset ring-black/10 dark:ring-white/10"
                 :class="languageColor"
               />
-              <span class="text-xs text-text-muted">
+              <span class="text-xs font-medium text-text-muted">
                 {{ repository.language }}
               </span>
             </div>
 
             <!-- Auto-review badge -->
             <div
-              class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium"
+              class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset"
               :class="repository.auto_review_enabled 
-                ? 'bg-success/10 text-success' 
-                : 'bg-bg-surface text-text-muted'"
+                ? 'bg-success/10 text-success ring-success/20' 
+                : 'bg-bg-surface text-text-muted ring-border-subtle'"
             >
               {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
             </div>
@@ -96,13 +96,19 @@ const githubUrl = computed(
           <!-- Description -->
           <p
             v-if="repository.description"
-            class="text-sm text-text-secondary mb-3 line-clamp-1"
+            class="text-sm text-text-secondary mb-2 line-clamp-1 leading-relaxed"
           >
             {{ repository.description }}
           </p>
+          <p
+            v-else
+            class="text-sm text-text-muted italic mb-2"
+          >
+            No description provided
+          </p>
 
           <!-- Meta info -->
-          <div class="flex items-center gap-5 text-xs text-text-muted">
+          <div class="flex items-center gap-5 text-xs font-medium text-text-muted">
             <!-- Default branch -->
             <span class="flex items-center gap-1.5">
               <Icon
@@ -117,25 +123,29 @@ const githubUrl = computed(
               :href="githubUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center gap-1.5 hover:text-text-primary transition-default"
+              class="flex items-center gap-1.5 hover:text-text-primary transition-colors"
             >
               <Icon
                 name="lucide:external-link"
                 class="w-3.5 h-3.5"
               />
-              Open in GitHub
+              GitHub
             </a>
           </div>
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="flex items-center gap-2 shrink-0">
+      <div class="flex items-center gap-2 shrink-0 self-center">
         <!-- Quick toggle for auto-review -->
         <button
           v-if="canManage"
-          class="p-2.5 rounded-lg hover:bg-bg-surface transition-default"
-          :class="repository.auto_review_enabled ? 'text-success' : 'text-text-muted'"
+          class="p-2 rounded-lg transition-colors"
+          :class="[
+            repository.auto_review_enabled 
+              ? 'text-success hover:bg-success/10' 
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
+          ]"
           :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
           @click="$emit('toggleAutoReview', repository.id)"
         >
@@ -148,13 +158,13 @@ const githubUrl = computed(
         <!-- Settings button -->
         <button
           v-if="canManage"
-          class="p-2.5 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-default"
+          class="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-colors"
           title="Repository settings"
           @click="$emit('openSettings', repository.id)"
         >
           <Icon
             name="lucide:settings"
-            class="w-5 h-5"
+            class="w-4.5 h-4.5"
           />
         </button>
       </div>
