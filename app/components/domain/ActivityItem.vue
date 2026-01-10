@@ -25,7 +25,7 @@ const formattedDescription = computed(() => {
 </script>
 
 <template>
-  <div class="group flex items-start gap-3 py-3 transition-colors hover:bg-bg-surface/50 -mx-4 px-4 rounded-lg">
+  <div class="group flex items-start gap-3 py-3 transition-colors hover:bg-bg-surface/50 -mx-4 px-4">
     <!-- Avatar -->
     <div class="flex-shrink-0 mt-0.5">
       <BaseAvatar
