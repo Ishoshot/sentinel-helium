@@ -16,7 +16,7 @@ export function useRunsService() {
     page = 1,
     perPage = 20
   ): Promise<PaginatedResponse<Run>> {
-    return await $api<PaginatedResponse<Run>>(
+    const response = await $api<PaginatedResponse<Run>>(
       `/workspaces/${workspaceId}/repositories/${repositoryId}/runs`,
       {
         params: {
@@ -25,16 +25,18 @@ export function useRunsService() {
         },
       }
     );
+    // Paginated responses are usually standard, but we return as is
+    return response;
   }
 
   /**
    * Get a single run detail
    */
   async function getRun(workspaceId: number, runId: number): Promise<Run> {
-    const response = await $api<ApiResponse<Run>>(
+    const response = await $api<ApiResponse<Run> | Run>(
       `/workspaces/${workspaceId}/runs/${runId}`
     );
-    return response.data;
+    return "data" in response ? response.data : response;
   }
 
   return {

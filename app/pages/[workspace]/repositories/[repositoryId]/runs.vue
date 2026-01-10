@@ -19,6 +19,35 @@ const repositoryId = computed(() => parseInt(route.params.repositoryId as string
 // Composables
 const { runs, isLoading, error, fetchRuns, pagination } = useRuns(workspaceId)
 
+// Filtering Engine
+const { 
+  search, 
+  filters, 
+  filteredData: filteredRuns, 
+  setFilter 
+} = useDataFilter(runs, {
+  searchFields: [
+    'metadata.pull_request_title', 
+    'metadata.sender_login', 
+    'status',
+    'id'
+  ],
+  filters: {
+    // Custom filter for risk level (nested property)
+    risk: (run, value) => {
+      const level = run.metadata?.review_summary?.risk_level?.toLowerCase()
+      return level === value
+    }
+  }
+})
+
+// Bindings for FilterBar
+const currentStatus = computed(() => filters.value.status ?? null)
+const currentRisk = computed(() => filters.value.risk ?? null)
+
+const handleStatusChange = (value: string | null) => setFilter('status', value)
+const handleRiskChange = (value: string | null) => setFilter('risk', value)
+
 // Local state for repository details
 const repository = ref<Repository | null>(null)
 const isLoadingRepo = ref(true)
@@ -97,7 +126,7 @@ const goBack = () => {
         </div>
       </BaseCard>
 
-      <!-- Empty State -->
+      <!-- Empty State (No Runs at all) -->
       <BaseCard v-else-if="runs.length === 0">
         <BaseEmptyState
           icon="lucide:play-circle"
@@ -110,12 +139,40 @@ const goBack = () => {
         </BaseEmptyState>
       </BaseCard>
 
-      <!-- Runs List -->
-      <DomainRunList
-        v-else
-        :runs="runs"
-        :workspace-slug="workspaceSlug"
-      />
+      <!-- Content with Filters -->
+      <div v-else class="space-y-6">
+        <!-- Filter Bar -->
+        <DomainRunFilterBar
+          :search="search"
+          :status="currentStatus"
+          :risk="currentRisk"
+          @update:search="search = $event"
+          @update:status="handleStatusChange"
+          @update:risk="handleRiskChange"
+        />
+
+        <!-- Empty State (No Matches) -->
+        <div v-if="filteredRuns.length === 0" class="py-12 text-center">
+          <div class="w-12 h-12 rounded-full bg-bg-elevated mx-auto flex items-center justify-center mb-3">
+            <Icon name="lucide:search-x" class="w-6 h-6 text-text-muted" />
+          </div>
+          <h3 class="text-sm font-medium text-text-primary">No matching runs found</h3>
+          <p class="text-sm text-text-secondary mt-1">Try adjusting your search or filters</p>
+          <button 
+            @click="() => { search = ''; handleStatusChange(null); handleRiskChange(null) }"
+            class="mt-3 text-sm text-accent hover:text-accent-hover font-medium"
+          >
+            Clear all filters
+          </button>
+        </div>
+
+        <!-- Filtered Runs List -->
+        <DomainRunList
+          v-else
+          :runs="filteredRuns"
+          :workspace-slug="workspaceSlug"
+        />
+      </div>
     </div>
   </div>
 </template>

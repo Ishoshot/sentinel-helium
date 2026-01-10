@@ -44,9 +44,31 @@ const findingsCount = computed(() => run.value?.findings?.length ?? 0)
 const hasFindings = computed(() => findingsCount.value > 0)
 
 const duration = computed(() => {
+  if (run.value?.metrics?.duration_ms) {
+    const ms = run.value.metrics.duration_ms
+    if (ms < 1000) return `${ms}ms`
+    return `${(ms / 1000).toFixed(1)}s`
+  }
   if (!run.value?.started_at || !run.value?.completed_at) return null
-  // Simple duration calculation could be added here if needed
-  return null
+  return null // Fallback calculation could go here
+})
+
+const reviewSummary = computed(() => run.value?.metadata?.review_summary)
+const metrics = computed(() => run.value?.metrics)
+
+// Risk level configuration
+const riskConfig = computed(() => {
+  const level = reviewSummary.value?.risk_level?.toLowerCase()
+  if (!level) return null
+  
+  const configs: Record<string, { color: string; bg: string; icon: string; label: string }> = {
+    low: { color: 'text-success', bg: 'bg-success-light', icon: 'lucide:shield-check', label: 'Low Risk' },
+    medium: { color: 'text-warning', bg: 'bg-warning-light', icon: 'lucide:alert-triangle', label: 'Medium Risk' },
+    high: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:alert-circle', label: 'High Risk' },
+    critical: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:siren', label: 'Critical' },
+  }
+  
+  return configs[level] || { color: 'text-text-muted', bg: 'bg-bg-surface', icon: 'lucide:info', label: level }
 })
 </script>
 
@@ -100,6 +122,16 @@ const duration = computed(() => {
                   {{ prTitle || 'Run Details' }}
                 </h1>
                 <DomainRunStatusBadge :status="run.status" />
+                
+                <!-- Risk Badge -->
+                <div 
+                  v-if="riskConfig"
+                  class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border border-transparent"
+                  :class="[riskConfig.bg, riskConfig.color]"
+                >
+                  <Icon :name="riskConfig.icon" class="w-3.5 h-3.5" />
+                  <span>{{ riskConfig.label }}</span>
+                </div>
               </div>
 
               <div class="flex items-center gap-x-6 gap-y-2 flex-wrap text-sm text-text-secondary">
@@ -152,6 +184,71 @@ const duration = computed(() => {
               {{ findingsCount }} issues found
             </div>
           </div>
+        </div>
+
+        <!-- Metrics Grid (Secondary Metadata) -->
+        <div v-if="metrics" class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 mt-6 border-t border-border-subtle/50">
+          <div>
+            <div class="text-xs font-medium text-text-muted mb-1">Files Changed</div>
+            <div class="text-sm text-text-primary font-mono">{{ metrics.files_changed }}</div>
+          </div>
+          
+          <div>
+            <div class="text-xs font-medium text-text-muted mb-1">Lines</div>
+            <div class="text-sm text-text-primary font-mono">
+              <span class="text-success">+{{ metrics.lines_added }}</span>
+              <span class="text-border-muted mx-1">/</span>
+              <span class="text-error">-{{ metrics.lines_deleted }}</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-medium text-text-muted mb-1">Tokens</div>
+            <div class="text-sm text-text-primary font-mono">{{ metrics.tokens_used_estimated.toLocaleString() }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-medium text-text-muted mb-1">Duration</div>
+            <div class="text-sm text-text-primary font-mono">{{ duration || '-' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review Summary Card -->
+      <div 
+        v-if="run.status === RunStatus.Completed || run.status === RunStatus.Failed"
+        class="bg-bg-elevated border border-border-subtle rounded-xl p-6 mb-8 shadow-sm"
+      >
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center text-accent">
+            <Icon name="lucide:file-text" class="w-4 h-4" />
+          </div>
+          <h2 class="text-lg font-semibold text-text-primary">Review Summary</h2>
+        </div>
+
+        <div v-if="reviewSummary" class="space-y-4">
+          <p class="text-text-secondary leading-relaxed">
+            {{ reviewSummary.overview }}
+          </p>
+
+          <div v-if="reviewSummary.recommendations?.length" class="space-y-2">
+            <h3 class="text-sm font-medium text-text-primary">Recommendations</h3>
+            <ul class="space-y-1.5">
+              <li 
+                v-for="(rec, index) in reviewSummary.recommendations" 
+                :key="index"
+                class="flex items-start gap-2 text-sm text-text-secondary"
+              >
+                <Icon name="lucide:check-circle" class="w-4 h-4 text-success mt-0.5 shrink-0" />
+                <span>{{ rec }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div v-else class="flex items-center gap-2 text-text-muted text-sm py-2">
+          <Icon name="lucide:clock" class="w-4 h-4" />
+          <span>Review summary pending...</span>
         </div>
       </div>
 

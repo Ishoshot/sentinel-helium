@@ -297,9 +297,37 @@ export interface Run {
   status: RunStatus;
   started_at: string | null;
   completed_at: string | null;
-  metrics: Record<string, unknown> | null;
-  policy_snapshot: Record<string, unknown> | null;
-  metadata: Record<string, unknown> | null;
+  metrics: {
+    files_changed: number;
+    lines_added: number;
+    lines_deleted: number;
+    tokens_used_estimated: number;
+    model: string;
+    provider: string;
+    duration_ms: number;
+  } | null;
+  policy_snapshot: {
+    policy_version: number;
+    enabled_rules: readonly string[];
+    severity_thresholds: Record<string, string>;
+    comment_limits: Record<string, number>;
+    ignored_paths: readonly string[];
+  } | null;
+  metadata: {
+    pull_request_number?: number;
+    pull_request_title?: string;
+    sender_login?: string;
+    sender_avatar_url?: string;
+    head_branch?: string;
+    base_branch?: string;
+    repository_full_name?: string;
+    review_summary?: {
+      overview: string;
+      risk_level: string; // 'low', 'medium', 'high', 'critical'
+      recommendations: readonly string[];
+    };
+    [key: string]: unknown;
+  } | null;
   repository?: Repository;
   findings?: readonly Finding[];
   created_at: string;

@@ -19,8 +19,23 @@ const pullRequestTitle = computed(() => props.run.metadata?.pull_request_title)
 const senderLogin = computed(() => props.run.metadata?.sender_login)
 const headBranch = computed(() => props.run.metadata?.head_branch)
 const baseBranch = computed(() => props.run.metadata?.base_branch)
+const riskLevel = computed(() => props.run.metadata?.review_summary?.risk_level?.toLowerCase())
 
 const runUrl = computed(() => `/${props.workspaceSlug}/runs/${props.run.id}`)
+
+// Risk level configuration
+const riskConfig = computed(() => {
+  if (!riskLevel.value) return null
+  
+  const configs: Record<string, { color: string; bg: string; icon: string; label: string }> = {
+    low: { color: 'text-success', bg: 'bg-success-light', icon: 'lucide:shield-check', label: 'Low Risk' },
+    medium: { color: 'text-warning', bg: 'bg-warning-light', icon: 'lucide:alert-triangle', label: 'Medium Risk' },
+    high: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:alert-circle', label: 'High Risk' },
+    critical: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:siren', label: 'Critical' },
+  }
+  
+  return configs[riskLevel.value] || { color: 'text-text-muted', bg: 'bg-bg-surface', icon: 'lucide:info', label: riskLevel.value }
+})
 </script>
 
 <template>
@@ -56,6 +71,16 @@ const runUrl = computed(() => `/${props.workspaceSlug}/runs/${props.run.id}`)
 
             <!-- Status Badge -->
             <DomainRunStatusBadge :status="run.status" />
+
+            <!-- Risk Badge -->
+            <div 
+              v-if="riskConfig"
+              class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border border-transparent"
+              :class="[riskConfig.bg, riskConfig.color]"
+            >
+              <Icon :name="riskConfig.icon" class="w-3.5 h-3.5" />
+              <span>{{ riskConfig.label }}</span>
+            </div>
           </div>
 
           <!-- Description / Meta -->
