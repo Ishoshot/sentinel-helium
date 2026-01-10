@@ -177,6 +177,77 @@ Options API is forbidden.
 
 ---
 
+## Type Safety & Enums (STRICT)
+
+**No magic strings are allowed.** All string literals that represent application state,
+status codes, or categories must be defined as TypeScript enums.
+
+### Enum Rules
+
+1. **All enums live in `app/types/enums.ts`**
+2. **Enum keys MUST be PascalCase**
+3. **Enum values MUST match the API contract** (usually snake_case or lowercase)
+4. **Group related enums together** with clear section headers
+5. **Add JSDoc comments** to every enum for clarity
+6. **Re-export from `app/types/index.ts`** for convenient importing
+
+### Available Enums
+
+| Category | Enum | Example Values |
+|----------|------|----------------|
+| UI | `ToastType` | `Success`, `Error`, `Warning`, `Info` |
+| UI | `EmptyStateVariant` | `Empty`, `Error`, `Success`, `Warning`, `Info`, `Offline` |
+| UI | `ButtonVariant` | `Primary`, `Secondary`, `Ghost`, `Danger` |
+| UI | `ButtonSize` | `Small`, `Medium`, `Large` |
+| UI | `ModalSize` | `Small`, `Medium`, `Large` |
+| API | `HttpStatus` | `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, etc. |
+| API | `ErrorCategory` | `Auth`, `Permission`, `NotFound`, `Validation`, `Server`, `Network` |
+| Auth | `OAuthProvider` | `GitHub`, `Google` |
+| Auth | `MemberRole` | `Owner`, `Admin`, `Member` |
+| GitHub | `ConnectionStatus` | `Pending`, `Active`, `Disconnected`, `Failed` |
+| GitHub | `InstallationStatus` | `Active`, `Suspended`, `Uninstalled` |
+| GitHub | `GitHubAccountType` | `User`, `Organization` |
+| Notifications | `NotificationType` | `WorkspaceInvitation`, `MemberJoined`, etc. |
+| Storage | `StorageKey` | `AuthToken`, `Theme`, `Locale` |
+| Routes | `RouteName` | `Home`, `Login`, `WorkspaceOverview`, etc. |
+
+### Usage Examples
+
+```typescript
+// BAD - Magic string
+if (member.role === 'owner') { ... }
+
+// GOOD - Using enum
+import { MemberRole } from '~/types'
+if (member.role === MemberRole.Owner) { ... }
+```
+
+```typescript
+// BAD - Magic string
+const ERROR_MESSAGES = {
+  401: 'Session expired',
+  403: 'Forbidden',
+}
+
+// GOOD - Using enum
+import { HttpStatus } from '~/types'
+const ERROR_MESSAGES = {
+  [HttpStatus.Unauthorized]: 'Session expired',
+  [HttpStatus.Forbidden]: 'Forbidden',
+}
+```
+
+### Adding New Enums
+
+When you need a new enum:
+
+1. Check if it already exists in `app/types/enums.ts`
+2. Add to the appropriate section with JSDoc
+3. Re-export from `app/types/index.ts`
+4. Update this documentation table
+
+---
+
 ## Forbidden Shortcuts
 
 AI agents MUST NOT:
