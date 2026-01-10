@@ -1,4 +1,5 @@
-import type { TeamMember, MemberRole } from '~/types'
+import type { TeamMember } from '~/types'
+import { MemberRole } from '~/types'
 import { useMembersService } from '~/services/membersService'
 import { ApiError } from '~/services/api'
 
@@ -110,17 +111,17 @@ export function useMembers(workspaceId: Ref<number | null>) {
   /**
    * Get the owner of the workspace
    */
-  const owner = computed(() => members.value.find(m => m.role === 'owner') ?? null)
+  const owner = computed(() => members.value.find(m => m.role === MemberRole.Owner) ?? null)
 
   /**
    * Get admins of the workspace
    */
-  const admins = computed(() => members.value.filter(m => m.role === 'admin'))
+  const admins = computed(() => members.value.filter(m => m.role === MemberRole.Admin))
 
   /**
    * Get regular members of the workspace
    */
-  const regularMembers = computed(() => members.value.filter(m => m.role === 'member'))
+  const regularMembers = computed(() => members.value.filter(m => m.role === MemberRole.Member))
 
   // Watch for workspace changes and refetch
   watch(workspaceId, (newId) => {

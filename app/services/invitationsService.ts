@@ -3,14 +3,14 @@ import type {
   ApiResponse,
   ApiListResponse,
   CreateInvitationData,
-} from '~/types'
-import { useApiClient } from './api'
+} from "~/types";
+import { useApiClient } from "./api";
 
 /**
  * Invitations service - handles invitation API calls
  */
 export function useInvitationsService() {
-  const { $api } = useApiClient()
+  const { $api } = useApiClient();
 
   /**
    * List all pending invitations for a workspace
@@ -18,8 +18,8 @@ export function useInvitationsService() {
   async function list(workspaceId: number): Promise<Invitation[]> {
     const response = await $api<ApiListResponse<Invitation>>(
       `/workspaces/${workspaceId}/invitations`
-    )
-    return response.data
+    );
+    return response.data;
   }
 
   /**
@@ -32,20 +32,23 @@ export function useInvitationsService() {
     const response = await $api<ApiResponse<Invitation>>(
       `/workspaces/${workspaceId}/invitations`,
       {
-        method: 'POST',
+        method: "POST",
         body: data,
       }
-    )
-    return response.data
+    );
+    return response.data;
   }
 
   /**
    * Cancel an invitation
    */
-  async function cancel(workspaceId: number, invitationId: number): Promise<void> {
+  async function cancel(
+    workspaceId: number,
+    invitationId: number
+  ): Promise<void> {
     await $api(`/workspaces/${workspaceId}/invitations/${invitationId}`, {
-      method: 'DELETE',
-    })
+      method: "DELETE",
+    });
   }
 
   /**
@@ -55,9 +58,23 @@ export function useInvitationsService() {
   async function accept(token: string): Promise<Invitation> {
     const response = await $api<ApiResponse<Invitation>>(
       `/invitations/${token}/accept`,
-      { method: 'POST' }
-    )
-    return response.data
+      { method: "POST" }
+    );
+    return response.data;
+  }
+
+  /**
+   * Resend an invitation email
+   */
+  async function resend(
+    workspaceId: number,
+    invitationId: number
+  ): Promise<Invitation> {
+    const response = await $api<ApiResponse<Invitation>>(
+      `/workspaces/${workspaceId}/invitations/${invitationId}/resend`,
+      { method: "POST" }
+    );
+    return response.data;
   }
 
   return {
@@ -65,5 +82,6 @@ export function useInvitationsService() {
     create,
     cancel,
     accept,
-  }
+    resend,
+  };
 }
