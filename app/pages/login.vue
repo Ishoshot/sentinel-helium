@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OAuthProvider } from '~/types'
+import { OAuthProvider } from '~/types'
 import { useAuth } from '~/composables/useAuth'
 
 /**
@@ -35,11 +35,11 @@ function handleOAuthClick(provider: OAuthProvider) {
     <BaseCard>
       <div class="space-y-3">
         <DomainOAuthButton
-          provider="github"
+          :provider="OAuthProvider.GitHub"
           @click="handleOAuthClick"
         />
         <DomainOAuthButton
-          provider="google"
+          :provider="OAuthProvider.Google"
           @click="handleOAuthClick"
         />
       </div>
