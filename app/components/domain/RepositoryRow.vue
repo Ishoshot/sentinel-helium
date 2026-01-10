@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Repository } from '~/types'
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 
 /**
  * RepositoryRow - Displays a single repository with its settings
@@ -18,6 +19,10 @@ const emit = defineEmits<{
   toggleAutoReview: [repositoryId: number]
   openSettings: [repositoryId: number]
 }>()
+
+const workspaceStore = useWorkspaceStore()
+const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '')
+const runsUrl = computed(() => `/${workspaceSlug.value}/repositories/${props.repository.id}/runs`)
 
 // Language color mapping
 const languageColors: Record<string, string> = {
@@ -137,36 +142,48 @@ const githubUrl = computed(
 
       <!-- Actions -->
       <div class="flex items-center gap-2 shrink-0 self-center">
-        <!-- Quick toggle for auto-review -->
-        <button
-          v-if="canManage"
-          class="p-2 rounded-lg transition-colors"
-          :class="[
-            repository.auto_review_enabled 
-              ? 'text-success hover:bg-success/10' 
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
-          ]"
-          :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
-          @click="$emit('toggleAutoReview', repository.id)"
+        <!-- View Runs History -->
+        <NuxtLink
+          :to="runsUrl"
+          class="p-2.5 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-colors"
+          title="View runs history"
         >
           <Icon
-            :name="repository.auto_review_enabled ? 'lucide:toggle-right' : 'lucide:toggle-left'"
+            name="lucide:history"
             class="w-5 h-5"
           />
-        </button>
+        </NuxtLink>
 
-        <!-- Settings button -->
-        <button
-          v-if="canManage"
-          class="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-colors"
-          title="Repository settings"
-          @click="$emit('openSettings', repository.id)"
-        >
-          <Icon
-            name="lucide:settings"
-            class="w-4.5 h-4.5"
-          />
-        </button>
+        <!-- Quick toggle for auto-review -->
+        <template v-if="canManage">
+          <button
+            class="p-2.5 rounded-lg transition-colors"
+            :class="[
+              repository.auto_review_enabled 
+                ? 'text-success hover:bg-success/10' 
+                : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
+            ]"
+            :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
+            @click="$emit('toggleAutoReview', repository.id)"
+          >
+            <Icon
+              :name="repository.auto_review_enabled ? 'lucide:toggle-right' : 'lucide:toggle-left'"
+              class="w-5 h-5"
+            />
+          </button>
+
+          <!-- Settings button -->
+          <button
+            class="p-2.5 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-colors"
+            title="Repository settings"
+            @click="$emit('openSettings', repository.id)"
+          >
+            <Icon
+              name="lucide:settings"
+              class="w-5 h-5"
+            />
+          </button>
+        </template>
       </div>
     </div>
   </div>
