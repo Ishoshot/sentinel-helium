@@ -197,4 +197,32 @@ export enum RouteName {
   WorkspaceSettings = "workspace-settings",
   WorkspaceIntegrations = "workspace-settings-integrations",
   WorkspaceRepositories = "workspace-repositories",
+  WorkspaceRepositoryRuns = "workspace-repository-runs",
+  WorkspaceRunDetail = "workspace-run-detail",
+}
+
+// =============================================================================
+// Review System Enums
+// =============================================================================
+
+/**
+ * Run status values
+ */
+export enum RunStatus {
+  Queued = "queued",
+  InProgress = "in_progress",
+  Completed = "completed",
+  Failed = "failed",
+  Skipped = "skipped",
+}
+
+/**
+ * Finding severity levels
+ */
+export enum FindingSeverity {
+  Critical = "critical",
+  High = "high",
+  Medium = "medium",
+  Low = "low",
+  Info = "info",
 }

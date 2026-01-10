@@ -15,6 +15,8 @@ export {
   NotificationType,
   StorageKey,
   RouteName,
+  RunStatus,
+  FindingSeverity,
 } from "./enums";
 
 // Import enums for use in interfaces
@@ -24,6 +26,8 @@ import {
   InstallationStatus,
   GitHubAccountType,
   NotificationType,
+  RunStatus,
+  FindingSeverity,
 } from "./enums";
 
 // User types
@@ -96,6 +100,26 @@ export interface ApiResponse<T> {
 
 export interface ApiListResponse<T> {
   data: T[];
+}
+
+export interface PaginatedResponse<T> {
+  current_page: number;
+  data: T[];
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: {
+    url: string | null;
+    label: string;
+    active: boolean;
+  }[];
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number;
+  total: number;
 }
 
 export interface ApiErrorResponse {
@@ -239,4 +263,44 @@ export interface NotificationListResponse {
 
 export interface UnreadCountResponse {
   count: number;
+}
+
+// Review System types
+export interface Annotation {
+  id: number;
+  provider_id: number | null;
+  external_id: string | null;
+  type: string;
+  created_at: string;
+}
+
+export interface Finding {
+  id: number;
+  run_id: number;
+  severity: FindingSeverity | string;
+  category: string;
+  title: string;
+  description: string;
+  file_path: string | null;
+  line_start: number | null;
+  line_end: number | null;
+  confidence: number | null;
+  metadata: Record<string, unknown> | null;
+  annotations: readonly Annotation[];
+  created_at: string;
+}
+
+export interface Run {
+  id: number;
+  repository_id: number;
+  external_reference: string;
+  status: RunStatus;
+  started_at: string | null;
+  completed_at: string | null;
+  metrics: Record<string, unknown> | null;
+  policy_snapshot: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  repository?: Repository;
+  findings?: readonly Finding[];
+  created_at: string;
 }
