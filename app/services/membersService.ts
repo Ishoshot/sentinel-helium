@@ -3,23 +3,27 @@ import type {
   ApiResponse,
   ApiListResponse,
   UpdateMemberRoleData,
-} from '~/types'
-import { useApiClient } from './api'
+} from "~/types";
+import { useApiClient } from "./api";
 
 /**
  * Members service - handles team member API calls
  */
 export function useMembersService() {
-  const { $api } = useApiClient()
+  const { $api } = useApiClient();
 
   /**
    * List all members in a workspace
    */
   async function list(workspaceId: number): Promise<TeamMember[]> {
-    const response = await $api<ApiListResponse<TeamMember>>(
+    const response = await $api<ApiListResponse<TeamMember> | TeamMember[]>(
       `/workspaces/${workspaceId}/members`
-    )
-    return response.data
+    );
+    return "data" in response && Array.isArray(response.data)
+      ? response.data
+      : Array.isArray(response)
+      ? response
+      : [];
   }
 
   /**
@@ -30,14 +34,14 @@ export function useMembersService() {
     memberId: number,
     data: UpdateMemberRoleData
   ): Promise<TeamMember> {
-    const response = await $api<ApiResponse<TeamMember>>(
+    const response = await $api<ApiResponse<TeamMember> | TeamMember>(
       `/workspaces/${workspaceId}/members/${memberId}`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
       }
-    )
-    return response.data
+    );
+    return "data" in response ? response.data : response;
   }
 
   /**
@@ -45,13 +49,13 @@ export function useMembersService() {
    */
   async function remove(workspaceId: number, memberId: number): Promise<void> {
     await $api(`/workspaces/${workspaceId}/members/${memberId}`, {
-      method: 'DELETE',
-    })
+      method: "DELETE",
+    });
   }
 
   return {
     list,
     updateRole,
     remove,
-  }
+  };
 }
