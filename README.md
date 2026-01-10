@@ -1,75 +1,54 @@
-# Nuxt Minimal Starter
+# Sentinel
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Sentinel frontend built with Nuxt 4, Vue 3, PrimeVue, and TailwindCSS.
+
+## Tech Stack
+
+- **Framework:** Nuxt 4 / Vue 3
+- **UI Components:** PrimeVue 4
+- **Styling:** TailwindCSS
+- **Icons:** Lucide (via @iconify-json/lucide)
+- **State Management:** Pinia
+- **Package Manager:** pnpm
 
 ## Setup
 
-Make sure to install dependencies:
-
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+> **Note:** If prompted about build scripts, run `pnpm approve-builds` and approve the required packages.
 
-Start the development server on `http://localhost:3000`:
+## Development
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Scripts
+
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `pnpm dev`      | Start development server |
+| `pnpm build`    | Build for production     |
+| `pnpm preview`  | Preview production build |
+| `pnpm lint`     | Run ESLint               |
+| `pnpm lint:fix` | Run ESLint with auto-fix |
 
 ## Production
 
-Build the application for production:
-
 ```bash
-# npm
-npm run build
-
-# pnpm
 pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
 pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Documentation
+
+See the [docs](./docs) folder for detailed documentation:
+
+- [Design System](./docs/frontend/DESIGN_SYSTEM.md)
+- [Frontend Architecture](./docs/frontend/FRONTEND_ARCHITECTURE.md)
+- [Component Standards](./docs/frontend/COMPONENT_STANDARDS.md)
+- [State & Data](./docs/frontend/STATE_AND_DATA.md)
