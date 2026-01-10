@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { TeamMember, MemberRole } from '~/types'
+import type { TeamMember } from '~/types'
+import { MemberRole } from '~/types'
 
 /**
  * MemberRow - Single member display row
@@ -15,20 +16,20 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  changeRole: [memberId: number, role: Exclude<MemberRole, 'owner'>]
+  changeRole: [memberId: number, role: Exclude<MemberRole, MemberRole.Owner>]
   remove: [memberId: number]
 }>()
 
 // Check if this is the owner (cannot be changed/removed)
-const isOwner = computed(() => props.member.role === 'owner')
+const isOwner = computed(() => props.member.role === MemberRole.Owner)
 
 // Check if this is the current user
 const isCurrentUser = computed(() => props.member.user_id === props.currentUserId)
 
 // Available roles for changing
-const availableRoles: { value: Exclude<MemberRole, 'owner'>; label: string }[] = [
-  { value: 'admin', label: 'Admin' },
-  { value: 'member', label: 'Member' },
+const availableRoles: { value: Exclude<MemberRole, MemberRole.Owner>; label: string }[] = [
+  { value: MemberRole.Admin, label: 'Admin' },
+  { value: MemberRole.Member, label: 'Member' },
 ]
 
 // Dropdown state

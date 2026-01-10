@@ -15,10 +15,15 @@ defineProps<Props>()
 
 const emit = defineEmits<{
   cancel: [invitationId: number]
+  resend: [invitationId: number]
 }>()
 
 function handleCancel(invitationId: number) {
   emit('cancel', invitationId)
+}
+
+function handleResend(invitationId: number) {
+  emit('resend', invitationId)
 }
 </script>
 
@@ -50,6 +55,19 @@ function handleCancel(invitationId: number) {
         :role="invitation.role"
         :label="invitation.role_label"
       />
+
+      <!-- Resend button -->
+      <button
+        v-if="canManage"
+        class="p-1.5 text-text-muted hover:text-accent-primary hover:bg-accent-primary/10 rounded transition-default"
+        title="Resend invitation"
+        @click="handleResend(invitation.id)"
+      >
+        <Icon
+          name="lucide:send"
+          class="w-4 h-4"
+        />
+      </button>
 
       <!-- Cancel button -->
       <button
