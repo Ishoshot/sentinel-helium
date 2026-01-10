@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base layer - Sentinel design system foundations */
+@layer base {
+  :root {
+    /* Backgrounds & Surfaces */
+    --color-bg-app: #f9fafb;
+    --color-bg-surface: #f3f4f6;
+    --color-bg-elevated: #ffffff;
+
+    /* Borders & Dividers */
+    --color-border-subtle: #e5e7eb;
+    --color-border-muted: #d1d5db;
+
+    /* Typography */
+    --color-text-primary: #111827;
+    --color-text-secondary: #374151;
+    --color-text-muted: #6b7280;
+
+    /* Accent - Sentinel Blue */
+    --color-accent-primary: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-accent-light: #dbeafe;
+
+    /* Semantic Colors */
+    --color-success: #16a34a;
+    --color-success-light: #dcfce7;
+    --color-warning: #d97706;
+    --color-warning-light: #fef3c7;
+    --color-error: #dc2626;
+    --color-error-light: #fee2e2;
+  }
+
+  html {
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+      "Noto Color Emoji";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg-app text-text-primary;
+  }
+}
+
+/* Components layer - reusable component styles */
+@layer components {
+  /* Focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+
+  /* Smooth transitions */
+  .transition-default {
+    @apply transition-all duration-150 ease-in-out;
+  }
+}
+
+/* Utilities layer - custom utilities */
+@layer utilities {
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
