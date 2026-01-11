@@ -202,9 +202,9 @@ function goToIntegrations() {
           @click="handleSync"
         >
           <Icon
+            v-if="!isSyncing"
             name="lucide:refresh-cw"
             class="w-4 h-4 mr-1.5"
-            :class="{ 'animate-spin': isSyncing }"
           />
           Sync from GitHub
         </BaseButton>
