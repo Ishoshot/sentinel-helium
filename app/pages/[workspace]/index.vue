@@ -98,6 +98,8 @@ const activityIconFallback: Record<string, string> = {
   member_joined: 'user-check',
   member_removed: 'user-minus',
   workspace_created: 'plus-circle',
+  'provider_key.updated': 'key',
+  'provider_key.deleted': 'trash-2',
 }
 
 // Recent activity

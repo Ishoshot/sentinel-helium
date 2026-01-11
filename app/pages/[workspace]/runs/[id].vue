@@ -201,6 +201,45 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
       </div>
     </BaseCard>
 
+    <!-- Run Error State -->
+    <div
+      v-if="run && run.status === RunStatus.Skipped && run?.metadata?.skip_reason"
+      class="mb-8 p-4 bg-error/5 border border-error/20 rounded-xl"
+    >
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-error/10 flex items-center justify-center shrink-0">
+          <Icon
+            name="lucide:alert-circle"
+            class="w-4 h-4 text-error"
+          />
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">
+            Analysis Failed
+          </h3>
+          <p class="text-sm text-text-secondary">
+            {{ run.metadata.skip_message }}
+          </p>
+          <div
+            v-if="run.metadata.skip_message?.toLowerCase().includes('provider key') || run.metadata.skip_reason?.toLowerCase() === 'no_provider_keys'"
+            class="mt-3"
+          >
+            <NuxtLink
+              v-if="run.repository_id"
+              :to="`/${workspaceSlug}/repositories?settings=${run.repository_id}`"
+              class="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-hover"
+            >
+              Configure Provider Keys
+              <Icon
+                name="lucide:arrow-right"
+                class="w-4 h-4"
+              />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <template v-else-if="run">
       <!-- Run Header Card -->
       <div class="bg-bg-elevated border border-border-subtle rounded-xl shadow-sm overflow-hidden mb-8">
