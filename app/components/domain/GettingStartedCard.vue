@@ -21,6 +21,8 @@ interface Props {
   isGitHubConnected: boolean
   membersCount: number
   repositoriesCount: number
+  hasRuns: boolean
+  hasInvitations: boolean
 }
 
 const props = defineProps<Props>()
@@ -52,9 +54,9 @@ const steps = computed<Step[]>(() => [
     description: 'Collaborate with teammates on code reviews.',
     benefit: 'Enable team collaboration',
     icon: 'lucide:users',
-    completed: props.membersCount > 1,
+    completed: props.membersCount > 1 || props.hasInvitations,
     route: `/${props.workspaceSlug}/members`,
-    cta: props.membersCount > 1 ? 'Team invited' : 'Invite',
+    cta: props.membersCount > 1 ? 'Team joined' : (props.hasInvitations ? 'Invitation sent' : 'Invite'),
   },
   {
     id: 'first-review',
@@ -62,9 +64,9 @@ const steps = computed<Step[]>(() => [
     description: 'Open a pull request to see Sentinel in action.',
     benefit: 'Experience the magic',
     icon: 'lucide:sparkles',
-    completed: false, // Will be connected to actual review data
+    completed: props.hasRuns,
     route: `/${props.workspaceSlug}/repositories`,
-    cta: 'View repositories',
+    cta: props.hasRuns ? 'View reviews' : 'View repositories',
   },
 ])
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Repository } from '~/types'
+import { useSentinelConfig } from '~/composables/useSentinelConfig'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 
 /**
@@ -23,6 +24,10 @@ const emit = defineEmits<{
 const workspaceStore = useWorkspaceStore()
 const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '')
 const runsUrl = computed(() => `/${workspaceSlug.value}/repositories/${props.repository.id}/runs`)
+
+const { status: configStatus } = useSentinelConfig(
+  computed(() => props.repository.settings)
+)
 
 // Language color mapping
 const languageColors: Record<string, string> = {
@@ -95,6 +100,21 @@ const githubUrl = computed(
                 : 'bg-bg-surface text-text-muted ring-border-subtle'"
             >
               {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
+            </div>
+
+            <div
+              v-if="configStatus !== 'default'"
+              class="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset flex items-center gap-1.5"
+              :class="configStatus === 'error'
+                ? 'bg-warning/10 text-warning ring-warning/20'
+                : 'bg-accent/10 text-accent ring-accent/20'"
+              :title="configStatus === 'error' ? 'Configuration error' : 'Configuration active'"
+            >
+              <Icon
+                :name="configStatus === 'error' ? 'lucide:alert-triangle' : 'lucide:check-circle-2'"
+                class="w-3.5 h-3.5"
+              />
+              <span>{{ configStatus === 'error' ? 'Error' : 'Config' }}</span>
             </div>
           </div>
 

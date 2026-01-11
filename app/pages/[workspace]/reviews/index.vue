@@ -20,6 +20,7 @@ const { runs, isLoading, error, fetchWorkspaceRuns, pagination } = useRuns(works
 // State for repositories (for filter dropdown)
 const repositories = ref<Repository[]>([])
 const isLoadingRepos = ref(false)
+const isInitializing = ref(true)
 
 // Filter state
 const search = ref('')
@@ -77,11 +78,15 @@ watch(queryParams, async (params) => {
 
 // Initial fetch
 onMounted(async () => {
-  if (workspaceId.value) {
-    await Promise.all([
-      fetchWorkspaceRuns(queryParams.value),
-      fetchRepositories()
-    ])
+  try {
+    if (workspaceId.value) {
+      await Promise.all([
+        fetchWorkspaceRuns(queryParams.value),
+        fetchRepositories()
+      ])
+    }
+  } finally {
+    isInitializing.value = false
   }
 })
 
@@ -547,7 +552,7 @@ const currentSort = computed({
     <div class="flex-1 overflow-auto bg-bg-app px-8 py-6">
       <!-- Loading State (Initial) -->
       <div
-        v-if="isLoading && runs.length === 0"
+        v-if="(isLoading || isInitializing) && runs.length === 0"
         class="space-y-4"
       >
         <BaseSkeleton class="h-24 w-full rounded-xl" />
@@ -584,7 +589,7 @@ const currentSort = computed({
 
       <!-- Empty State (No Runs at all) -->
       <div
-        v-else-if="runs.length === 0 && !hasActiveFilters && !isLoading"
+        v-else-if="runs.length === 0 && !hasActiveFilters && !isLoading && !isInitializing"
         class="h-full flex flex-col items-center justify-center"
       >
         <BaseEmptyState

@@ -33,7 +33,7 @@ onMounted(() => {
 
 // Main navigation items
 const mainNavItems = computed(() => {
-  const workspace = workspaceStore.currentWorkspaceSlug
+  const workspace = workspaceStore.currentWorkspaceSlug || (route.params.workspace as string)
   if (!workspace) return []
 
   return [
@@ -57,7 +57,7 @@ const mainNavItems = computed(() => {
 
 // Workspace management items
 const workspaceNavItems = computed(() => {
-  const workspace = workspaceStore.currentWorkspaceSlug
+  const workspace = workspaceStore.currentWorkspaceSlug || (route.params.workspace as string)
   if (!workspace) return []
 
   return [

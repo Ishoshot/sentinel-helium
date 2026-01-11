@@ -51,6 +51,7 @@ const handleRiskChange = (value: string | null) => setFilter('risk', value)
 // Local state for repository details
 const repository = ref<Repository | null>(null)
 const isLoadingRepo = ref(true)
+const isInitializing = ref(true)
 
 // Fetch data
 onMounted(async () => {
@@ -65,8 +66,14 @@ onMounted(async () => {
       isLoadingRepo.value = false
     }
 
-    // Fetch runs
-    await fetchRuns(repositoryId.value)
+    try {
+      // Fetch runs
+      await fetchRuns(repositoryId.value)
+    } finally {
+      isInitializing.value = false
+    }
+  } else {
+    isInitializing.value = false
   }
 })
 
@@ -113,7 +120,7 @@ const goBack = () => {
     <div class="space-y-6">
       <!-- Loading State -->
       <div
-        v-if="isLoading"
+        v-if="isLoading || isInitializing"
         class="space-y-4"
       >
         <BaseSkeleton class="h-24 w-full rounded-xl" />
@@ -150,7 +157,7 @@ const goBack = () => {
       </BaseCard>
 
       <!-- Empty State (No Runs at all) -->
-      <BaseCard v-else-if="runs.length === 0">
+      <BaseCard v-else-if="runs.length === 0 && !isInitializing && !isLoading">
         <BaseEmptyState
           icon="lucide:play-circle"
           title="No runs yet"

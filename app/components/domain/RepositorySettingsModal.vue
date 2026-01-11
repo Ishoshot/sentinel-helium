@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Repository, UpdateRepositoryData } from '~/types'
+import { useSentinelConfig } from '~/composables/useSentinelConfig'
 
 /**
  * RepositorySettingsModal - Configure repository settings
@@ -22,8 +23,10 @@ const emit = defineEmits<{
 
 // Form state
 const autoReviewEnabled = ref(false)
-const focusAreas = ref('')
-const ignorePaths = ref('')
+const showConfigViewer = ref(false)
+
+const { hasConfig, error: configError, hasError, syncedAtLabel, configJson, config } =
+  useSentinelConfig(computed(() => props.repository?.settings))
 
 // Initialize form when repository changes
 watch(
@@ -31,9 +34,6 @@ watch(
   (repo) => {
     if (repo) {
       autoReviewEnabled.value = repo.auto_review_enabled
-      const rules = repo.settings?.review_rules as Record<string, unknown> | null
-      focusAreas.value = (rules?.focus_areas as string[] | undefined)?.join(', ') ?? ''
-      ignorePaths.value = (rules?.ignore_paths as string[] | undefined)?.join(', ') ?? ''
     }
   },
   { immediate: true }
@@ -46,6 +46,7 @@ watch(
     if (!isOpen) {
       // Reset on close
       autoReviewEnabled.value = props.repository?.auto_review_enabled ?? false
+      showConfigViewer.value = false
     }
   }
 )
@@ -54,43 +55,13 @@ watch(
 const hasChanges = computed(() => {
   if (!props.repository) return false
 
-  const currentRules = props.repository.settings?.review_rules as Record<string, unknown> | null
-  const currentFocusAreas = (currentRules?.focus_areas as string[] | undefined)?.join(', ') ?? ''
-  const currentIgnorePaths = (currentRules?.ignore_paths as string[] | undefined)?.join(', ') ?? ''
-
-  return (
-    autoReviewEnabled.value !== props.repository.auto_review_enabled ||
-    focusAreas.value !== currentFocusAreas ||
-    ignorePaths.value !== currentIgnorePaths
-  )
+  return autoReviewEnabled.value !== props.repository.auto_review_enabled
 })
-
-// Build review rules from form
-function buildReviewRules(): Record<string, unknown> | null {
-  const rules: Record<string, unknown> = {}
-
-  if (focusAreas.value.trim()) {
-    rules.focus_areas = focusAreas.value
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  }
-
-  if (ignorePaths.value.trim()) {
-    rules.ignore_paths = ignorePaths.value
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  }
-
-  return Object.keys(rules).length > 0 ? rules : null
-}
 
 // Handle save
 function handleSave() {
   const data: UpdateRepositoryData = {
     auto_review_enabled: autoReviewEnabled.value,
-    review_rules: buildReviewRules(),
   }
   emit('save', data)
 }
@@ -155,51 +126,163 @@ function close() {
 
       <!-- Advanced settings (only shown when auto-review is enabled) -->
       <div
-        v-if="autoReviewEnabled"
         class="space-y-4 pt-4 border-t border-border-subtle"
       >
         <h4 class="text-sm font-medium text-text-primary">
-          Review Rules (Advanced)
+          Sentinel Configuration
         </h4>
 
-        <!-- Focus areas -->
-        <div>
-          <label
-            for="focus-areas"
-            class="block text-sm font-medium text-text-secondary mb-1"
-          >
-            Focus Areas
-          </label>
-          <input
-            id="focus-areas"
-            v-model="focusAreas"
-            type="text"
-            class="w-full px-3 py-2 bg-bg-surface border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            placeholder="security, performance, accessibility"
-          >
-          <p class="mt-1 text-xs text-text-muted">
-            Comma-separated areas Sentinel should focus on during reviews
-          </p>
+        <div
+          v-if="hasError"
+          class="rounded-lg border border-warning/20 bg-warning/5 p-3"
+        >
+          <div class="flex items-start gap-2">
+            <Icon
+              name="lucide:alert-triangle"
+              class="w-4 h-4 text-warning mt-0.5"
+            />
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-text-primary">
+                Config Error
+              </div>
+              <div class="mt-1 text-sm text-text-secondary whitespace-pre-line">
+                {{ configError }}
+              </div>
+              <div class="mt-2 text-xs text-text-muted">
+                Reviews are skipped until this is fixed.
+              </div>
+              <div class="mt-1 text-xs text-text-muted">
+                Last sync attempt: {{ syncedAtLabel }}
+              </div>
+
+              <div class="mt-3">
+                <BaseButton
+                  variant="secondary"
+                  size="sm"
+                  disabled
+                >
+                  <Icon
+                    name="lucide:book-open"
+                    class="w-4 h-4 mr-1.5"
+                  />
+                  View Documentation
+                </BaseButton>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Ignore paths -->
-        <div>
-          <label
-            for="ignore-paths"
-            class="block text-sm font-medium text-text-secondary mb-1"
-          >
-            Ignore Paths
-          </label>
-          <input
-            id="ignore-paths"
-            v-model="ignorePaths"
-            type="text"
-            class="w-full px-3 py-2 bg-bg-surface border border-border-subtle rounded-lg text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
-            placeholder="tests/**, docs/**, *.md"
-          >
-          <p class="mt-1 text-xs text-text-muted">
-            Comma-separated glob patterns for files to skip during reviews
-          </p>
+        <div
+          v-else-if="hasConfig"
+          class="rounded-lg border border-border-subtle bg-bg-surface p-3"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <Icon
+                  name="lucide:file-code"
+                  class="w-4 h-4 text-accent"
+                />
+                <div class="text-sm font-medium text-text-primary">
+                  Config Active
+                </div>
+              </div>
+              <div class="mt-1 text-xs text-text-muted">
+                Last synced: {{ syncedAtLabel }}
+              </div>
+
+              <!-- AI Provider Info -->
+              <div
+                v-if="config?.provider"
+                class="mt-3 pt-3 border-t border-border-subtle"
+              >
+                <div class="text-xs font-medium text-text-secondary mb-2">
+                  AI Provider Settings
+                </div>
+                <div class="space-y-1.5">
+                  <div
+                    v-if="config.provider.preferred"
+                    class="flex items-center gap-2 text-xs text-text-muted"
+                  >
+                    <Icon
+                      name="lucide:bot"
+                      class="w-3.5 h-3.5"
+                    />
+                    <span>Provider: <span class="font-medium text-text-primary">{{ config.provider.preferred }}</span></span>
+                  </div>
+                  <div
+                    v-if="config.provider.model"
+                    class="flex items-center gap-2 text-xs text-text-muted"
+                  >
+                    <Icon
+                      name="lucide:cpu"
+                      class="w-3.5 h-3.5"
+                    />
+                    <span>Model: <span class="font-medium text-text-primary">{{ config.provider.model }}</span></span>
+                  </div>
+                  <div
+                    v-if="config.provider.fallback !== undefined"
+                    class="flex items-center gap-2 text-xs text-text-muted"
+                  >
+                    <Icon
+                      name="lucide:shield-check"
+                      class="w-3.5 h-3.5"
+                    />
+                    <span>Fallback: <span class="font-medium text-text-primary">{{ config.provider.fallback ? 'Enabled' : 'Disabled' }}</span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <BaseButton
+                variant="secondary"
+                size="sm"
+                @click="showConfigViewer = true"
+              >
+                View Full Config
+              </BaseButton>
+              <BaseButton
+                variant="secondary"
+                size="sm"
+                disabled
+              >
+                <Icon
+                  name="lucide:book-open"
+                  class="w-4 h-4 mr-1.5"
+                />
+                View Documentation
+              </BaseButton>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-else
+          class="rounded-lg border border-border-subtle bg-bg-surface p-3"
+        >
+          <div class="text-sm text-text-secondary">
+            This repository is using Sentinel's default settings.
+          </div>
+          <div class="mt-1 text-xs text-text-muted">
+            To customize behavior, create <span class="font-mono">.sentinel/config.yaml</span> in your repository.
+          </div>
+          <div class="mt-2 text-xs text-text-muted">
+            Last checked: {{ syncedAtLabel }}
+          </div>
+
+          <div class="mt-3">
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              disabled
+            >
+              <Icon
+                name="lucide:book-open"
+                class="w-4 h-4 mr-1.5"
+              />
+              View Documentation
+            </BaseButton>
+          </div>
         </div>
       </div>
     </div>
@@ -218,6 +301,47 @@ function close() {
           @click="handleSave"
         >
           Save Changes
+        </BaseButton>
+      </div>
+    </template>
+  </BaseModal>
+
+  <BaseModal
+    :model-value="showConfigViewer"
+    title=".sentinel/config.yaml"
+    size="lg"
+    @update:model-value="showConfigViewer = $event"
+  >
+    <div
+      v-if="configJson"
+      class="space-y-2"
+    >
+      <div class="text-xs text-text-muted">
+        Last synced: {{ syncedAtLabel }}
+      </div>
+      <div class="max-h-[60vh] overflow-auto">
+        <BaseCodeBlock
+          :code="configJson"
+          language="json"
+          :max-preview-lines="9999"
+        />
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="text-sm text-text-muted"
+    >
+      No configuration found.
+    </div>
+
+    <template #footer>
+      <div class="flex justify-end">
+        <BaseButton
+          variant="secondary"
+          @click="showConfigViewer = false"
+        >
+          Close
         </BaseButton>
       </div>
     </template>

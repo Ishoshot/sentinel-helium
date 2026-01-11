@@ -5,6 +5,7 @@ import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useMembers } from '~/composables/useMembers'
 import { useGitHub } from '~/composables/useGitHub'
+import { useStorage } from '@vueuse/core'
 
 /**
  * Repositories page - list and manage GitHub repositories
@@ -48,7 +49,8 @@ const canManage = computed(
 
 // View mode (list or grid)
 type ViewMode = 'list' | 'grid'
-const viewMode = ref<ViewMode>('list')
+const viewMode = useStorage<ViewMode>('sentinel:repositories-view-mode', 'list')
+const isInitializing = ref(true)
 
 // Repository settings modal
 const showSettingsModal = ref(false)
@@ -64,11 +66,15 @@ const hasRepositories = computed(() => repositories.value.length > 0)
 
 // Fetch data on mount
 onMounted(async () => {
-  await Promise.all([fetchMembers(), fetchConnection()])
+  try {
+    await Promise.all([fetchMembers(), fetchConnection()])
 
-  // Only fetch repositories if connected
-  if (isConnected.value) {
-    await fetchRepositories()
+    // Only fetch repositories if connected
+    if (isConnected.value) {
+      await fetchRepositories()
+    }
+  } finally {
+    isInitializing.value = false
   }
 })
 
@@ -206,7 +212,7 @@ function goToIntegrations() {
     </div>
 
     <!-- Not connected state -->
-    <BaseCard v-if="!isConnected && !isLoading">
+    <BaseCard v-if="!isConnected && !isLoading && !isInitializing">
       <BaseEmptyState
         icon="lucide:github"
         title="GitHub not connected"
@@ -224,7 +230,7 @@ function goToIntegrations() {
 
     <!-- Loading state -->
     <div
-      v-else-if="isLoading"
+      v-else-if="isLoading || isInitializing"
       class="space-y-4"
     >
       <BaseSkeleton class="h-24 w-full rounded-xl" />

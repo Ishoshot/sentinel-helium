@@ -3,6 +3,8 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useMembers } from '~/composables/useMembers'
 import { useActivity } from '~/composables/useActivity'
 import { useGitHub } from '~/composables/useGitHub'
+import { useRuns } from '~/composables/useRuns'
+import { useInvitations } from '~/composables/useInvitations'
 import { useAuth } from '~/composables/useAuth'
 import { formatRelativeTime } from '~/utils/date'
 
@@ -24,6 +26,8 @@ const workspaceId = computed(() => workspace.value?.id ?? null)
 const { members, fetchMembers } = useMembers(workspaceId)
 const { activities, fetchActivities } = useActivity(workspaceId)
 const { isConnected: isGitHubConnected, repositoriesCount, fetchConnection } = useGitHub(workspaceId)
+const { pagination: runsPagination, fetchWorkspaceRuns } = useRuns(workspaceId)
+const { invitations, fetchInvitations } = useInvitations(workspaceId)
 
 // Getting Started visibility (persist in localStorage)
 const isGettingStartedDismissed = ref(false)
@@ -37,6 +41,8 @@ onMounted(() => {
     fetchMembers()
     fetchActivities()
     fetchConnection()
+    fetchWorkspaceRuns({ perPage: 1 }) // Fetch just enough to get the total count
+    fetchInvitations()
   }
 })
 
@@ -47,18 +53,20 @@ function handleDismissGettingStarted() {
 
 // Show getting started if not all setup and not dismissed
 const showGettingStarted = computed(() => {
+  // Currently, I always show the getting started card
   if (isGettingStartedDismissed.value) return false
-  // Always show until fully setup
-  const isFullySetup = isGitHubConnected.value && members.value.length > 1
-  return !isFullySetup
+  // const hasTeam = members.value.length > 1 || invitations.value.length > 0
+  // const isFullySetup = isGitHubConnected.value && hasTeam && runsPagination.value.total > 0
+  // return !isFullySetup
+  return true
 })
 
 // Stats data
 const stats = computed(() => [
   {
     label: 'Code Reviews',
-    value: 0,
-    description: 'No reviews yet',
+    value: runsPagination.value.total,
+    description: runsPagination.value.total === 0 ? 'No reviews yet' : 'Total reviews ran',
     icon: 'lucide:git-pull-request',
   },
   {
@@ -157,6 +165,8 @@ const teamMembers = computed(() => {
       :is-git-hub-connected="isGitHubConnected"
       :members-count="members.length"
       :repositories-count="repositoriesCount"
+      :has-runs="runsPagination.total > 0"
+      :has-invitations="invitations.length > 0"
       @dismiss="handleDismissGettingStarted"
     />
 
