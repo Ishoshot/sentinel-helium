@@ -295,6 +295,7 @@ const currentSort = computed({
           :options="[]"
           placeholder="Author"
           class="w-40"
+          menu-width="w-56"
         >
           <template #trigger>
             <button
@@ -341,6 +342,7 @@ const currentSort = computed({
           :options="[]"
           placeholder="Date Range"
           class="w-48"
+          menu-width="w-70"
         >
           <template #trigger>
             <button
