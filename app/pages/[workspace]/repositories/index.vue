@@ -16,6 +16,7 @@ definePageMeta({
 })
 
 const router = useRouter()
+const route = useRoute()
 const toast = useAppToast()
 const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
@@ -282,6 +283,7 @@ function goToIntegrations() {
       v-model="showSettingsModal"
       :repository="selectedRepository"
       :is-updating="isUpdating"
+      :can-manage="canManage"
       @save="handleSaveSettings"
     />
   </div>
