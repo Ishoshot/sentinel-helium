@@ -21,6 +21,7 @@ interface Props {
   direction?: 'down' | 'up'
   placeholder?: string
   searchable?: boolean
+  menuWidth?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
   options: () => [],
   align: 'right',
   direction: 'down',
-  searchable: false
+  searchable: false,
+  menuWidth: 'w-48'
 })
 
 const emit = defineEmits<{
@@ -118,8 +120,8 @@ const directionClasses = computed(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-50 w-48 bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
-        :class="[alignmentClasses, directionClasses]"
+        class="absolute z-50 bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
+        :class="[alignmentClasses, directionClasses, menuWidth]"
       >
         <!-- Search -->
         <div
