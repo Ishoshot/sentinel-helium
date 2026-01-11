@@ -1,5 +1,8 @@
 import type { Run, PaginatedResponse } from "~/types";
-import { useRunsService } from "~/services/runsService";
+import {
+  useRunsService,
+  type WorkspaceRunsParams,
+} from "~/services/runsService";
 
 /**
  * Runs composable - manages review runs state
@@ -60,6 +63,41 @@ export function useRuns(workspaceId: Ref<number | null>) {
   }
 
   /**
+   * Fetch all runs across the workspace
+   * Handles API Resource pagination format (meta wrapper)
+   */
+  async function fetchWorkspaceRuns(params: WorkspaceRunsParams = {}) {
+    if (!workspaceId.value) return;
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const response = await runsService.listWorkspaceRuns(workspaceId.value, {
+        ...params,
+        perPage: params.perPage ?? pagination.value.perPage,
+      });
+
+      runs.value = response.data;
+
+      // Update pagination from meta object
+      pagination.value = {
+        currentPage: response.meta.current_page,
+        lastPage: response.meta.last_page,
+        total: response.meta.total,
+        perPage: response.meta.per_page,
+        from: response.meta.from,
+        to: response.meta.to,
+      };
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : "Failed to fetch runs";
+      runs.value = [];
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /**
    * Fetch a single run detail
    */
   async function fetchRun(runId: number) {
@@ -89,6 +127,10 @@ export function useRuns(workspaceId: Ref<number | null>) {
 
     // Methods
     fetchRuns,
+    fetchWorkspaceRuns,
     fetchRun,
   };
 }
+
+// Re-export types for convenience
+export type { WorkspaceRunsParams } from "~/services/runsService";

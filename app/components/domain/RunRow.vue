@@ -10,9 +10,12 @@ import { formatRelativeTime } from '~/utils/date'
 interface Props {
   run: Run
   workspaceSlug: string
+  showRepository?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showRepository: false
+})
 
 const pr = computed(() => props.run.pull_request)
 const meta = computed(() => props.run.metadata)
@@ -36,6 +39,7 @@ const labels = computed(() => pr.value?.labels ?? [])
 const headBranch = computed(() => pr.value?.head_branch ?? meta.value?.head_branch)
 const baseBranch = computed(() => pr.value?.base_branch ?? meta.value?.base_branch)
 const riskLevel = computed(() => props.run.summary?.risk_level?.toLowerCase() ?? meta.value?.review_summary?.risk_level?.toLowerCase())
+const repositoryName = computed(() => props.run.repository?.full_name ?? meta.value?.repository_full_name as string | undefined)
 
 const runUrl = computed(() => `/${props.workspaceSlug}/runs/${props.run.id}`)
 
@@ -147,8 +151,21 @@ const riskConfig = computed(() => {
             </div>
           </div>
 
-          <!-- Row 2: Branch Info -->
+          <!-- Row 2: Repository + Branch Info -->
           <div class="flex items-center gap-3 text-xs text-text-muted">
+            <!-- Repository Name (when showRepository is true) -->
+            <div
+              v-if="props.showRepository && repositoryName"
+              class="flex items-center gap-1.5"
+            >
+              <Icon
+                name="lucide:folder-git-2"
+                class="w-3.5 h-3.5"
+              />
+              <span class="font-medium text-text-secondary">{{ repositoryName }}</span>
+              <span class="text-text-muted/30">•</span>
+            </div>
+
             <div class="flex items-center gap-1.5 font-mono">
               <Icon
                 name="lucide:git-branch"

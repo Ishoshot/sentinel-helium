@@ -8,9 +8,12 @@ import type { Run } from '~/types'
 interface Props {
   runs: readonly Run[]
   workspaceSlug: string
+  showRepository?: boolean
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showRepository: false
+})
 </script>
 
 <template>
@@ -39,6 +42,7 @@ defineProps<Props>()
         :key="run.id"
         :run="run"
         :workspace-slug="workspaceSlug"
+        :show-repository="props.showRepository"
       />
     </div>
   </div>

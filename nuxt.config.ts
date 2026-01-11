@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
     "@primevue/nuxt-module",
+    "@vueuse/nuxt",
   ],
 
   // Runtime configuration

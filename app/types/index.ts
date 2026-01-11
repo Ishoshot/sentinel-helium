@@ -122,6 +122,34 @@ export interface PaginatedResponse<T> {
   total: number;
 }
 
+/**
+ * Laravel API Resource pagination format
+ * Used when returning paginated data via API Resources
+ */
+export interface ApiResourcePaginatedResponse<T> {
+  data: T[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      url: string | null;
+      label: string;
+      active: boolean;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
 export interface ApiErrorResponse {
   message: string;
   errors?: Record<string, string[]>;

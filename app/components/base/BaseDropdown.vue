@@ -10,21 +10,57 @@ interface DropdownItem {
   action?: () => void
   separator?: boolean
   danger?: boolean
+  active?: boolean
 }
 
 interface Props {
-  items: DropdownItem[]
+  items?: DropdownItem[]
+  options?: { label: string; value: any; icon?: string }[]
+  modelValue?: any
   align?: 'left' | 'right'
   direction?: 'down' | 'up'
+  placeholder?: string
+  searchable?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  items: () => [],
+  options: () => [],
   align: 'right',
   direction: 'down',
+  searchable: false
 })
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: any): void
+}>()
 
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
+const searchQuery = ref('')
+
+// Computed items combining props.items and props.options
+const displayItems = computed<DropdownItem[]>(() => {
+  if (props.items.length > 0) return props.items
+
+  if (props.options.length > 0) {
+    let opts = props.options
+    
+    if (props.searchable && searchQuery.value) {
+      const q = searchQuery.value.toLowerCase()
+      opts = opts.filter(o => o.label.toLowerCase().includes(q))
+    }
+
+    return opts.map(opt => ({
+      label: opt.label,
+      icon: opt.icon,
+      action: () => emit('update:modelValue', opt.value),
+      active: props.modelValue === opt.value
+    }))
+  }
+
+  return []
+})
 
 // Close dropdown when clicking outside
 onMounted(() => {
@@ -85,36 +121,67 @@ const directionClasses = computed(() => {
         class="absolute z-50 w-48 bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
         :class="[alignmentClasses, directionClasses]"
       >
-        <div class="py-1">
-          <template
-            v-for="(item, index) in items"
-            :key="index"
+        <!-- Search -->
+        <div
+          v-if="searchable"
+          class="p-2 border-b border-border-subtle"
+        >
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search..."
+            class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded focus:outline-none focus:border-accent"
+            @click.stop
           >
-            <!-- Separator -->
-            <div
-              v-if="item.separator"
-              class="my-1 border-t border-border-subtle"
-            />
+        </div>
 
-            <!-- Menu item -->
-            <button
-              v-else
-              class="w-full flex items-center gap-2 px-3 py-2 text-sm transition-default"
-              :class="[
-                item.danger
-                  ? 'text-error hover:bg-error-light'
-                  : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
-              ]"
-              @click="handleItemClick(item)"
+        <div class="py-1 max-h-64 overflow-y-auto">
+          <slot>
+            <template
+              v-for="(item, index) in displayItems"
+              :key="index"
             >
-              <Icon
-                v-if="item.icon"
-                :name="item.icon"
-                class="w-4 h-4"
+              <!-- Separator -->
+              <div
+                v-if="item.separator"
+                class="my-1 border-t border-border-subtle"
               />
-              <span>{{ item.label }}</span>
-            </button>
-          </template>
+
+              <!-- Menu item -->
+              <button
+                v-else
+                class="w-full flex items-center justify-between px-3 py-2 text-sm transition-default"
+                :class="[
+                  item.danger
+                    ? 'text-error hover:bg-error-light'
+                    : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary',
+                  item.active ? 'bg-bg-surface text-text-primary font-medium' : ''
+                ]"
+                @click="handleItemClick(item)"
+              >
+                <div class="flex items-center gap-2">
+                  <Icon
+                    v-if="item.icon"
+                    :name="item.icon"
+                    class="w-4 h-4"
+                  />
+                  <span>{{ item.label }}</span>
+                </div>
+                <Icon
+                  v-if="item.active"
+                  name="lucide:check"
+                  class="w-4 h-4 text-accent"
+                />
+              </button>
+            </template>
+
+            <div
+              v-if="displayItems.length === 0 && !($slots.default)"
+              class="px-3 py-2 text-sm text-text-muted text-center"
+            >
+              No results
+            </div>
+          </slot>
         </div>
       </div>
     </Transition>
