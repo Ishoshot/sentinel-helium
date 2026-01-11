@@ -30,6 +30,26 @@ import {
   FindingSeverity,
 } from "./enums";
 
+export type AiProvider = "anthropic" | "openai";
+
+export interface ProviderKey {
+  id: number;
+  provider: AiProvider;
+  provider_label: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StoreProviderKeyRequest {
+  provider: AiProvider;
+  key: string;
+}
+
+export const AI_PROVIDERS: { value: AiProvider; label: string }[] = [
+  { value: "anthropic", label: "Anthropic" },
+  { value: "openai", label: "OpenAI" },
+];
+
 // User types
 export interface User {
   id: number;
@@ -468,6 +488,8 @@ export interface Run {
     head_branch?: string;
     base_branch?: string;
     repository_full_name?: string;
+    skip_reason?: string;
+    skip_message?: string;
     /** @deprecated Use run.summary instead */
     review_summary?: RunSummary;
     [key: string]: unknown;
