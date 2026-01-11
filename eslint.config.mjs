@@ -28,6 +28,7 @@ export default withNuxt(
       'vue/require-prop-types': 'off',
       'vue/one-component-per-file': 'off',
       'vue/prefer-import-from-vue': 'off',
+      'vue/no-v-html': ['warn', { ignorePattern: '^highlightedCode$' }],
     },
   }
 )

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ThemeRegistrationRaw } from 'shiki'
+
 interface Props {
   code: string
   label?: string
@@ -34,6 +36,102 @@ const displayedCode = computed(() => {
 const languageClass = computed(() => {
   if (!props.language) return ''
   return `language-${props.language}`
+})
+
+const shikiLanguage = computed(() => (props.language || 'text').toLowerCase())
+
+// const sentinelShikiTheme: ThemeRegistrationRaw = {
+//   name: 'sentinel',
+//   settings: [
+//     {
+//       scope: ['comment', 'punctuation.definition.comment'],
+//       settings: { foreground: 'var(--color-text-muted)' },
+//     },
+//     {
+//       scope: ['keyword', 'storage.type', 'storage.modifier'],
+//       settings: { foreground: 'var(--color-accent-primary)' },
+//     },
+//     {
+//       scope: ['string', 'punctuation.definition.string'],
+//       settings: { foreground: 'var(--color-text-secondary)' },
+//     },
+//     {
+//       scope: ['constant.numeric'],
+//       settings: { foreground: 'var(--color-text-secondary)' },
+//     },
+//     {
+//       scope: ['entity.name.function', 'support.function'],
+//       settings: { foreground: 'var(--color-text-secondary)' },
+//     },
+//     {
+//       scope: ['entity.name.type', 'support.type'],
+//       settings: { foreground: 'var(--color-text-secondary)' },
+//     },
+//   ],
+//   type: 'light',
+//   colors: {
+//     'editor.background': 'transparent',
+//     'editor.foreground': 'var(--color-text-primary)',
+//   },
+// }
+
+const highlightedCode = ref<string>('')
+
+let highlightRequestId = 0
+
+async function highlightCode(code: string, lang: string): Promise<string> {
+  const { codeToHtml } = await import('shiki/bundle/web')
+
+  try {
+    return await codeToHtml(code, {
+      lang,
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+      defaultColor: 'light',
+      structure: 'inline',
+    })
+  } catch {
+    if (lang === 'text') throw new Error('Failed to highlight code')
+
+    return codeToHtml(code, {
+      lang: 'text',
+      themes:
+      {
+        light: 'github-light',
+        dark: 'github-dark'
+      },
+      defaultColor: 'light',
+      structure: 'inline',
+    })
+  }
+}
+
+async function updateHighlight(code: string, lang: string): Promise<void> {
+  if (!import.meta.client) return
+
+  const requestId = ++highlightRequestId
+
+  try {
+    const html = await highlightCode(code, lang)
+
+    if (requestId !== highlightRequestId) return
+
+    highlightedCode.value = html
+  } catch {
+    if (requestId !== highlightRequestId) return
+
+    highlightedCode.value = ''
+  }
+}
+
+onMounted(() => {
+  void updateHighlight(displayedCode.value, shikiLanguage.value)
+})
+
+watch([displayedCode, shikiLanguage], ([code, lang]: [string, string]) => {
+  void updateHighlight(code, lang)
 })
 
 async function handleCopy(_: MouseEvent) {
@@ -135,6 +233,13 @@ watch(
 
     <pre class="p-3 overflow-x-auto">
       <code
+        v-if="highlightedCode"
+        class="block whitespace-pre font-mono text-xs leading-relaxed text-text-primary"
+        :class="languageClass"
+        v-html="highlightedCode"
+      />
+      <code
+        v-else
         class="block whitespace-pre font-mono text-xs leading-relaxed text-text-primary"
         :class="languageClass"
       >{{ displayedCode }}</code>
