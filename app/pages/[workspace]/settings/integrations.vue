@@ -154,71 +154,8 @@ function goToRepositories() {
 
 <template>
   <div>
-    <!-- Stats Summary - full width grid -->
-    <div class="grid grid-cols-3 gap-5 my-10">
-      <!-- Active Integrations -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-            <Icon
-              name="lucide:plug-zap"
-              class="w-6 h-6 text-success"
-            />
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              {{ activeIntegrationsCount }}
-            </p>
-            <p class="text-sm text-text-muted">
-              Active
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Available Integrations -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Icon
-              name="lucide:puzzle"
-              class="w-6 h-6 text-accent"
-            />
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              1
-            </p>
-            <p class="text-sm text-text-muted">
-              Available
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Coming Soon -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-bg-surface flex items-center justify-center">
-            <Icon
-              name="lucide:clock"
-              class="w-6 h-6 text-text-muted"
-            />
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              {{ comingSoonIntegrations.length }}
-            </p>
-            <p class="text-sm text-text-muted">
-              Coming Soon
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Two Column Layout for main content - 60/40 split -->
-    <div class="grid xl:grid-cols-5 gap-8 my-17">
+    <div class="grid xl:grid-cols-5 gap-8 my-10">
       <!-- Left Column - Source Control (60%) -->
       <div class="xl:col-span-3">
         <div class="flex items-center gap-3 mb-5">

@@ -72,6 +72,11 @@ const workspaceNavItems = computed(() => {
       icon: 'lucide:plug',
     },
     {
+      label: 'API Keys',
+      to: `/${workspace}/settings/api-keys`,
+      icon: 'lucide:key',
+    },
+    {
       label: 'Settings',
       to: `/${workspace}/settings`,
       icon: 'lucide:settings',
