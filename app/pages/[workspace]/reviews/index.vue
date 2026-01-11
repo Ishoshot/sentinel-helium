@@ -31,6 +31,15 @@ const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, 
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const sortBy = ref<'created_at' | 'completed_at' | 'findings_count'>('created_at')
 
+const dateRangeDisplay = computed(() => {
+  if (dateRange.value.from && dateRange.value.to) {
+    return `${dateRange.value.from} - ${dateRange.value.to}`
+  }
+  if (dateRange.value.from) return `From ${dateRange.value.from}`
+  if (dateRange.value.to) return `Until ${dateRange.value.to}`
+  return null
+})
+
 // Debounced search
 const debouncedSearch = refDebounced(search, 300)
 
@@ -50,7 +59,7 @@ const fetchRepositories = async () => {
 // Build query params
 const queryParams = computed<WorkspaceRunsParams>(() => ({
   page: 1,
-  search: debouncedSearch.value || undefined,
+  search: debouncedSearch.value.trim() || undefined,
   status: statusFilter.value || undefined,
   riskLevel: riskFilter.value || undefined,
   repositoryId: repositoryFilter.value || undefined,
@@ -96,9 +105,15 @@ const loadPage = async (page: number) => {
 }
 
 // Check if any filters are active
-const hasActiveFilters = computed(() => 
-  search.value || statusFilter.value || riskFilter.value || 
-  repositoryFilter.value || authorFilter.value || dateRange.value.from
+const hasActiveFilters = computed(() =>
+  Boolean(
+    search.value.trim() ||
+      statusFilter.value ||
+      riskFilter.value ||
+      repositoryFilter.value ||
+      authorFilter.value ||
+      dateRangeDisplay.value
+  )
 )
 
 // Options for dropdowns
@@ -142,7 +157,7 @@ const currentSort = computed({
 </script>
 
 <template>
-  <div class="h-[calc(100vh-64px)] flex flex-col">
+  <div class="h-[calc(100vh-64px)] flex flex-col -m-8">
     <!-- Header -->
     <div class="px-8 py-6 border-b border-border-subtle bg-bg-app shrink-0">
       <div class="flex items-center justify-between mb-6">
@@ -151,12 +166,13 @@ const currentSort = computed({
             Code Reviews
           </h1>
           <p class="mt-1 text-text-secondary">
-            All review runs across your repositories
+            All reviews across your repositories
           </p>
         </div>
         <div class="flex items-center gap-3">
           <BaseButton
             variant="secondary"
+            :disabled="isLoading"
             @click="fetchWorkspaceRuns(queryParams)"
           >
             <Icon
@@ -179,10 +195,24 @@ const currentSort = computed({
           />
           <input
             v-model="search"
-            type="text"
+            type="search"
             placeholder="Search reviews..."
-            class="w-full h-9 pl-9 pr-3 text-sm bg-bg-surface border border-border-subtle rounded-md focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent placeholder:text-text-muted transition-all"
+            class="w-full h-9 pl-9 pr-9 text-sm bg-bg-surface border border-border-subtle rounded-md placeholder:text-text-muted transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            @keydown.escape="search = ''"
           >
+
+          <button
+            v-if="search.trim()"
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
+            aria-label="Clear search"
+            @click="search = ''"
+          >
+            <Icon
+              name="lucide:x"
+              class="w-4 h-4"
+            />
+          </button>
         </div>
 
         <div class="h-6 w-px bg-border-subtle mx-1" />
@@ -196,7 +226,10 @@ const currentSort = computed({
           @update:model-value="handleStatusChange"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm hover:border-border-muted transition-colors w-full justify-between">
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            >
               <span class="truncate">{{ statusOptions.find(o => o.value === statusFilter)?.label || 'Status' }}</span>
               <Icon
                 name="lucide:chevron-down"
@@ -215,7 +248,10 @@ const currentSort = computed({
           @update:model-value="handleRiskChange"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm hover:border-border-muted transition-colors w-full justify-between">
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            >
               <span class="truncate">{{ riskOptions.find(o => o.value === riskFilter)?.label || 'Risk Level' }}</span>
               <Icon
                 name="lucide:chevron-down"
@@ -235,7 +271,10 @@ const currentSort = computed({
           @update:model-value="handleRepositoryChange"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm hover:border-border-muted transition-colors w-full justify-between">
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            >
               <span class="truncate">{{ repositoryOptions.find(o => o.value === repositoryFilter)?.label || 'Repository' }}</span>
               <Icon
                 name="lucide:chevron-down"
@@ -253,8 +292,11 @@ const currentSort = computed({
           class="w-40"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm hover:border-border-muted transition-colors w-full justify-between">
-              <span class="truncate">{{ authorFilter || 'Author' }}</span>
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            >
+              <span class="truncate">{{ authorFilter?.trim() || 'Author' }}</span>
               <Icon
                 name="lucide:user"
                 class="w-4 h-4 text-text-muted"
@@ -269,7 +311,7 @@ const currentSort = computed({
                 v-model.lazy="authorFilter"
                 type="text"
                 placeholder="Username (e.g. octocat)"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded focus:outline-none focus:border-accent"
+                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded placeholder:text-text-muted transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
                 @keydown.enter="($event.target as HTMLInputElement).blur()"
               >
               <p class="text-[10px] text-text-muted">
@@ -278,6 +320,7 @@ const currentSort = computed({
             </div>
             <div class="pt-2 mt-2 border-t border-border-subtle flex justify-end">
               <button 
+                type="button"
                 class="text-xs text-accent hover:text-accent-hover font-medium"
                 @click="authorFilter = null"
               >
@@ -295,9 +338,12 @@ const currentSort = computed({
           class="w-48"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm hover:border-border-muted transition-colors w-full justify-between">
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+            >
               <span class="truncate">
-                {{ dateRange.from ? (dateRange.to ? `${dateRange.from} - ${dateRange.to}` : `From ${dateRange.from}`) : 'Date Range' }}
+                {{ dateRangeDisplay ?? 'Date Range' }}
               </span>
               <Icon
                 name="lucide:calendar"
@@ -312,7 +358,7 @@ const currentSort = computed({
               <input 
                 v-model="dateRange.from"
                 type="date"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded focus:outline-none focus:border-accent"
+                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
               >
             </div>
             <div class="space-y-1.5">
@@ -320,12 +366,13 @@ const currentSort = computed({
               <input 
                 v-model="dateRange.to"
                 type="date"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded focus:outline-none focus:border-accent"
+                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
                 :min="dateRange.from || undefined"
               >
             </div>
             <div class="pt-2 border-t border-border-subtle flex justify-end">
               <button 
+                type="button"
                 class="text-xs text-accent hover:text-accent-hover font-medium"
                 @click="dateRange = { from: null, to: null }"
               >
@@ -344,7 +391,10 @@ const currentSort = computed({
           class="w-44"
         >
           <template #trigger>
-            <button class="h-9 px-3 flex items-center gap-2 text-text-secondary hover:text-text-primary text-sm font-medium transition-colors">
+            <button
+              type="button"
+              class="h-9 px-3 flex items-center gap-2 rounded-md text-text-secondary text-sm font-medium transition-default hover:bg-bg-surface hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
+            >
               <Icon
                 name="lucide:arrow-up-down"
                 class="w-4 h-4"
@@ -363,6 +413,26 @@ const currentSort = computed({
         <span class="text-xs font-medium text-text-secondary">Active filters:</span>
         <div class="flex flex-wrap items-center gap-2">
           <BaseBadge
+            v-if="search.trim()"
+            variant="default"
+            size="sm"
+            class="pl-2 pr-1 gap-1"
+          >
+            Search: {{ search.trim() }}
+            <button
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear search filter"
+              @click="search = ''"
+            >
+              <Icon
+                name="lucide:x"
+                class="w-3 h-3"
+              />
+            </button>
+          </BaseBadge>
+
+          <BaseBadge
             v-if="statusFilter"
             variant="default"
             size="sm"
@@ -370,7 +440,9 @@ const currentSort = computed({
           >
             Status: {{ statusOptions.find(o => o.value === statusFilter)?.label }}
             <button
-              class="p-0.5 hover:bg-black/5 rounded-full"
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear status filter"
               @click="statusFilter = null"
             >
               <Icon
@@ -388,7 +460,9 @@ const currentSort = computed({
           >
             Risk: {{ riskOptions.find(o => o.value === riskFilter)?.label }}
             <button
-              class="p-0.5 hover:bg-black/5 rounded-full"
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear risk filter"
               @click="riskFilter = null"
             >
               <Icon
@@ -404,9 +478,11 @@ const currentSort = computed({
             size="sm"
             class="pl-2 pr-1 gap-1"
           >
-            Repo: {{ repositories.find(r => r.id === repositoryFilter)?.name }}
+            Repository: {{ repositoryOptions.find(o => o.value === repositoryFilter)?.label ?? repositories.find(r => r.id === repositoryFilter)?.full_name ?? repositories.find(r => r.id === repositoryFilter)?.name }}
             <button
-              class="p-0.5 hover:bg-black/5 rounded-full"
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear repository filter"
               @click="repositoryFilter = null"
             >
               <Icon
@@ -416,8 +492,49 @@ const currentSort = computed({
             </button>
           </BaseBadge>
 
-          <button 
-            class="text-xs text-accent hover:text-accent-hover font-medium ml-1"
+          <BaseBadge
+            v-if="authorFilter?.trim()"
+            variant="default"
+            size="sm"
+            class="pl-2 pr-1 gap-1"
+          >
+            Author: {{ authorFilter?.trim() }}
+            <button
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear author filter"
+              @click="authorFilter = null"
+            >
+              <Icon
+                name="lucide:x"
+                class="w-3 h-3"
+              />
+            </button>
+          </BaseBadge>
+
+          <BaseBadge
+            v-if="dateRangeDisplay"
+            variant="default"
+            size="sm"
+            class="pl-2 pr-1 gap-1"
+          >
+            Date: {{ dateRangeDisplay }}
+            <button
+              type="button"
+              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
+              aria-label="Clear date filter"
+              @click="dateRange = { from: null, to: null }"
+            >
+              <Icon
+                name="lucide:x"
+                class="w-3 h-3"
+              />
+            </button>
+          </BaseBadge>
+
+          <button
+            type="button"
+            class="ml-1 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-accent hover:text-accent-hover hover:bg-bg-surface transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
             @click="clearFilters"
           >
             Clear all
@@ -477,13 +594,14 @@ const currentSort = computed({
         >
           <NuxtLink
             :to="`/${workspaceSlug}/repositories`"
-            class="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-md text-sm font-medium hover:bg-accent-hover transition-colors shadow-sm"
           >
-            <Icon
-              name="lucide:folder-git-2"
-              class="w-4 h-4"
-            />
-            View Repositories
+            <BaseButton variant="primary">
+              <Icon
+                name="lucide:folder-git-2"
+                class="w-4 h-4 mr-1.5"
+              />
+              View Repositories
+            </BaseButton>
           </NuxtLink>
         </BaseEmptyState>
       </div>
@@ -493,26 +611,22 @@ const currentSort = computed({
         <!-- Empty State (No Matches) -->
         <div
           v-if="runs.length === 0"
-          class="h-64 flex flex-col items-center justify-center"
+          class="h-64 flex items-center justify-center"
         >
-          <div class="w-12 h-12 rounded-full bg-bg-elevated flex items-center justify-center mb-4">
-            <Icon
-              name="lucide:search-x"
-              class="w-6 h-6 text-text-muted"
-            />
-          </div>
-          <h3 class="text-base font-medium text-text-primary">
-            No matching reviews found
-          </h3>
-          <p class="text-sm text-text-secondary mt-1">
-            Try adjusting your search or filters
-          </p>
-          <button
-            class="mt-4 text-sm text-accent hover:text-accent-hover font-medium"
-            @click="clearFilters"
+          <BaseEmptyState
+            compact
+            icon="lucide:search-x"
+            title="No matching reviews"
+            description="Try adjusting your search or filters."
           >
-            Clear all filters
-          </button>
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              @click="clearFilters"
+            >
+              Clear all filters
+            </BaseButton>
+          </BaseEmptyState>
         </div>
 
         <!-- Runs List -->

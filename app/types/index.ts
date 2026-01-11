@@ -302,6 +302,18 @@ export interface Annotation {
   created_at: string;
 }
 
+export interface FindingMetadata {
+  current_code?: string;
+  replacement_code?: string;
+  explanation?: string;
+  rationale?: string;
+  references?: readonly string[];
+  suggestion?: string;
+  patch?: string;
+  tags?: readonly string[];
+  [key: string]: unknown;
+}
+
 export interface Finding {
   id: number;
   run_id: number;
@@ -313,7 +325,7 @@ export interface Finding {
   line_start: number | null;
   line_end: number | null;
   confidence: number | null;
-  metadata: Record<string, unknown> | null;
+  metadata: FindingMetadata | null;
   annotations: readonly Annotation[];
   created_at: string;
 }
@@ -343,6 +355,17 @@ export interface PullRequest {
   labels: readonly Label[];
 }
 
+export type RunVerdict = "approve" | "request_changes" | "comment";
+
+export interface RunSummary {
+  overview: string;
+  verdict?: RunVerdict;
+  risk_level?: string;
+  strengths?: readonly string[];
+  concerns?: readonly string[];
+  recommendations?: readonly string[];
+}
+
 export interface Run {
   id: number;
   repository_id: number;
@@ -367,11 +390,7 @@ export interface Run {
     ignored_paths: readonly string[];
   } | null;
   pull_request: PullRequest | null;
-  summary: {
-    overview: string;
-    risk_level: string; // 'low', 'medium', 'high', 'critical'
-    recommendations: readonly string[];
-  } | null;
+  summary: RunSummary | null;
   metadata: {
     pull_request_number?: number;
     pull_request_title?: string;
@@ -381,11 +400,7 @@ export interface Run {
     base_branch?: string;
     repository_full_name?: string;
     /** @deprecated Use run.summary instead */
-    review_summary?: {
-      overview: string;
-      risk_level: string; // 'low', 'medium', 'high', 'critical'
-      recommendations: readonly string[];
-    };
+    review_summary?: RunSummary;
     [key: string]: unknown;
   } | null;
   repository?: Repository;

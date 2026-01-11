@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FindingSeverity } from '~/types'
-import type { Finding } from '~/types'
+import type { Finding, FindingMetadata } from '~/types'
 
 /**
  * FindingItem - Displays a single finding with severity and location
@@ -13,48 +13,59 @@ interface Props {
 const props = defineProps<Props>()
 
 const severityConfig = computed(() => {
-  switch (props.finding.severity) {
+  const severity = props.finding.severity?.toString().toLowerCase()
+
+  switch (severity) {
     case FindingSeverity.Critical:
     case 'critical':
       return {
-        bg: 'bg-error/10',
-        text: 'text-error',
-        border: 'border-error/20',
+        iconBg: 'bg-error-light',
+        iconText: 'text-error',
+        badgeVariant: 'error' as const,
         icon: 'lucide:alert-octagon',
         label: 'Critical',
       }
     case FindingSeverity.High:
     case 'high':
       return {
-        bg: 'bg-orange-500/10',
-        text: 'text-orange-600 dark:text-orange-400',
-        border: 'border-orange-500/20',
+        iconBg: 'bg-error-light',
+        iconText: 'text-error',
+        badgeVariant: 'error' as const,
         icon: 'lucide:alert-triangle',
         label: 'High',
       }
     case FindingSeverity.Medium:
     case 'medium':
       return {
-        bg: 'bg-warning/10',
-        text: 'text-warning',
-        border: 'border-warning/20',
+        iconBg: 'bg-warning-light',
+        iconText: 'text-warning',
+        badgeVariant: 'warning' as const,
         icon: 'lucide:alert-circle',
         label: 'Medium',
       }
     case FindingSeverity.Low:
     case 'low':
       return {
-        bg: 'bg-info/10',
-        text: 'text-info',
-        border: 'border-info/20',
+        iconBg: 'bg-bg-elevated',
+        iconText: 'text-text-muted',
+        badgeVariant: 'default' as const,
         icon: 'lucide:info',
         label: 'Low',
       }
+    case FindingSeverity.Info:
+    case 'info':
+      return {
+        iconBg: 'bg-bg-elevated',
+        iconText: 'text-text-muted',
+        badgeVariant: 'default' as const,
+        icon: 'lucide:info',
+        label: 'Info',
+      }
     default:
       return {
-        bg: 'bg-bg-surface',
-        text: 'text-text-muted',
-        border: 'border-border-subtle',
+        iconBg: 'bg-bg-elevated',
+        iconText: 'text-text-muted',
+        badgeVariant: 'default' as const,
         icon: 'lucide:help-circle',
         label: props.finding.severity,
       }
@@ -68,32 +79,111 @@ const location = computed(() => {
   }
   return props.finding.file_path
 })
+
+const metadata = computed<FindingMetadata | null>(() => props.finding.metadata)
+
+const currentCode = computed(() => {
+  const code = metadata.value?.current_code
+  if (typeof code !== 'string' || !code.trim()) return null
+  return code
+})
+
+const suggestedCode = computed(() => {
+  const code = metadata.value?.replacement_code ?? metadata.value?.suggestion ?? metadata.value?.patch
+  if (typeof code !== 'string' || !code.trim()) return null
+  return code
+})
+
+const suggestedCodeLabel = computed(() => {
+  if (typeof metadata.value?.replacement_code === 'string' && metadata.value.replacement_code.trim()) return 'Suggested Fix'
+  if (typeof metadata.value?.suggestion === 'string' && metadata.value.suggestion.trim()) return 'Suggestion'
+  if (typeof metadata.value?.patch === 'string' && metadata.value.patch.trim()) return 'Patch'
+  return 'Suggested Fix'
+})
+
+const explanation = computed(() => {
+  const text = metadata.value?.explanation
+  if (typeof text !== 'string' || !text.trim()) return null
+  return text
+})
+
+const rationale = computed(() => {
+  const text = metadata.value?.rationale
+  if (typeof text !== 'string' || !text.trim()) return null
+  return text
+})
+
+const language = computed(() => {
+  if (!props.finding.file_path) return ''
+  const ext = props.finding.file_path.split('.').pop()?.toLowerCase()
+  if (!ext) return ''
+
+  const map: Record<string, string> = {
+    js: 'javascript',
+    jsx: 'jsx',
+    ts: 'typescript',
+    tsx: 'tsx',
+    vue: 'vue',
+    php: 'php',
+    py: 'python',
+    go: 'go',
+    rb: 'ruby',
+    java: 'java',
+    json: 'json',
+    yml: 'yaml',
+    yaml: 'yaml',
+    sh: 'bash',
+  }
+
+  return map[ext] ?? ''
+})
+
+function getReferenceUrl(ref: string): string | null {
+  const trimmed = ref.trim()
+  const cwe = /^CWE-(\d+)$/i.exec(trimmed)
+  if (cwe?.[1]) return `https://cwe.mitre.org/data/definitions/${cwe[1]}.html`
+  if (/^OWASP-/i.test(trimmed)) return 'https://owasp.org/Top10/'
+  return null
+}
+
+const referenceLinks = computed(() => {
+  const refs = metadata.value?.references
+  if (!Array.isArray(refs)) return []
+
+  return refs
+    .map((ref) => ref.trim())
+    .filter((ref) => ref.length > 0)
+    .map((ref) => ({
+      ref,
+      url: getReferenceUrl(ref),
+    }))
+})
 </script>
 
 <template>
-  <div class="p-4 bg-bg-surface border border-border-subtle rounded-lg hover:border-border-muted transition-colors">
+  <div class="p-4 bg-bg-surface border border-border-subtle rounded-lg hover:border-border-muted transition-default">
     <div class="flex items-start gap-3">
       <!-- Severity Icon -->
       <div 
         class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
-        :class="severityConfig.bg"
+        :class="severityConfig.iconBg"
       >
         <Icon
           :name="severityConfig.icon"
           class="w-4 h-4"
-          :class="severityConfig.text"
+          :class="severityConfig.iconText"
         />
       </div>
 
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1 flex-wrap">
           <!-- Severity Badge -->
-          <span 
-            class="text-xs font-medium px-2 py-0.5 rounded-full border"
-            :class="[severityConfig.bg, severityConfig.text, severityConfig.border]"
+          <BaseBadge
+            size="sm"
+            :variant="severityConfig.badgeVariant"
           >
             {{ severityConfig.label }}
-          </span>
+          </BaseBadge>
 
           <!-- Category -->
           <span class="text-xs text-text-muted capitalize">
@@ -121,6 +211,71 @@ const location = computed(() => {
             class="w-3 h-3"
           />
           {{ location }}
+        </div>
+
+        <div
+          v-if="rationale"
+          class="mt-3 pt-3 border-t border-border-subtle"
+        >
+          <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+            Impact
+          </div>
+          <p class="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+            {{ rationale }}
+          </p>
+        </div>
+
+        <div
+          v-if="suggestedCode"
+          class="mt-3 pt-3 border-t border-border-subtle space-y-3"
+        >
+          <BaseCodeBlock
+            v-if="currentCode"
+            :code="currentCode"
+            label="Current Code"
+            :language="language"
+          />
+
+          <BaseCodeBlock
+            :code="suggestedCode"
+            :label="suggestedCodeLabel"
+            :language="language"
+          />
+
+          <div
+            v-if="explanation"
+            class="space-y-1"
+          >
+            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Why this fix
+            </div>
+            <p class="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
+              {{ explanation }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          v-if="referenceLinks.length > 0"
+          class="mt-3 pt-3 border-t border-border-subtle"
+        >
+          <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+            References
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <component
+              :is="reference.url ? 'a' : 'span'"
+              v-for="reference in referenceLinks"
+              :key="reference.ref"
+              :href="reference.url || undefined"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center rounded-full bg-bg-elevated border border-border-subtle px-2 py-0.5 text-xs text-text-secondary transition-default hover:bg-bg-app focus-ring"
+              :class="reference.url ? '' : 'cursor-default hover:bg-bg-elevated'"
+            >
+              {{ reference.ref }}
+            </component>
+          </div>
         </div>
       </div>
     </div>

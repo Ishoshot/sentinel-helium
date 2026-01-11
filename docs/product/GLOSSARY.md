@@ -28,9 +28,9 @@ All data in Sentinel is scoped to a Workspace.
 
 A Workspace:
 
--   has exactly one Team
--   owns integrations, repositories, runs, findings, and billing
--   enforces plan limits and usage rules
+- has exactly one Team
+- owns integrations, repositories, runs, findings, and billing
+- enforces plan limits and usage rules
 
 ---
 
@@ -43,9 +43,9 @@ A Team defines which Users have access to the Workspace.
 
 A Team:
 
--   contains Members
--   is managed by the Workspace owner
--   is used for access control, not product isolation
+- contains Members
+- is managed by the Workspace owner
+- is used for access control, not product isolation
 
 ---
 
@@ -64,9 +64,9 @@ A pending request for a User to join a Team.
 
 An Invitation:
 
--   is issued by an authorized Member
--   is associated with a Workspace and Team
--   becomes a Member once accepted
+- is issued by an authorized Member
+- is associated with a Workspace and Team
+- becomes a Member once accepted
 
 ---
 
@@ -78,8 +78,8 @@ An external source control or service platform supported by Sentinel.
 
 Examples:
 
--   GitHub
--   GitLab (future)
+- GitHub
+- GitLab (future)
 
 Providers define how Sentinel connects to repositories and receives events.
 
@@ -101,9 +101,9 @@ An instance of Sentinel being installed within a Provider account
 
 An Installation:
 
--   belongs to exactly one Workspace
--   grants Sentinel access to selected repositories
--   is subject to plan limits
+- belongs to exactly one Workspace
+- grants Sentinel access to selected repositories
+- is subject to plan limits
 
 ---
 
@@ -113,10 +113,10 @@ A source code repository connected to Sentinel via a Provider.
 
 A Repository:
 
--   belongs to a Workspace
--   may be enabled or disabled for reviews
--   has configurable review settings
--   produces Runs and Findings
+- belongs to a Workspace
+- may be enabled or disabled for reviews
+- has configurable review settings
+- produces Runs and Findings
 
 ---
 
@@ -126,16 +126,16 @@ Configuration that controls how Sentinel behaves for a specific Repository.
 
 Repository Settings may define:
 
--   review thresholds
--   enabled rules
--   ignored paths
--   comment limits
--   manual vs automatic review behavior
+- review thresholds
+- enabled rules
+- ignored paths
+- comment limits
+- manual vs automatic review behavior
 
 Settings may be defined via:
 
--   dashboard configuration
--   configuration file (e.g. `sentinel.yaml`), if present
+- dashboard configuration
+- configuration file (e.g. `sentinel.yaml`), if present
 
 ---
 
@@ -150,10 +150,24 @@ Runs are append-only and immutable once completed.
 
 A Run includes:
 
--   metadata about the change
--   AI review results
--   execution metrics
--   a policy snapshot
+- metadata about the change
+- AI review results
+- execution metrics
+- a policy snapshot
+
+---
+
+### Review (UI)
+
+A user-facing label for a Run in the Sentinel application UI.
+
+Reviews and Runs may be used interchangeably in UI copy when it improves clarity.
+Reviews are not a separate domain entity; the canonical system term remains Run.
+
+Use:
+
+- **Review / Code Review** in UI navigation, labels, and headings
+- **Run** in APIs, database models, and internal code
 
 ---
 
@@ -163,10 +177,10 @@ A discrete issue, observation, or recommendation identified during a Run.
 
 A Finding:
 
--   has a severity and category
--   may reference a file and line range
--   may include a suggested fix
--   may or may not be surfaced as a comment
+- has a severity and category
+- may reference a file and line range
+- may include a suggested fix
+- may or may not be surfaced as a comment
 
 Findings are the primary unit of insight in Sentinel.
 
@@ -178,9 +192,9 @@ A representation of a Finding surfaced back to the source control platform.
 
 Annotations may appear as:
 
--   inline comments
--   check summaries
--   status indicators
+- inline comments
+- check summaries
+- status indicators
 
 Not all Findings result in Annotations.
 
@@ -194,10 +208,10 @@ A collection of rules and thresholds that govern how Sentinel reviews code.
 
 A Policy defines:
 
--   which checks are enabled
--   severity thresholds
--   comment limits
--   enforcement behavior
+- which checks are enabled
+- severity thresholds
+- comment limits
+- enforcement behavior
 
 Policies are versioned and captured per Run.
 
@@ -219,10 +233,10 @@ A subscription tier that defines what a Workspace is allowed to use.
 
 A Plan controls:
 
--   number of repositories
--   number of installations
--   feature access
--   usage enforcement rules
+- number of repositories
+- number of installations
+- feature access
+- usage enforcement rules
 
 Plans do not include AI usage costs by default.
 
@@ -243,10 +257,10 @@ A metered record of resource consumption produced by a Run.
 
 Usage Records may track:
 
--   executions
--   duration
--   token estimates
--   cost attribution (if applicable)
+- executions
+- duration
+- token estimates
+- cost attribution (if applicable)
 
 ---
 
@@ -257,9 +271,9 @@ for an external AI provider.
 
 Provider Keys:
 
--   are stored securely
--   are scoped to a Workspace
--   determine which AI providers are eligible during routing
+- are stored securely
+- are scoped to a Workspace
+- determine which AI providers are eligible during routing
 
 Sentinel will never route to a provider without a configured Provider Key.
 
@@ -273,10 +287,10 @@ The structured output produced by Sentinel’s AI review engine.
 
 A Review Result includes:
 
--   a summary
--   a collection of Findings
--   execution metrics
--   a policy snapshot
+- a summary
+- a collection of Findings
+- execution metrics
+- a policy snapshot
 
 Review Results are stored and used for analytics and dashboards.
 
@@ -284,9 +298,9 @@ Review Results are stored and used for analytics and dashboards.
 
 ## General Principles
 
--   All data access is Workspace-scoped
--   Naming is intentional and stable
--   Terms defined here must not be redefined elsewhere
--   New domain terms must be added here first
+- All data access is Workspace-scoped
+- Naming is intentional and stable
+- Terms defined here must not be redefined elsewhere
+- New domain terms must be added here first
 
 This glossary is authoritative.

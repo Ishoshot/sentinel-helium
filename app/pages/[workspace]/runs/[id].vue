@@ -2,7 +2,7 @@
 import { useRuns } from '~/composables/useRuns'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { formatRelativeTime } from '~/utils/date'
-import { RunStatus, EmptyStateVariant, FindingSeverity } from '~/types'
+import { RunStatus, EmptyStateVariant, FindingSeverity, type RunVerdict } from '~/types'
 
 definePageMeta({
   middleware: ['auth', 'workspace'],
@@ -77,6 +77,33 @@ const duration = computed(() => {
 const reviewSummary = computed(() => run.value?.summary ?? run.value?.metadata?.review_summary)
 const metrics = computed(() => run.value?.metrics)
 
+const verdictBadge = computed(() => {
+  const verdict = reviewSummary.value?.verdict as RunVerdict | undefined
+  if (!verdict) return null
+
+  const configs: Record<RunVerdict, { label: string; icon: string; variant: 'default' | 'primary' | 'success' | 'warning' | 'error' }> = {
+    approve: { label: 'Approve', icon: 'lucide:check', variant: 'success' },
+    request_changes: { label: 'Request Changes', icon: 'lucide:alert-triangle', variant: 'warning' },
+    comment: { label: 'Comment', icon: 'lucide:message-square', variant: 'primary' },
+  }
+
+  return configs[verdict]
+})
+
+const riskBadge = computed(() => {
+  const level = reviewSummary.value?.risk_level?.toLowerCase()
+  if (!level) return null
+
+  const configs: Record<string, { label: string; icon: string; variant: 'default' | 'success' | 'warning' | 'error' }> = {
+    low: { label: 'Low Risk', icon: 'lucide:shield-check', variant: 'success' },
+    medium: { label: 'Medium Risk', icon: 'lucide:alert-triangle', variant: 'warning' },
+    high: { label: 'High Risk', icon: 'lucide:alert-circle', variant: 'error' },
+    critical: { label: 'Critical', icon: 'lucide:siren', variant: 'error' },
+  }
+
+  return configs[level] ?? { label: level, icon: 'lucide:info', variant: 'default' as const }
+})
+
 // Collapsible state
 const isReviewExpanded = ref(true)
 
@@ -117,23 +144,9 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
   { label: 'High', value: FindingSeverity.High, count: findingsBySeverity.value[FindingSeverity.High] ?? 0, color: 'text-error' },
   { label: 'Medium', value: FindingSeverity.Medium, count: findingsBySeverity.value[FindingSeverity.Medium] ?? 0, color: 'text-warning' },
   { label: 'Low', value: FindingSeverity.Low, count: findingsBySeverity.value[FindingSeverity.Low] ?? 0, color: 'text-success' },
-  { label: 'Info', value: FindingSeverity.Info, count: findingsBySeverity.value[FindingSeverity.Info] ?? 0, color: 'text-info' },
+  { label: 'Info', value: FindingSeverity.Info, count: findingsBySeverity.value[FindingSeverity.Info] ?? 0, color: 'text-text-muted' },
 ])
 
-// Risk level configuration
-const riskConfig = computed(() => {
-  const level = reviewSummary.value?.risk_level?.toLowerCase()
-  if (!level) return null
-  
-  const configs: Record<string, { color: string; bg: string; icon: string; label: string }> = {
-    low: { color: 'text-success', bg: 'bg-success-light', icon: 'lucide:shield-check', label: 'Low Risk' },
-    medium: { color: 'text-warning', bg: 'bg-warning-light', icon: 'lucide:alert-triangle', label: 'Medium Risk' },
-    high: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:alert-circle', label: 'High Risk' },
-    critical: { color: 'text-error', bg: 'bg-error-light', icon: 'lucide:siren', label: 'Critical' },
-  }
-  
-  return configs[level] || { color: 'text-text-muted', bg: 'bg-bg-surface', icon: 'lucide:info', label: level }
-})
 </script>
 
 <template>
@@ -407,7 +420,7 @@ const riskConfig = computed(() => {
         class="bg-bg-elevated border border-border-subtle rounded-xl mb-8 shadow-sm transition-all duration-200"
       >
         <button 
-          class="w-full flex items-center justify-between p-6 hover:bg-bg-surface/50 transition-colors rounded-xl"
+          class="w-full flex items-center justify-between p-6 hover:bg-bg-surface/50 transition-colors rounded-xl focus-ring"
           @click="isReviewExpanded = !isReviewExpanded"
         >
           <div class="flex items-center gap-3">
@@ -421,11 +434,40 @@ const riskConfig = computed(() => {
               Review Summary
             </h2>
           </div>
-          <Icon 
-            name="lucide:chevron-down" 
-            class="w-5 h-5 text-text-muted transition-transform duration-200"
-            :class="{ 'rotate-180': isReviewExpanded }"
-          />
+
+          <div class="flex items-center gap-2">
+            <BaseBadge
+              v-if="verdictBadge"
+              size="sm"
+              :variant="verdictBadge.variant"
+              class="gap-1.5"
+            >
+              <Icon
+                :name="verdictBadge.icon"
+                class="w-3.5 h-3.5"
+              />
+              <span>{{ verdictBadge.label }}</span>
+            </BaseBadge>
+
+            <BaseBadge
+              v-if="riskBadge"
+              size="sm"
+              :variant="riskBadge.variant"
+              class="gap-1.5"
+            >
+              <Icon
+                :name="riskBadge.icon"
+                class="w-3.5 h-3.5"
+              />
+              <span>{{ riskBadge.label }}</span>
+            </BaseBadge>
+
+            <Icon 
+              name="lucide:chevron-down" 
+              class="w-5 h-5 text-text-muted transition-transform duration-200"
+              :class="{ 'rotate-180': isReviewExpanded }"
+            />
+          </div>
         </button>
 
         <div
@@ -436,9 +478,66 @@ const riskConfig = computed(() => {
             v-if="reviewSummary"
             class="space-y-4 pt-2 border-t border-border-subtle"
           >
-            <p class="text-text-secondary leading-relaxed mt-4">
+            <p class="text-text-secondary leading-relaxed mt-4 whitespace-pre-line">
               {{ reviewSummary.overview }}
             </p>
+
+            <div
+              v-if="reviewSummary.strengths?.length || reviewSummary.concerns?.length"
+              class="grid gap-6 sm:grid-cols-2"
+            >
+              <div
+                v-if="reviewSummary.strengths?.length"
+                class="space-y-2"
+              >
+                <h3 class="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <Icon
+                    name="lucide:check-circle"
+                    class="w-4 h-4 text-success"
+                  />
+                  <span>Strengths</span>
+                </h3>
+                <ul class="space-y-1.5">
+                  <li
+                    v-for="(strength, index) in reviewSummary.strengths"
+                    :key="index"
+                    class="flex items-start gap-2 text-sm text-text-secondary"
+                  >
+                    <span class="mt-1 w-1 h-1 rounded-full bg-border-muted shrink-0" />
+                    <span>{{ strength }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="space-y-2">
+                <h3 class="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <Icon
+                    name="lucide:alert-triangle"
+                    class="w-4 h-4 text-warning"
+                  />
+                  <span>Concerns</span>
+                </h3>
+                <ul
+                  v-if="reviewSummary.concerns?.length"
+                  class="space-y-1.5"
+                >
+                  <li
+                    v-for="(concern, index) in reviewSummary.concerns"
+                    :key="index"
+                    class="flex items-start gap-2 text-sm text-text-secondary"
+                  >
+                    <span class="mt-1 w-1 h-1 rounded-full bg-border-muted shrink-0" />
+                    <span>{{ concern }}</span>
+                  </li>
+                </ul>
+                <div
+                  v-else
+                  class="text-sm text-text-muted italic"
+                >
+                  No concerns identified
+                </div>
+              </div>
+            </div>
 
             <div
               v-if="reviewSummary.recommendations?.length"
