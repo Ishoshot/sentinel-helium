@@ -274,7 +274,7 @@ const features = [
         <!-- Not Connected State -->
         <template v-if="isNotConnected">
           <!-- Features -->
-          <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             <div
               v-for="feature in features"
               :key="feature.text"

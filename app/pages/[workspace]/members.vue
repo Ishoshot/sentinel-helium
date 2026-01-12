@@ -229,7 +229,7 @@ async function handleResendInvitation(invitationId: number) {
 <template>
   <div>
     <!-- Page Header -->
-    <div class="flex items-start justify-between mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
         <h1 class="text-2xl font-semibold text-text-primary">
           Team Members
@@ -252,7 +252,7 @@ async function handleResendInvitation(invitationId: number) {
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-3 gap-5 mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
       <div
         v-for="stat in stats"
         :key="stat.label"
@@ -590,7 +590,7 @@ async function handleResendInvitation(invitationId: number) {
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <BaseButton
             variant="secondary"
             @click="showRemoveMemberModal = false"
@@ -645,7 +645,7 @@ async function handleResendInvitation(invitationId: number) {
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <BaseButton
             variant="secondary"
             @click="showCancelInvitationModal = false"

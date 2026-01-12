@@ -111,7 +111,7 @@ const formattedDescription = computed(() => {
     @mouseleave="isHovered = false"
   >
     <!-- Timeline connector column -->
-    <div class="relative flex flex-col items-center flex-shrink-0 w-16">
+    <div class="relative flex flex-col items-center flex-shrink-0 w-12 sm:w-16">
       <!-- Upper Line (hidden for first item) -->
       <div
         v-if="!isFirst"
@@ -144,7 +144,7 @@ const formattedDescription = computed(() => {
     </div>
 
     <!-- Content -->
-    <div class="flex-1 min-w-0 py-5 pr-4">
+    <div class="flex-1 min-w-0 py-5 pr-2 sm:pr-4">
       <!-- Actor Name -->
       <h4 class="text-sm font-semibold text-text-primary">
         {{ actorName }}
@@ -156,7 +156,7 @@ const formattedDescription = computed(() => {
       </p>
 
       <!-- Badge and Timestamp row -->
-      <div class="flex items-center gap-3 mt-3">
+      <div class="flex flex-wrap items-center gap-3 mt-3">
         <!-- Activity Type Badge -->
         <div
           class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors"

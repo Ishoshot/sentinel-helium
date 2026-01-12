@@ -43,7 +43,7 @@ const tabs = computed(() => [
 
     <!-- Tabs navigation -->
     <div class="border-b border-border-subtle mb-6">
-      <nav class="-mb-px flex gap-6">
+      <nav class="-mb-px flex flex-wrap gap-4">
         <NuxtLink
           v-for="tab in tabs"
           :key="tab.to"

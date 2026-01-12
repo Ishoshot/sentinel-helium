@@ -244,8 +244,8 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
       <!-- Run Header Card -->
       <div class="bg-bg-elevated border border-border-subtle rounded-xl shadow-sm overflow-hidden mb-8">
         <!-- Top Section: Identity & Context -->
-        <div class="p-8 pb-6">
-          <div class="flex items-start gap-5">
+        <div class="p-4 pb-4 sm:p-6 sm:pb-5 lg:p-8 lg:pb-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
             <!-- Icon -->
             <div class="w-14 h-14 rounded-xl bg-bg-surface ring-1 ring-border-subtle flex items-center justify-center shrink-0 shadow-sm">
               <Icon
@@ -324,7 +324,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         <div class="h-px bg-border-subtle w-full" />
 
         <!-- Primary Meta Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
           <!-- Author -->
           <div>
             <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
@@ -396,7 +396,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         </div>
 
         <!-- Findings Summary -->
-        <div class="px-8 pb-8">
+        <div class="px-4 sm:px-6 lg:px-8 pb-6 lg:pb-8">
           <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
             Findings
           </div>
@@ -411,7 +411,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         <!-- Metrics Grid (Secondary) -->
         <div
           v-if="metrics"
-          class="grid grid-cols-2 md:grid-cols-4 gap-8 p-8 border-t border-border-subtle bg-bg-surface/50"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8 border-t border-border-subtle bg-bg-surface/50"
         >
           <div>
             <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
@@ -459,7 +459,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         class="bg-bg-elevated border border-border-subtle rounded-xl mb-8 shadow-sm transition-all duration-200"
       >
         <button 
-          class="w-full flex items-center justify-between p-6 hover:bg-bg-surface/50 transition-colors rounded-xl focus-ring"
+          class="w-full flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 hover:bg-bg-surface/50 transition-colors rounded-xl focus-ring"
           @click="isReviewExpanded = !isReviewExpanded"
         >
           <div class="flex items-center gap-3">
@@ -474,7 +474,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
             </h2>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <BaseBadge
               v-if="verdictBadge"
               size="sm"
@@ -511,7 +511,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
 
         <div
           v-show="isReviewExpanded"
-          class="px-6 pb-6"
+          class="px-4 sm:px-6 pb-6"
         >
           <div
             v-if="reviewSummary"
@@ -624,7 +624,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           <!-- Severity Filter Tabs -->
           <div
             v-if="hasFindings"
-            class="flex items-center gap-1 p-1 bg-bg-elevated rounded-lg border border-border-subtle"
+            class="flex flex-wrap items-center gap-1 p-1 bg-bg-elevated rounded-lg border border-border-subtle"
           >
             <button
               v-for="tab in severityTabs"

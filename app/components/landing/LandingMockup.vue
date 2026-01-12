@@ -41,7 +41,7 @@ defineProps<{
         <!-- Content -->
         <div class="p-6 lg:p-8 bg-gradient-to-b from-gray-50/50 to-white">
           <!-- Stats row -->
-          <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div class="bg-white rounded-xl p-4 border border-gray-200/80 shadow-sm">
               <div class="text-2xl font-semibold text-gray-900 tabular-nums">
                 847

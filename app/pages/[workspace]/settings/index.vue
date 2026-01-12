@@ -203,7 +203,7 @@ const hasChanges = computed(() =>
       </div>
 
       <template #footer>
-        <div class="flex justify-end gap-3">
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <BaseButton
             variant="secondary"
             @click="showDeleteModal = false"

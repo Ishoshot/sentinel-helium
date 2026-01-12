@@ -162,10 +162,10 @@ const currentSort = computed({
 </script>
 
 <template>
-  <div class="h-[calc(100vh-64px)] flex flex-col -m-8">
+  <div class="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
     <!-- Header -->
-    <div class="px-8 py-6 border-b border-border-subtle bg-bg-app shrink-0">
-      <div class="flex items-center justify-between mb-6">
+    <div class="px-4 sm:px-6 lg:px-8 py-6 border-b border-border-subtle bg-bg-app shrink-0">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 class="text-2xl font-semibold text-text-primary">
             Code Reviews
@@ -191,9 +191,9 @@ const currentSort = computed({
       </div>
 
       <!-- Filters -->
-      <div class="flex flex-wrap items-center gap-3">
+      <div class="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
         <!-- Search -->
-        <div class="relative w-64">
+        <div class="relative w-full sm:w-64">
           <Icon
             name="lucide:search"
             class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"
@@ -220,14 +220,14 @@ const currentSort = computed({
           </button>
         </div>
 
-        <div class="h-6 w-px bg-border-subtle mx-1" />
+        <div class="hidden lg:block h-6 w-px bg-border-subtle mx-1" />
 
         <!-- Status Filter -->
         <BaseDropdown
           :model-value="statusFilter"
           :options="statusOptions"
           placeholder="Status"
-          class="w-40"
+          class="w-full sm:w-40"
           @update:model-value="handleStatusChange"
         >
           <template #trigger>
@@ -249,7 +249,7 @@ const currentSort = computed({
           :model-value="riskFilter"
           :options="riskOptions"
           placeholder="Risk Level"
-          class="w-40"
+          class="w-full sm:w-40"
           @update:model-value="handleRiskChange"
         >
           <template #trigger>
@@ -271,7 +271,7 @@ const currentSort = computed({
           :model-value="repositoryFilter"
           :options="repositoryOptions"
           placeholder="Repository"
-          class="w-48"
+          class="w-full sm:w-48"
           searchable
           @update:model-value="handleRepositoryChange"
         >
@@ -294,7 +294,7 @@ const currentSort = computed({
           :model-value="null"
           :options="[]"
           placeholder="Author"
-          class="w-40"
+          class="w-full sm:w-40"
           menu-width="w-56"
         >
           <template #trigger>
@@ -341,7 +341,7 @@ const currentSort = computed({
           :model-value="null"
           :options="[]"
           placeholder="Date Range"
-          class="w-48"
+          class="w-full sm:w-48"
           menu-width="w-70"
         >
           <template #trigger>
@@ -389,13 +389,13 @@ const currentSort = computed({
           </div>
         </BaseDropdown>
 
-        <div class="flex-1" />
+        <div class="hidden lg:block lg:flex-1" />
 
         <!-- Sort -->
         <BaseDropdown
           v-model="currentSort"
           :options="sortOptions"
-          class="w-44"
+          class="w-full sm:w-44"
         >
           <template #trigger>
             <button
@@ -415,7 +415,7 @@ const currentSort = computed({
       <!-- Active Filters -->
       <div
         v-if="hasActiveFilters"
-        class="flex items-center gap-2 mt-4"
+        class="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center"
       >
         <span class="text-xs font-medium text-text-secondary">Active filters:</span>
         <div class="flex flex-wrap items-center gap-2">
@@ -551,7 +551,7 @@ const currentSort = computed({
     </div>
 
     <!-- Content Area -->
-    <div class="flex-1 overflow-auto bg-bg-app px-8 py-6">
+    <div class="flex-1 overflow-auto bg-bg-app px-4 sm:px-6 lg:px-8 py-6">
       <!-- Loading State (Initial) -->
       <div
         v-if="(isLoading || isInitializing) && runs.length === 0"

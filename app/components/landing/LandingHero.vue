@@ -56,7 +56,7 @@ defineProps<{
     </div>
 
     <!-- Stats -->
-    <div class="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto">
+    <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-lg mx-auto">
       <div class="text-center">
         <div class="text-2xl lg:text-3xl font-semibold text-gray-900 tabular-nums">
           94%

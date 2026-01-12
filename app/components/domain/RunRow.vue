@@ -94,7 +94,7 @@ const riskConfig = computed(() => {
     :to="runUrl"
     class="group block bg-bg-elevated border border-border-subtle rounded-xl px-6 py-4 hover:border-border-muted hover:shadow-sm transition-all duration-200"
   >
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <!-- Left Group: Avatar + Main Info -->
       <div class="flex items-center gap-4 flex-1 min-w-0">
         <!-- Avatar -->
@@ -119,7 +119,7 @@ const riskConfig = computed(() => {
 
         <div class="flex-1 min-w-0">
           <!-- Row 1: Title • Status • Labels -->
-          <div class="flex items-center gap-3 mb-1">
+          <div class="flex items-center gap-3 mb-1 flex-wrap">
             <h3 class="text-sm font-semibold text-text-primary truncate">
               {{ pullRequestTitle || 'Run #' + run.id }}
             </h3>
@@ -152,7 +152,7 @@ const riskConfig = computed(() => {
           </div>
 
           <!-- Row 2: Repository + Branch Info -->
-          <div class="flex items-center gap-3 text-xs text-text-muted">
+          <div class="flex items-center gap-3 text-xs text-text-muted flex-wrap">
             <!-- Repository Name (when showRepository is true) -->
             <div
               v-if="props.showRepository && repositoryName"

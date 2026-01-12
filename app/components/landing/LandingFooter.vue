@@ -30,7 +30,7 @@ const links = [
             <span class="text-sm font-semibold text-gray-900">Sentinel</span>
           </div>
 
-          <div class="flex items-center gap-8 text-sm text-gray-500">
+          <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-gray-500">
             <a
               v-for="link in links"
               :key="link.label"

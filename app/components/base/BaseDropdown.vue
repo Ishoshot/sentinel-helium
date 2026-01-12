@@ -120,7 +120,7 @@ const directionClasses = computed(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-50 bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
+        class="absolute z-50 w-full min-w-[12rem] max-w-[calc(100vw-2rem)] bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
         :class="[alignmentClasses, directionClasses, menuWidth]"
       >
         <!-- Search -->

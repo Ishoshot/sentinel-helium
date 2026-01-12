@@ -60,7 +60,7 @@ const githubUrl = computed(
 
 <template>
   <div class="group bg-bg-elevated border border-border-subtle rounded-xl p-5 hover:border-border-muted hover:shadow-sm transition-all duration-200">
-    <div class="flex items-start justify-between gap-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
       <!-- Repository info -->
       <div class="flex items-start gap-4 flex-1 min-w-0">
         <!-- Icon -->
@@ -72,9 +72,9 @@ const githubUrl = computed(
         </div>
 
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-3 mb-1.5 min-w-0">
+          <div class="flex items-center gap-3 mb-1.5 min-w-0 flex-wrap">
             <!-- Repository name -->
-            <h3 class="text-sm font-semibold text-text-primary truncate max-w-[50%] leading-tight">
+            <h3 class="text-sm font-semibold text-text-primary truncate max-w-full sm:max-w-[50%] leading-tight">
               {{ repository.full_name }}
             </h3>
 

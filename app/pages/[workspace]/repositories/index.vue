@@ -152,7 +152,7 @@ function goToIntegrations() {
 <template>
   <div>
     <!-- Page header -->
-    <div class="flex items-start justify-between mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
         <h1 class="text-2xl font-semibold text-text-primary">
           Repositories
@@ -164,7 +164,7 @@ function goToIntegrations() {
 
       <div
         v-if="isConnected"
-        class="flex items-center gap-3"
+        class="flex flex-wrap items-center gap-3"
       >
         <!-- View toggle -->
         <div class="flex items-center bg-bg-surface border border-border-subtle rounded-lg p-1">

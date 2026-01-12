@@ -167,7 +167,7 @@ function handleSecondaryAction() {
     <div class="relative min-h-screen flex flex-col items-center justify-center px-6 py-12">
       <!-- Error code - Large ambient number -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none">
-        <span class="text-[20rem] sm:text-[28rem] font-bold text-text-primary/[0.02] leading-none tracking-tighter">
+        <span class="text-[10rem] sm:text-[18rem] lg:text-[28rem] font-bold text-text-primary/[0.02] leading-none tracking-tighter">
           {{ errorConfig.code }}
         </span>
       </div>
