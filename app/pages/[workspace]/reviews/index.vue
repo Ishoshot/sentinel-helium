@@ -310,7 +310,7 @@ const currentSort = computed({
             </button>
           </template>
           
-          <div class="p-3 w-56">
+          <div class="p-3 w-full">
             <div class="space-y-2">
               <label class="text-xs font-medium text-text-secondary">Filter by Author</label>
               <input 
@@ -359,7 +359,7 @@ const currentSort = computed({
             </button>
           </template>
           
-          <div class="p-3 space-y-3 w-64">
+          <div class="p-3 space-y-3 w-full">
             <div class="space-y-1.5">
               <label class="text-xs font-medium text-text-secondary">From</label>
               <input 

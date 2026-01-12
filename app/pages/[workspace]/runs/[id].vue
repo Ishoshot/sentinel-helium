@@ -218,7 +218,7 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
             Analysis Failed
           </h3>
           <p class="text-sm text-text-secondary">
-            {{ run.metadata.skip_message }}
+            {{ run.metadata.skip_message ?? run.metadata.skip_reason }}
           </p>
           <div
             v-if="run.metadata.skip_message?.toLowerCase().includes('provider key') || run.metadata.skip_reason?.toLowerCase() === 'no_provider_keys'"
