@@ -11,6 +11,12 @@ definePageMeta({
   layout: false,
 })
 
+useHead({
+  htmlAttrs: {
+    class: 'scroll-smooth',
+  },
+})
+
 const router = useRouter()
 const { workspaces, fetchWorkspaces } = useWorkspaces()
 

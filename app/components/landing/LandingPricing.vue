@@ -6,30 +6,39 @@
 
 const tiers = [
   {
-    name: 'Free',
+    name: 'Foundation',
     price: '$0',
-    period: 'forever',
-    description: 'For individuals',
-    features: ['Up to 3 repositories', '100 reviews per month', 'Community support', 'Basic insights'],
+    period: 'free forever',
+    description: 'For individual developers and small projects getting started with trusted code review.',
+    features: ['Bring-your-own-key providers', 'Core review insights', 'Usage visibility', 'Community support'],
     cta: 'Get started',
     highlighted: false,
   },
   {
-    name: 'Pro',
-    price: '$29',
-    period: 'per seat / month',
-    description: 'For teams',
-    features: ['Unlimited repositories', 'Unlimited reviews', 'Custom policies', 'Priority support', 'Advanced analytics'],
-    cta: 'Start free trial',
+    name: 'Illuminate',
+    price: '$20',
+    period: 'per month, billed monthly or yearly',
+    description: 'For growing teams that want deeper insight and consistent code quality across projects.',
+    features: ['Custom guidelines', 'Priority review queue', 'Expanded team limits', 'Workspace insights'],
+    cta: 'Choose Illuminate',
     highlighted: true,
   },
   {
-    name: 'Enterprise',
-    price: 'Custom',
-    period: 'contact us',
-    description: 'For organizations',
-    features: ['Everything in Pro', 'SSO & SAML', 'Dedicated support', 'SLA guarantee', 'Custom integrations'],
-    cta: 'Contact sales',
+    name: 'Orchestrate',
+    price: '$50',
+    period: 'per month, billed monthly or yearly',
+    description: 'For professional teams coordinating code quality at scale across multiple repositories.',
+    features: ['API access', 'Advanced limits', 'Priority processing', 'Operational insights'],
+    cta: 'Choose Orchestrate',
+    highlighted: false,
+  },
+  {
+    name: 'Sanctum',
+    price: '$200',
+    period: 'per month, billed monthly or yearly',
+    description: 'For organizations that require governance, security, and reliability guarantees.',
+    features: ['SSO & security controls', 'Audit logs', 'Governance support', 'Dedicated success'],
+    cta: 'Choose Sanctum',
     highlighted: false,
   },
 ]
@@ -50,7 +59,7 @@ const tiers = [
         </p>
       </div>
 
-      <div class="grid lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+      <div class="grid lg:grid-cols-2 xl:grid-cols-4 gap-5 max-w-6xl mx-auto">
         <div
           v-for="tier in tiers"
           :key="tier.name"
@@ -103,7 +112,6 @@ const tiers = [
           </ul>
 
           <NuxtLink
-            v-if="tier.name !== 'Enterprise'"
             to="/login"
             class="block w-full text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200"
             :class="tier.highlighted
@@ -112,13 +120,6 @@ const tiers = [
           >
             {{ tier.cta }}
           </NuxtLink>
-          <a
-            v-else
-            href="mailto:sales@sentinel.dev"
-            class="block w-full text-center py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200"
-          >
-            {{ tier.cta }}
-          </a>
         </div>
       </div>
     </div>
