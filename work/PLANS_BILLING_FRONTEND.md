@@ -19,12 +19,12 @@ Sentinel uses a subscription-based model where:
 
 ### Plan Tiers
 
-| Tier           | Monthly Price | Reviews/Month | Team Size | Key Features                        |
-| -------------- | ------------- | ------------- | --------- | ----------------------------------- |
-| **Free**       | $0            | 20            | 2 members | BYOK only                           |
-| **Team**       | $49           | 500           | 5 members | + Custom guidelines, Priority queue |
-| **Business**   | $199          | 2,000         | Unlimited | + API access                        |
-| **Enterprise** | Custom        | Unlimited     | Unlimited | + SSO, Audit logs                   |
+| Tier                         | Description                                                                             | Monthly | Yearly |
+| ---------------------------- | --------------------------------------------------------------------------------------- | ------- | ------ |
+| **Foundation** (free)        | For individual developers and small projects getting started with trusted code review.  | $0      | $0     |
+| **Illuminate**               | For growing teams that want deeper insight and consistent code quality across projects. | $20     | $210   |
+| **Orchestrate**              | For professional teams coordinating code quality at scale across multiple repositories. | $50     | $450   |
+| **Sanctum**                  | For organizations that require governance, security, and reliability guarantees.        | $200    | $2,100 |
 
 ### Feature Flags
 
@@ -43,7 +43,7 @@ These boolean flags control what users can access:
 
 | Status     | Meaning                                |
 | ---------- | -------------------------------------- |
-| `active`   | Normal paid/free subscription          |
+| `active`   | Normal paid/Foundation subscription    |
 | `trialing` | In trial period                        |
 | `past_due` | Payment failed, grace period           |
 | `canceled` | Subscription cancelled, will downgrade |
@@ -68,8 +68,9 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 {
     "data": [
         {
-            "id": "01942d8a-1234-7abc-8def-123456789abc",
-            "tier": "free",
+            "id": 1,
+            "tier": "foundation",
+            "description": "For individual developers and small projects getting started with trusted code review.",
             "monthly_runs_limit": 20,
             "team_size_limit": 2,
             "features": {
@@ -82,14 +83,15 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
             },
             "price_monthly_cents": 0,
             "price_monthly": "0.00",
-            "currency": "USD",
-            "nonprofit_discount_percent": 0,
-            "nonprofit_price_monthly_cents": 0,
-            "nonprofit_price_monthly": "0.00"
+            "price_yearly_cents": 0,
+            "price_yearly": "0.00",
+            "yearly_savings_percent": 0,
+            "currency": "USD"
         },
         {
-            "id": "01942d8a-5678-7abc-8def-123456789abc",
-            "tier": "team",
+            "id": 2,
+            "tier": "illuminate",
+            "description": "For growing teams that want deeper insight and consistent code quality across projects.",
             "monthly_runs_limit": 500,
             "team_size_limit": 5,
             "features": {
@@ -100,16 +102,17 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
                 "sso_enabled": false,
                 "audit_logs": false
             },
-            "price_monthly_cents": 4900,
-            "price_monthly": "49.00",
-            "currency": "USD",
-            "nonprofit_discount_percent": 50,
-            "nonprofit_price_monthly_cents": 2450,
-            "nonprofit_price_monthly": "24.50"
+            "price_monthly_cents": 2000,
+            "price_monthly": "20.00",
+            "price_yearly_cents": 21000,
+            "price_yearly": "210.00",
+            "yearly_savings_percent": 12,
+            "currency": "USD"
         },
         {
-            "id": "01942d8a-9012-7abc-8def-123456789abc",
-            "tier": "business",
+            "id": 3,
+            "tier": "orchestrate",
+            "description": "For professional teams coordinating code quality at scale across multiple repositories.",
             "monthly_runs_limit": 2000,
             "team_size_limit": null,
             "features": {
@@ -120,16 +123,17 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
                 "sso_enabled": false,
                 "audit_logs": false
             },
-            "price_monthly_cents": 19900,
-            "price_monthly": "199.00",
-            "currency": "USD",
-            "nonprofit_discount_percent": 50,
-            "nonprofit_price_monthly_cents": 9950,
-            "nonprofit_price_monthly": "99.50"
+            "price_monthly_cents": 5000,
+            "price_monthly": "50.00",
+            "price_yearly_cents": 45000,
+            "price_yearly": "450.00",
+            "yearly_savings_percent": 25,
+            "currency": "USD"
         },
         {
-            "id": "01942d8a-3456-7abc-8def-123456789abc",
-            "tier": "enterprise",
+            "id": 4,
+            "tier": "sanctum",
+            "description": "For organizations that require governance, security, and reliability guarantees.",
             "monthly_runs_limit": null,
             "team_size_limit": null,
             "features": {
@@ -140,12 +144,12 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
                 "sso_enabled": true,
                 "audit_logs": true
             },
-            "price_monthly_cents": null,
-            "price_monthly": null,
-            "currency": null,
-            "nonprofit_discount_percent": 0,
-            "nonprofit_price_monthly_cents": null,
-            "nonprofit_price_monthly": null
+            "price_monthly_cents": 20000,
+            "price_monthly": "200.00",
+            "price_yearly_cents": 210000,
+            "price_yearly": "2100.00",
+            "yearly_savings_percent": 12,
+            "currency": "USD"
         }
     ]
 }
@@ -155,7 +159,7 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 
 -   `null` for `monthly_runs_limit` or `team_size_limit` means **unlimited**
 -   `null` for price fields means **contact sales / custom pricing**
--   `nonprofit_discount_percent` of 50 means 50% off for verified nonprofits
+-   `yearly_savings_percent` is the percent saved vs monthly pricing
 
 ---
 
@@ -172,8 +176,9 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
     "data": {
         "workspace_id": "01942d8a-aaaa-7abc-8def-123456789abc",
         "plan": {
-            "id": "01942d8a-1234-7abc-8def-123456789abc",
-            "tier": "team",
+            "id": 2,
+            "tier": "illuminate",
+            "description": "For growing teams that want deeper insight and consistent code quality across projects.",
             "monthly_runs_limit": 500,
             "team_size_limit": 5,
             "features": {
@@ -184,12 +189,12 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
                 "sso_enabled": false,
                 "audit_logs": false
             },
-            "price_monthly_cents": 4900,
-            "price_monthly": "49.00",
-            "currency": "USD",
-            "nonprofit_discount_percent": 50,
-            "nonprofit_price_monthly_cents": 2450,
-            "nonprofit_price_monthly": "24.50"
+            "price_monthly_cents": 2000,
+            "price_monthly": "20.00",
+            "price_yearly_cents": 21000,
+            "price_yearly": "210.00",
+            "yearly_savings_percent": 12,
+            "currency": "USD"
         },
         "status": "active",
         "trial_ends_at": null
@@ -257,22 +262,29 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 
 ```json
 {
-    "plan_id": "01942d8a-5678-7abc-8def-123456789abc",
-    "is_nonprofit": false
+    "plan_tier": "illuminate",
+    "billing_interval": "yearly",
+    "promo_code": "LAUNCH2026"
 }
 ```
 
 **Fields**:
 
--   `plan_id` (required): UUID of the target plan from `/api/plans`
--   `is_nonprofit` (optional, default false): Apply nonprofit discount if eligible
+-   `plan_tier` (required): `illuminate`, `orchestrate`, or `sanctum`
+-   `billing_interval` (optional, default `monthly`): `monthly` or `yearly`
+-   `promo_code` (optional): Promotion code to apply at checkout
 
 **Response** `200 OK`:
 
 ```json
 {
     "data": {
-        "checkout_url": "https://buy.polar.sh/checkout/abc123..."
+        "checkout_url": "https://buy.polar.sh/checkout/abc123...",
+        "billing_interval": "yearly",
+        "promotion": {
+            "code": "LAUNCH2026",
+            "discount": "20% off"
+        }
     }
 }
 ```
@@ -287,7 +299,18 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 {
     "message": "You are already on this plan.",
     "errors": {
-        "plan_id": ["You are already on this plan."]
+        "plan_tier": ["You are already on this plan."]
+    }
+}
+```
+
+`422 Unprocessable Entity` - Invalid billing interval:
+
+```json
+{
+    "message": "Billing interval must be monthly or yearly.",
+    "errors": {
+        "billing_interval": ["Billing interval must be monthly or yearly."]
     }
 }
 ```
@@ -304,7 +327,7 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 
 ### POST `/api/workspaces/{workspace}/subscription/cancel`
 
-**Purpose**: Cancel the current subscription. Workspace will downgrade to Free at end of billing period.
+**Purpose**: Cancel the current subscription. Workspace will downgrade to Foundation at end of billing period.
 
 **When to call**: User confirms they want to cancel.
 
@@ -314,17 +337,17 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 
 ```json
 {
-    "message": "Subscription cancelled. You will be downgraded to Free at the end of your billing period."
+    "message": "Subscription cancelled. You will be downgraded to Foundation at the end of your billing period."
 }
 ```
 
 **Error responses**:
 
-`422 Unprocessable Entity` - Already on Free:
+`422 Unprocessable Entity` - Already on Foundation:
 
 ```json
 {
-    "message": "You are already on the Free plan."
+    "message": "You are already on the Foundation plan."
 }
 ```
 
@@ -366,6 +389,24 @@ All endpoints are authenticated. Replace `{workspace}` with the workspace UUID.
 {
     "message": "Billing portal is not available."
 }
+```
+
+---
+
+## Environment Variables (Backend)
+
+Yearly checkout URLs are configured via environment variables:
+
+```env
+# Monthly checkout URLs
+POLAR_CHECKOUT_ILLUMINATE_MONTHLY_URL=
+POLAR_CHECKOUT_ORCHESTRATE_MONTHLY_URL=
+POLAR_CHECKOUT_SANCTUM_MONTHLY_URL=
+
+# Yearly checkout URLs
+POLAR_CHECKOUT_ILLUMINATE_YEARLY_URL=
+POLAR_CHECKOUT_ORCHESTRATE_YEARLY_URL=
+POLAR_CHECKOUT_SANCTUM_YEARLY_URL=
 ```
 
 ---
@@ -415,7 +456,8 @@ Other feature codes: `byok_enabled`, `priority_queue`, `api_access`, `sso_enable
 
 ```typescript
 // Plan tier values
-type PlanTier = "free" | "team" | "business" | "enterprise";
+type PlanTier = "foundation" | "illuminate" | "orchestrate" | "sanctum";
+type BillingInterval = "monthly" | "yearly";
 
 // Subscription status values
 type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled";
@@ -441,17 +483,18 @@ interface PlanFeatures {
 
 // Plan object from API
 interface Plan {
-    id: string;
+    id: number;
     tier: PlanTier;
+    description: string | null;
     monthly_runs_limit: number | null; // null = unlimited
     team_size_limit: number | null; // null = unlimited
     features: PlanFeatures;
     price_monthly_cents: number | null; // null = custom pricing
     price_monthly: string | null; // formatted price or null
+    price_yearly_cents: number | null; // null = custom pricing
+    price_yearly: string | null; // formatted price or null
+    yearly_savings_percent: number;
     currency: string | null; // "USD" or null
-    nonprofit_discount_percent: number;
-    nonprofit_price_monthly_cents: number | null;
-    nonprofit_price_monthly: string | null;
 }
 
 // Subscription object from API
@@ -474,13 +517,19 @@ interface Usage {
 
 // Upgrade request
 interface UpgradeRequest {
-    plan_id: string;
-    is_nonprofit?: boolean;
+    plan_tier: Exclude<PlanTier, "foundation">;
+    billing_interval?: BillingInterval;
+    promo_code?: string | null;
 }
 
 // Checkout response
 interface CheckoutResponse {
     checkout_url: string;
+    billing_interval: BillingInterval;
+    promotion?: {
+        code: string;
+        discount: string;
+    } | null;
 }
 
 // Portal response
@@ -531,17 +580,19 @@ Based on this backend, the frontend should:
 
 1. **`null` means unlimited** - For both `monthly_runs_limit` and `team_size_limit`, a `null` value means no limit. Display as "Unlimited" or "∞".
 
-2. **`null` price means custom** - Enterprise tier has null prices. Display as "Contact Sales" or "Custom".
+2. **`null` price means custom** - If pricing fields are null, display "Contact Sales" or "Custom".
 
 3. **Limits are enforced server-side** - The frontend should display limits but cannot bypass them. Always handle limit errors from API responses.
 
 4. **Billing is external** - Upgrades and billing management redirect to Polar. After Polar processes payment, it sends a webhook to our backend which updates the subscription.
 
-5. **Subscription is on Workspace** - The subscription status lives on the workspace model, not a separate subscription table. A workspace always has a plan (defaults to Free).
+5. **Subscription is on Workspace** - The subscription status lives on the workspace model, not a separate subscription table. A workspace always has a plan (defaults to Foundation).
 
 6. **Only owners can manage billing** - The backend enforces that only workspace owners can upgrade, cancel, or access the billing portal.
 
-7. **Nonprofit discount** - Some workspaces may be eligible for nonprofit pricing. The `is_nonprofit` flag on upgrade applies the discount if the workspace qualifies.
+7. **Yearly billing** - The `billing_interval` field controls whether checkout uses monthly or yearly pricing. Yearly usually includes a savings percentage.
+
+8. **Promo codes** - `promo_code` is optional and validated by the backend. Surface validation errors from `errors.promo_code[0]`.
 
 ---
 
