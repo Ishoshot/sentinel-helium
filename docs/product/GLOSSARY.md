@@ -242,12 +242,35 @@ Plans do not include AI usage costs by default.
 
 ---
 
+### Plan Tiers
+
+Canonical plan tier names:
+
+- Foundation — For individual developers and small projects getting started with trusted code review.
+- Illuminate — For growing teams that want deeper insight and consistent code quality across projects.
+- Orchestrate — For professional teams coordinating code quality at scale across multiple repositories.
+- Sanctum — For organizations that require governance, security, and reliability guarantees.
+
+---
+
 ### Subscription
 
 The active billing state of a Workspace.
 
 A Subscription associates a Workspace with a Plan
 and determines whether Sentinel functionality is enabled.
+
+---
+
+### Promo Code
+
+A code that applies a discount during a Subscription upgrade checkout.
+
+Promo Codes:
+
+- are optional during upgrades
+- are validated at checkout
+- may be time-limited or usage-limited
 
 ---
 
