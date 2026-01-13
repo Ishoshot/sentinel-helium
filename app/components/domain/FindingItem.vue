@@ -89,15 +89,12 @@ const currentCode = computed(() => {
 })
 
 const suggestedCode = computed(() => {
-  const code = metadata.value?.replacement_code ?? metadata.value?.suggestion ?? metadata.value?.patch
+  const code = metadata.value?.replacement_code
   if (typeof code !== 'string' || !code.trim()) return null
   return code
 })
 
 const suggestedCodeLabel = computed(() => {
-  if (typeof metadata.value?.replacement_code === 'string' && metadata.value.replacement_code.trim()) return 'Suggested Fix'
-  if (typeof metadata.value?.suggestion === 'string' && metadata.value.suggestion.trim()) return 'Suggestion'
-  if (typeof metadata.value?.patch === 'string' && metadata.value.patch.trim()) return 'Patch'
   return 'Suggested Fix'
 })
 
@@ -107,8 +104,8 @@ const explanation = computed(() => {
   return text
 })
 
-const rationale = computed(() => {
-  const text = metadata.value?.rationale
+const impact = computed(() => {
+  const text = metadata.value?.impact
   if (typeof text !== 'string' || !text.trim()) return null
   return text
 })
@@ -214,14 +211,14 @@ const referenceLinks = computed(() => {
         </div>
 
         <div
-          v-if="rationale"
+          v-if="impact"
           class="mt-3 pt-3 border-t border-border-subtle"
         >
           <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
             Impact
           </div>
           <p class="text-sm text-text-secondary leading-relaxed whitespace-pre-line">
-            {{ rationale }}
+            {{ impact }}
           </p>
         </div>
 
