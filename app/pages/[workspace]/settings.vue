@@ -26,6 +26,11 @@ const tabs = computed(() => [
     to: `/${workspaceSlug.value}/settings/api-keys`,
     active: route.path === `/${workspaceSlug.value}/settings/api-keys`,
   },
+  {
+    label: 'Billing',
+    to: `/${workspaceSlug.value}/settings/billing`,
+    active: route.path === `/${workspaceSlug.value}/settings/billing`,
+  },
 ])
 </script>
 
