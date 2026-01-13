@@ -3,6 +3,11 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
+  // Nitro configuration for Railway deployment
+  nitro: {
+    preset: "node-server",
+  },
+
   modules: [
     "@nuxt/a11y",
     "@nuxt/fonts",
