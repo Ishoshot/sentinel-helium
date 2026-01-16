@@ -178,18 +178,18 @@ function handleClickOutside(event: MouseEvent) {
       <!-- Error alert for API errors -->
       <div
         v-if="createError && !createError.includes('required')"
-        class="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20"
+        class="mb-4 p-4 rounded-xl bg-error-light border border-error/20"
       >
         <div class="flex gap-3">
           <Icon
             name="ph:warning-circle-bold"
-            class="w-5 h-5 text-red-500 shrink-0 mt-0.5"
+            class="w-5 h-5 text-error shrink-0 mt-0.5"
           />
           <div>
-            <p class="text-sm font-medium text-red-800 dark:text-red-400">
+            <p class="text-sm font-medium text-error">
               Unable to create workspace
             </p>
-            <p class="text-sm text-red-600 dark:text-red-400/80 mt-1">
+            <p class="text-sm text-error/80 mt-1">
               {{ createError }}
             </p>
           </div>

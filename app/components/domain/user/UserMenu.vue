@@ -68,7 +68,7 @@ function handleLogout() {
     <!-- Trigger button -->
     <button
       ref="triggerRef"
-      class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all duration-200 group"
+      class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-bg-surface transition-all duration-200 group"
       @click="toggle"
     >
       <div class="relative">
@@ -76,22 +76,22 @@ function handleLogout() {
           :src="user.avatar_url"
           :name="user.name"
           size="sm"
-          class="ring-2 ring-transparent group-hover:ring-blue-500/20 transition-all duration-200"
+          class="ring-2 ring-transparent group-hover:ring-accent/20 transition-all duration-200"
         />
         <!-- Online indicator -->
-        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-800" />
+        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
       </div>
       <div class="flex-1 text-left hidden sm:block min-w-0">
-        <p class="text-sm font-medium text-slate-900 dark:text-white truncate">
+        <p class="text-sm font-medium text-text-primary truncate">
           {{ user.name }}
         </p>
-        <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
+        <p class="text-xs text-text-muted truncate">
           {{ user.email }}
         </p>
       </div>
       <Icon
         name="lucide:chevrons-up-down"
-        class="w-4 h-4 text-slate-400 dark:text-slate-500 hidden sm:block transition-transform duration-200"
+        class="w-4 h-4 text-text-muted hidden sm:block transition-transform duration-200"
         :class="{ 'rotate-180': isOpen }"
       />
 
@@ -115,7 +115,7 @@ function handleLogout() {
         <div
           v-if="isOpen"
           ref="menuRef"
-          class="fixed z-[9999] rounded-xl shadow-2xl overflow-hidden bg-white dark:bg-[#1a1a24] ring-1 ring-black/5 dark:ring-white/10"
+          class="fixed z-[9999] rounded-xl shadow-elevated overflow-hidden bg-bg-elevated ring-1 ring-border-subtle"
           :style="{
             top: `${menuPosition.top}px`,
             left: `${menuPosition.left}px`,
@@ -124,7 +124,7 @@ function handleLogout() {
           }"
         >
           <!-- User info header -->
-          <div class="px-4 py-3 border-b border-slate-100 dark:border-white/10">
+          <div class="px-4 py-3 border-b border-border-subtle">
             <div class="flex items-center gap-3">
               <BaseAvatar
                 :src="user.avatar_url"
@@ -132,10 +132,10 @@ function handleLogout() {
                 size="md"
               />
               <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                <p class="text-sm font-semibold text-text-primary truncate">
                   {{ user.name }}
                 </p>
-                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
+                <p class="text-xs text-text-muted truncate">
                   {{ user.email }}
                 </p>
               </div>
@@ -146,7 +146,7 @@ function handleLogout() {
           <div class="py-2">
             <!-- Sign out -->
             <button
-              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error-light transition-colors"
               :disabled="isLoading"
               @click="handleLogout"
             >
@@ -164,8 +164,8 @@ function handleLogout() {
           </div>
 
           <!-- Footer -->
-          <div class="px-4 py-2.5 border-t border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-white/5">
-            <p class="text-xs text-slate-500 dark:text-slate-500">
+          <div class="px-4 py-2.5 border-t border-border-subtle bg-bg-surface">
+            <p class="text-xs text-text-muted">
               Sentinel v1.0
             </p>
           </div>
