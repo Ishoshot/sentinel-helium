@@ -1,14 +1,26 @@
 <script setup lang="ts">
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
+
 /**
- * Landing page navigation header
- * Fixed position with scroll-based background change
+ * Landing page navigation header - Light theme
+ * Fixed position with scroll-based glassmorphism
  */
 
 const props = defineProps<{
   scrolled: boolean
+  isAuthenticated?: boolean
 }>()
 
+const workspaceStore = useWorkspaceStore()
+
 const isMenuOpen = ref(false)
+
+const navLinks = [
+  { label: 'Product', href: '#product' },
+  { label: 'Workflow', href: '#workflow' },
+  { label: 'Plans', href: '#plans' },
+  { label: 'FAQ', href: '#faq' },
+] satisfies ReadonlyArray<{ label: string; href: string }>
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
@@ -17,46 +29,74 @@ function toggleMenu() {
 function closeMenu() {
   isMenuOpen.value = false
 }
+
+const dashboardUrl = computed(() => {
+  if (!props.isAuthenticated) {
+    return '/login'
+  }
+
+  // If there's a current workspace, use it
+  if (workspaceStore.hasCurrentWorkspace) {
+    return `/${workspaceStore.currentWorkspaceSlug}`
+  }
+
+  // Otherwise, try to get the first workspace from the list
+  if (workspaceStore.workspaces.length > 0) {
+    const sortedWorkspaces = [...workspaceStore.workspaces].sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )
+    const firstWorkspace = sortedWorkspaces.at(0)
+    if (firstWorkspace) {
+      return `/${firstWorkspace.slug}`
+    }
+  }
+
+  // No workspaces found, redirect to workspace creation or login
+  return '/login'
+})
+
+const ctaText = computed(() => {
+  return props.isAuthenticated ? 'Dashboard' : 'Get Started'
+})
 </script>
 
 <template>
   <header
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-    :class="props.scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    :class="props.scrolled
+      ? 'bg-[var(--landing-bg-surface)]/80 backdrop-blur-xl border-b border-[var(--landing-border-subtle)]'
+      : 'bg-transparent'"
   >
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-6xl mx-auto px-6 py-2">
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
-            <Icon
-              name="ph:shield-check-bold"
-              class="w-4 h-4 text-white"
-            />
-          </div>
-          <span class="text-[15px] font-semibold tracking-tight">Sentinel</span>
-        </div>
+        <NuxtLink
+          :to="isAuthenticated ? dashboardUrl : '/'"
+          class="flex items-center group"
+        >
+          <SentinelLogo size="lg" />
+        </NuxtLink>
 
         <!-- Nav Links (Desktop) -->
         <nav class="hidden md:flex items-center gap-8">
           <a
-            href="#features"
-            class="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200"
-          >Features</a>
-          <a
-            href="#how-it-works"
-            class="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200"
-          >How it works</a>
-          <a
-            href="#pricing"
-            class="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200"
-          >Pricing</a>
+            v-for="link in navLinks"
+            :key="link.href"
+            :href="link.href"
+            class="text-sm transition-colors duration-200"
+            :class="props.scrolled
+              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
+              : 'text-gray-600 hover:text-gray-900'"
+          >{{ link.label }}</a>
         </nav>
 
         <!-- CTA -->
         <div class="flex items-center gap-3">
           <button
-            class="md:hidden p-2 text-gray-500 hover:text-gray-900 transition-colors"
+            class="md:hidden p-2 transition-colors"
+            :class="props.scrolled
+              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
+              : 'text-gray-600 hover:text-gray-900'"
             aria-label="Toggle navigation menu"
             @click="toggleMenu"
           >
@@ -66,16 +106,20 @@ function closeMenu() {
             />
           </button>
           <NuxtLink
+            v-if="!isAuthenticated"
             to="/login"
-            class="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-200 hidden sm:block px-3 py-2"
+            class="hidden sm:block px-3 py-2 text-sm transition-colors duration-200"
+            :class="props.scrolled
+              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
+              : 'text-gray-600 hover:text-gray-900'"
           >
             Sign in
           </NuxtLink>
           <NuxtLink
-            to="/login"
-            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+            :to="dashboardUrl"
+            class="landing-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg"
           >
-            Get Started
+            {{ ctaText }}
           </NuxtLink>
         </div>
       </div>
@@ -92,24 +136,16 @@ function closeMenu() {
     >
       <div
         v-if="isMenuOpen"
-        class="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl"
+        class="md:hidden border-t border-[var(--landing-border-subtle)] bg-[var(--landing-bg-surface)]/95 backdrop-blur-xl"
       >
-        <nav class="px-6 py-4 flex flex-col gap-3 text-sm text-gray-600">
+        <nav class="px-6 py-4 flex flex-col gap-3 text-sm text-[var(--landing-text-secondary)]">
           <a
-            href="#features"
-            class="hover:text-gray-900 transition-colors"
+            v-for="link in navLinks"
+            :key="link.href"
+            :href="link.href"
+            class="hover:text-[var(--landing-text-primary)] transition-colors py-2"
             @click="closeMenu"
-          >Features</a>
-          <a
-            href="#how-it-works"
-            class="hover:text-gray-900 transition-colors"
-            @click="closeMenu"
-          >How it works</a>
-          <a
-            href="#pricing"
-            class="hover:text-gray-900 transition-colors"
-            @click="closeMenu"
-          >Pricing</a>
+          >{{ link.label }}</a>
         </nav>
       </div>
     </Transition>
