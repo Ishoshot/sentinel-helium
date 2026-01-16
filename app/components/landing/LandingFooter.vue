@@ -1,63 +1,158 @@
 <script setup lang="ts">
 /**
- * Landing page footer
- * Links, copyright, and brand wordmark
+ * Landing page footer 
+ * Links, copyright, and large brand wordmark
  */
 
 const currentYear = new Date().getFullYear()
 
-const links = [
+const productLinks = [
+  { label: 'Features', href: '#product' },
+  { label: 'Pricing', href: '#plans' },
+  { label: 'FAQ', href: '#faq' },
+]
+
+const companyLinks = [
+  { label: 'About', href: '#' },
+  { label: 'Blog', href: '#' },
+  { label: 'Contact', href: 'mailto:hello@usesentinel.ai' },
+]
+
+const legalLinks = [
   { label: 'Privacy', href: '#' },
   { label: 'Terms', href: '#' },
-  { label: 'Docs', href: '#' },
-  { label: 'Status', href: '#' },
+]
+
+const socialLinks = [
+  { label: 'X / Twitter', href: '#', icon: 'ph:x-logo-bold' },
+  { label: 'GitHub', href: '#', icon: 'ph:github-logo-bold' },
 ]
 </script>
 
 <template>
-  <footer class="relative border-t border-gray-200 overflow-hidden">
+  <footer class="relative bg-slate-50 border-t border-slate-200 overflow-hidden">
     <!-- Main footer content -->
-    <div class="relative z-10 py-12">
-      <div class="max-w-6xl mx-auto px-6">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-          <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center">
-              <Icon
-                name="ph:shield-check-bold"
-                class="w-3.5 h-3.5 text-white"
-              />
+    <div class="relative z-10 py-16 lg:py-20">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+          <!-- Brand column -->
+          <div class="col-span-2 md:col-span-1">
+            <div class="mb-4">
+              <SentinelLogo size="lg" />
             </div>
-            <span class="text-sm font-semibold text-gray-900">Sentinel</span>
+            <p class="text-sm text-slate-500 leading-relaxed">
+              Intelligent code reviews for teams who ship with confidence.
+            </p>
+
+            <!-- Social links -->
+            <div class="flex items-center gap-3 mt-6">
+              <a
+                v-for="social in socialLinks"
+                :key="social.label"
+                :href="social.href"
+                class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-colors"
+                :aria-label="social.label"
+              >
+                <Icon
+                  :name="social.icon"
+                  class="w-4 h-4 text-slate-500"
+                />
+              </a>
+            </div>
           </div>
 
-          <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-gray-500">
-            <a
-              v-for="link in links"
-              :key="link.label"
-              :href="link.href"
-              class="hover:text-gray-900 transition-colors duration-200"
-            >{{ link.label }}</a>
+          <!-- Product links -->
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+              Product
+            </h4>
+            <ul class="space-y-3">
+              <li
+                v-for="link in productLinks"
+                :key="link.label"
+              >
+                <a
+                  :href="link.href"
+                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >{{ link.label }}</a>
+              </li>
+            </ul>
           </div>
 
-          <div class="text-sm text-gray-400">
+          <!-- Company links -->
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+              Company
+            </h4>
+            <ul class="space-y-3">
+              <li
+                v-for="link in companyLinks"
+                :key="link.label"
+              >
+                <a
+                  :href="link.href"
+                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >{{ link.label }}</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Legal links -->
+          <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+              Legal
+            </h4>
+            <ul class="space-y-3">
+              <li
+                v-for="link in legalLinks"
+                :key="link.label"
+              >
+                <a
+                  :href="link.href"
+                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                >{{ link.label }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-slate-400">
             &copy; {{ currentYear }} Sentinel. All rights reserved.
+          </div>
+          <div class="text-sm text-slate-400">
+            Built for developers who care about quality.
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Large brand wordmark image -->
-    <div class="relative h-32 lg:h-48 overflow-hidden pointer-events-none select-none">
+    <!-- Large brand wordmark -->
+    <div class="relative h-24 lg:h-36 overflow-hidden pointer-events-none select-none">
       <!-- Top fade gradient -->
-      <div class="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white to-transparent z-10" />
-      <!-- Wordmark image -->
-      <div class="absolute inset-x-0 bottom-0 flex justify-center translate-y-[30%]">
-        <img
-          src="~/assets/images/sentinel-wordmark.png"
-          alt=""
-          class="w-[90%] max-w-5xl h-auto grayscale invert brightness-[0.85] opacity-[0.1] mix-blend-multiply"
+      <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-slate-50 to-transparent z-10" />
+
+      <!-- SVG Wordmark -->
+      <div class="absolute inset-x-0 bottom-0 flex justify-center translate-y-[35%]">
+        <svg
+          viewBox="0 0 600 100"
+          class="w-[95%] max-w-5xl h-auto opacity-[0.03]"
           aria-hidden="true"
         >
+          <text
+            x="50%"
+            y="80"
+            font-family="Instrument Sans, system-ui, -apple-system"
+            font-size="90"
+            font-weight="700"
+            fill="currentColor"
+            class="text-slate-900"
+            text-anchor="middle"
+          >
+            SENTINEL
+          </text>
+        </svg>
       </div>
     </div>
   </footer>
