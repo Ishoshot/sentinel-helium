@@ -128,7 +128,7 @@ const githubUrl = computed(
         class="flex items-center gap-2"
       >
         <span
-          class="w-2.5 h-2.5 rounded-full ring-1 ring-inset ring-black/10 dark:ring-white/10"
+          class="w-2.5 h-2.5 rounded-full ring-1 ring-inset ring-black/10"
           :class="languageColor"
         />
         {{ repository.language }}
