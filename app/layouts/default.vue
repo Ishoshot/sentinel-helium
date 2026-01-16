@@ -195,9 +195,9 @@ function toggleSidebar() {
       :class="isSidebarCollapsed ? 'w-16' : 'w-56'"
     >
       <!-- Workspace Switcher (Header) -->
-      <div class="h-16 mt-1 flex items-center transition-all duration-300" :class="isSidebarCollapsed ? 'px-2 justify-center' : 'px-5'">
+      <div class="h-16 mt-1 pt-3 flex items-center transition-all duration-300" :class="isSidebarCollapsed ? 'px-2 justify-center' : 'px-5'">
         <NuxtLink to="/" class="flex items-center">
-          <SentinelLogo v-if="!isSidebarCollapsed" size="md" />
+          <SentinelLogo v-if="!isSidebarCollapsed" size="lg" />
           <div
             v-else
             class="w-8 h-8 bg-text-primary rounded-lg flex items-center justify-center shrink-0"
@@ -211,7 +211,7 @@ function toggleSidebar() {
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto py-5 transition-all duration-300" :class="isSidebarCollapsed ? 'px-2' : 'px-4'">
+      <nav class="flex-1 overflow-y-auto py-8 transition-all duration-300" :class="isSidebarCollapsed ? 'px-2' : 'px-4'">
         <!-- Main Navigation -->
         <div class="space-y-3" :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''">
           <NuxtLink
@@ -456,7 +456,7 @@ function toggleSidebar() {
       :class="isSidebarCollapsed ? 'lg:pl-16' : 'lg:pl-56'"
     >
       <!-- Top Header -->
-      <header class="sticky top-0 h-16 bg-bg-elevated border-b border-border-subtle z-30">
+      <header class="sticky py-10 top-0 h-16 bg-bg-elevated border-b border-border-subtle z-30">
         <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
           <!-- Left: Breadcrumbs -->
           <div class="flex items-center gap-4 min-w-0">
