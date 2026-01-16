@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
-import { useInvitations } from '~/composables/useInvitations'
 import { OAuthProvider } from '~/types'
+import { useAuth } from '~/composables/auth/useAuth'
+import { useInvitations } from '~/composables/members/useInvitations'
+import DomainAuthOAuthButton from '~/components/domain/auth/OAuthButton.vue'
 
 /**
  * Accept invitation page - handles invitation acceptance
@@ -138,11 +139,11 @@ function handleLogin(provider: OAuthProvider) {
         </p>
 
         <div class="space-y-3">
-          <DomainOAuthButton
+          <DomainAuthOAuthButton
             :provider="OAuthProvider.GitHub"
             @click="handleLogin"
           />
-          <DomainOAuthButton
+          <DomainAuthOAuthButton
             :provider="OAuthProvider.Google"
             @click="handleLogin"
           />

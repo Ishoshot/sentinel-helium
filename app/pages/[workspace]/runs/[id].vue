@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { useRuns } from '~/composables/useRuns'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { formatRelativeTime } from '~/utils/date'
-import { RunStatus, EmptyStateVariant, FindingSeverity, type RunVerdict } from '~/types'
+import { RunStatus, FindingSeverity, type RunVerdict } from '~/types'
+import { useRuns } from '~/composables/reviews/useRuns'
+import DomainReviewsFindingList from '~/components/domain/reviews/FindingList.vue'
+import DomainReviewsRunStatusBadge from '~/components/domain/reviews/RunStatusBadge.vue'
+
+/**
+ * Run Details Page - Premium code review analysis view
+ * State-of-the-art design with visual hierarchy and polish
+ */
 
 definePageMeta({
   middleware: ['auth', 'workspace'],
@@ -71,7 +78,7 @@ const duration = computed(() => {
     return `${(ms / 1000).toFixed(1)}s`
   }
   if (!run.value?.started_at || !run.value?.completed_at) return null
-  return null // Fallback calculation could go here
+  return null
 })
 
 const reviewSummary = computed(() => run.value?.summary ?? run.value?.metadata?.review_summary)
@@ -81,10 +88,10 @@ const verdictBadge = computed(() => {
   const verdict = reviewSummary.value?.verdict as RunVerdict | undefined
   if (!verdict) return null
 
-  const configs: Record<RunVerdict, { label: string; icon: string; variant: 'default' | 'primary' | 'success' | 'warning' | 'error' }> = {
-    approve: { label: 'Approve', icon: 'lucide:check', variant: 'success' },
-    request_changes: { label: 'Request Changes', icon: 'lucide:alert-triangle', variant: 'warning' },
-    comment: { label: 'Comment', icon: 'lucide:message-square', variant: 'primary' },
+  const configs: Record<RunVerdict, { label: string; icon: string; variant: 'default' | 'primary' | 'success' | 'warning' | 'error'; gradient: string }> = {
+    approve: { label: 'Approve', icon: 'lucide:check', variant: 'success', gradient: 'from-success to-emerald-400' },
+    request_changes: { label: 'Request Changes', icon: 'lucide:alert-triangle', variant: 'warning', gradient: 'from-warning to-amber-400' },
+    comment: { label: 'Comment', icon: 'lucide:message-square', variant: 'primary', gradient: 'from-accent to-blue-400' },
   }
 
   return configs[verdict]
@@ -94,14 +101,46 @@ const riskBadge = computed(() => {
   const level = reviewSummary.value?.risk_level?.toLowerCase()
   if (!level) return null
 
-  const configs: Record<string, { label: string; icon: string; variant: 'default' | 'success' | 'warning' | 'error' }> = {
-    low: { label: 'Low Risk', icon: 'lucide:shield-check', variant: 'success' },
-    medium: { label: 'Medium Risk', icon: 'lucide:alert-triangle', variant: 'warning' },
-    high: { label: 'High Risk', icon: 'lucide:alert-circle', variant: 'error' },
-    critical: { label: 'Critical', icon: 'lucide:siren', variant: 'error' },
+  const configs: Record<string, { label: string; icon: string; variant: 'default' | 'success' | 'warning' | 'error'; color: string }> = {
+    low: { label: 'Low Risk', icon: 'lucide:shield-check', variant: 'success', color: 'text-success' },
+    medium: { label: 'Medium Risk', icon: 'lucide:alert-triangle', variant: 'warning', color: 'text-warning' },
+    high: { label: 'High Risk', icon: 'lucide:alert-circle', variant: 'error', color: 'text-error' },
+    critical: { label: 'Critical', icon: 'lucide:siren', variant: 'error', color: 'text-error' },
   }
 
-  return configs[level] ?? { label: level, icon: 'lucide:info', variant: 'default' as const }
+  return configs[level] ?? { label: level, icon: 'lucide:info', variant: 'default' as const, color: 'text-text-muted' }
+})
+
+// Status configuration
+const statusConfig = computed(() => {
+  const configs: Record<string, { gradient: string; bgGradient: string; icon: string }> = {
+    completed: {
+      gradient: 'from-success to-emerald-400',
+      bgGradient: 'from-success/10 via-success/5 to-transparent',
+      icon: 'lucide:check-circle',
+    },
+    in_progress: {
+      gradient: 'from-accent to-blue-400',
+      bgGradient: 'from-accent/10 via-accent/5 to-transparent',
+      icon: 'lucide:loader-2',
+    },
+    queued: {
+      gradient: 'from-violet-500 to-purple-400',
+      bgGradient: 'from-violet-500/10 via-violet-500/5 to-transparent',
+      icon: 'lucide:clock',
+    },
+    failed: {
+      gradient: 'from-error to-rose-400',
+      bgGradient: 'from-error/10 via-error/5 to-transparent',
+      icon: 'lucide:x-circle',
+    },
+    skipped: {
+      gradient: 'from-text-muted to-slate-400',
+      bgGradient: 'from-text-muted/10 via-text-muted/5 to-transparent',
+      icon: 'lucide:skip-forward',
+    },
+  }
+  return configs[run.value?.status ?? 'queued'] ?? configs.queued
 })
 
 // Collapsible state
@@ -118,48 +157,47 @@ const findingsBySeverity = computed(() => {
     [FindingSeverity.Low]: 0,
     [FindingSeverity.Info]: 0
   }
-  
+
   run.value?.findings?.forEach(f => {
     const severity = f.severity?.toLowerCase() as FindingSeverity
     if (counts[severity] !== undefined) {
       counts[severity]++
     }
   })
-  
+
   return counts
 })
 
 const filteredFindings = computed(() => {
   if (!run.value?.findings) return []
   if (selectedSeverity.value === 'all') return run.value.findings
-  
-  return run.value.findings.filter(f => 
+
+  return run.value.findings.filter(f =>
     (f.severity?.toLowerCase() as FindingSeverity) === selectedSeverity.value
   )
 })
 
-const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; count: number; color: string }[]>(() => [
-  { label: 'All', value: 'all', count: findingsCount.value, color: 'text-text-primary' },
-  { label: 'Critical', value: FindingSeverity.Critical, count: findingsBySeverity.value[FindingSeverity.Critical] ?? 0, color: 'text-error' },
-  { label: 'High', value: FindingSeverity.High, count: findingsBySeverity.value[FindingSeverity.High] ?? 0, color: 'text-error' },
-  { label: 'Medium', value: FindingSeverity.Medium, count: findingsBySeverity.value[FindingSeverity.Medium] ?? 0, color: 'text-warning' },
-  { label: 'Low', value: FindingSeverity.Low, count: findingsBySeverity.value[FindingSeverity.Low] ?? 0, color: 'text-success' },
-  { label: 'Info', value: FindingSeverity.Info, count: findingsBySeverity.value[FindingSeverity.Info] ?? 0, color: 'text-text-muted' },
+const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; count: number; color: string; bgColor: string }[]>(() => [
+  { label: 'All', value: 'all', count: findingsCount.value, color: 'text-text-primary', bgColor: 'bg-bg-surface' },
+  { label: 'Critical', value: FindingSeverity.Critical, count: findingsBySeverity.value[FindingSeverity.Critical] ?? 0, color: 'text-error', bgColor: 'bg-error/10' },
+  { label: 'High', value: FindingSeverity.High, count: findingsBySeverity.value[FindingSeverity.High] ?? 0, color: 'text-error', bgColor: 'bg-error/10' },
+  { label: 'Medium', value: FindingSeverity.Medium, count: findingsBySeverity.value[FindingSeverity.Medium] ?? 0, color: 'text-warning', bgColor: 'bg-warning/10' },
+  { label: 'Low', value: FindingSeverity.Low, count: findingsBySeverity.value[FindingSeverity.Low] ?? 0, color: 'text-success', bgColor: 'bg-success/10' },
+  { label: 'Info', value: FindingSeverity.Info, count: findingsBySeverity.value[FindingSeverity.Info] ?? 0, color: 'text-text-muted', bgColor: 'bg-bg-surface' },
 ])
-
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto">
+  <BaseContainer size="md">
     <!-- Header Navigation -->
-    <div class="mb-10">
-      <button 
-        class="text-text-muted hover:text-text-primary transition-colors flex items-center gap-1 text-sm font-medium"
+    <div class="mb-8">
+      <button
+        class="group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary bg-bg-elevated hover:bg-bg-surface border border-border-subtle hover:border-border-muted rounded-xl transition-all hover:shadow-sm"
         @click="goBack"
       >
         <Icon
           name="lucide:arrow-left"
-          class="w-4 h-4"
+          class="size-4 group-hover:-translate-x-0.5 transition-transform"
         />
         Back to Runs
       </button>
@@ -170,535 +208,508 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
       v-if="isLoading"
       class="space-y-6"
     >
-      <BaseSkeleton class="h-32 w-full rounded-xl" />
-      <BaseSkeleton class="h-64 w-full rounded-xl" />
+      <BaseSkeleton class="h-64 w-full rounded-2xl" />
+      <BaseSkeleton class="h-48 w-full rounded-2xl" />
+      <BaseSkeleton class="h-96 w-full rounded-2xl" />
     </div>
 
     <!-- Error State -->
-    <BaseCard
+    <div
       v-else-if="error"
-      class="bg-error/5 border-error/10"
+      class="rounded-2xl border border-error/20 bg-bg-elevated p-12"
     >
-      <div class="flex flex-col items-center justify-center py-12 text-center">
-        <div class="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center mb-4">
-          <Icon
-            name="lucide:alert-octagon"
-            class="w-6 h-6"
-          />
+      <div class="mx-auto max-w-md text-center">
+        <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-error/10">
+          <Icon name="lucide:alert-octagon" class="size-10 text-error" />
         </div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2">
-          Run not found
-        </h3>
-        <p class="text-text-secondary mb-6">
-          {{ error }}
-        </p>
-        <BaseButton
-          variant="secondary"
-          @click="goBack"
-        >
+        <h3 class="mb-2 text-xl font-bold text-text-primary">Run not found</h3>
+        <p class="mb-8 text-sm text-text-secondary">{{ error }}</p>
+        <BaseButton variant="secondary" @click="goBack">
+          <Icon name="lucide:arrow-left" class="size-4" />
           Return to Runs
         </BaseButton>
       </div>
-    </BaseCard>
+    </div>
 
-    <!-- Run Error State -->
+    <!-- Skipped Run State -->
     <div
-      v-if="run && run.status === RunStatus.Skipped && run?.metadata?.skip_reason"
-      class="mb-8 p-4 bg-error/5 border border-error/20 rounded-xl"
+      v-else-if="run && run.status === RunStatus.Skipped && run?.metadata?.skip_reason"
+      class="mb-8 overflow-hidden rounded-2xl border border-warning/20 bg-bg-elevated"
     >
-      <div class="flex items-start gap-3">
-        <div class="w-8 h-8 rounded-lg bg-error/10 flex items-center justify-center shrink-0">
-          <Icon
-            name="lucide:alert-circle"
-            class="w-4 h-4 text-error"
-          />
-        </div>
-        <div>
-          <h3 class="text-sm font-semibold text-text-primary mb-1">
-            Analysis Failed
-          </h3>
-          <p class="text-sm text-text-secondary">
-            {{ run.metadata.skip_message ?? run.metadata.skip_reason }}
-          </p>
-          <div
-            v-if="run.metadata.skip_message?.toLowerCase().includes('provider key') || run.metadata.skip_reason?.toLowerCase() === 'no_provider_keys'"
-            class="mt-3"
-          >
-            <NuxtLink
-              v-if="run.repository_id"
-              :to="`/${workspaceSlug}/repositories?settings=${run.repository_id}`"
-              class="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent-hover"
+      <div class="bg-gradient-to-r from-warning/10 via-warning/5 to-transparent p-6">
+        <div class="flex items-start gap-4">
+          <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-warning/10">
+            <Icon name="lucide:skip-forward" class="size-6 text-warning" />
+          </div>
+          <div class="flex-1">
+            <h3 class="mb-1 text-lg font-bold text-text-primary">Review Skipped</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              {{ run.metadata.skip_message ?? run.metadata.skip_reason }}
+            </p>
+            <div
+              v-if="run.metadata.skip_message?.toLowerCase().includes('provider key') || run.metadata.skip_reason?.toLowerCase() === 'no_provider_keys'"
+              class="mt-4"
             >
-              Configure Provider Keys
-              <Icon
-                name="lucide:arrow-right"
-                class="w-4 h-4"
-              />
-            </NuxtLink>
+              <NuxtLink
+                v-if="run.repository_id"
+                :to="`/${workspaceSlug}/settings/api-keys`"
+                class="inline-flex items-center gap-2 rounded-lg bg-warning/10 px-4 py-2 text-sm font-semibold text-warning transition-colors hover:bg-warning/20"
+              >
+                <Icon name="lucide:key" class="size-4" />
+                Configure Provider Keys
+                <Icon name="lucide:arrow-right" class="size-4" />
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <template v-else-if="run">
-      <!-- Run Header Card -->
-      <div class="bg-bg-elevated border border-border-subtle rounded-xl shadow-sm overflow-hidden mb-8">
-        <!-- Top Section: Identity & Context -->
-        <div class="p-4 pb-4 sm:p-6 sm:pb-5 lg:p-8 lg:pb-6">
-          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
-            <!-- Icon -->
-            <div class="w-14 h-14 rounded-xl bg-bg-surface ring-1 ring-border-subtle flex items-center justify-center shrink-0 shadow-sm">
-              <Icon
-                name="lucide:play-circle"
-                class="w-7 h-7 text-text-muted"
-              />
-            </div>
+      <!-- Run Header Card - Hero Section -->
+      <section class="relative mb-8 overflow-hidden rounded-2xl border border-border-subtle bg-bg-elevated">
+        <!-- Background gradient based on status -->
+        <div
+          class="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-50"
+          :class="statusConfig.bgGradient"
+        />
 
-            <div class="flex-1 min-w-0 pt-1">
-              <!-- Title Row -->
-              <div class="flex items-center gap-3 mb-3 flex-wrap">
-                <div class="text-2xl flex items-baseline gap-2 leading-none">
-                  <span
-                    v-if="prNumber"
-                    class="font-mono font-medium text-text-muted"
-                  >#{{ prNumber }}</span>
-                  <span class="font-bold text-text-primary">{{ prTitle || 'Run Details' }}</span>
-                </div>
-                
-                <DomainRunStatusBadge :status="run.status" />
-                
-                <BaseBadge 
-                  v-if="isDraft"
-                  size="sm"
-                  class="bg-bg-surface text-text-muted border border-border-subtle"
-                >
-                  Draft
-                </BaseBadge>
-              </div>
+        <!-- Decorative elements -->
+        <div
+          class="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-gradient-to-br opacity-20 blur-3xl"
+          :class="statusConfig.gradient"
+        />
 
-              <!-- Labels Row -->
+        <div class="relative p-8">
+          <!-- Top Row: Icon + Title + Status -->
+          <div class="mb-8 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div class="flex items-start gap-4">
               <div
-                v-if="labels.length > 0"
-                class="flex items-center gap-2 mb-4 flex-wrap"
+                class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg"
+                :class="statusConfig.gradient"
               >
-                <BaseLabel
-                  v-for="label in labels"
-                  :key="label.name"
-                  :name="label.name"
-                  :color="label.color"
-                  size="sm"
+                <Icon
+                  :name="statusConfig.icon"
+                  class="size-7 text-white"
+                  :class="{ 'animate-spin': run.status === RunStatus.InProgress }"
                 />
               </div>
-
-              <!-- Context Row -->
-              <div class="flex items-center gap-x-6 gap-y-2 flex-wrap text-sm text-text-secondary">
-                <div class="flex items-center gap-2">
-                  <Icon
-                    name="lucide:folder-git-2"
-                    class="w-4 h-4 text-text-muted"
-                  />
-                  <span class="font-medium">{{ repositoryName }}</span>
+              <div>
+                <div class="mb-2 flex flex-wrap items-center gap-2">
+                  <span
+                    v-if="prNumber"
+                    class="font-mono text-lg font-semibold text-text-muted"
+                  >
+                    #{{ prNumber }}
+                  </span>
+                  <DomainReviewsRunStatusBadge :status="run.status" />
+                  <BaseBadge
+                    v-if="isDraft"
+                    size="sm"
+                    class="border border-border-subtle bg-bg-surface text-text-muted"
+                  >
+                    <Icon name="lucide:file-edit" class="mr-1 size-3" />
+                    Draft
+                  </BaseBadge>
                 </div>
-                
-                <div
-                  v-if="headBranch"
-                  class="flex items-center gap-2 font-mono text-xs text-text-muted"
-                >
-                  <Icon
-                    name="lucide:git-branch"
-                    class="w-3.5 h-3.5"
-                  />
-                  <span>{{ headBranch }}</span>
-                  <Icon
-                    name="lucide:arrow-right"
-                    class="w-3 h-3 text-text-muted/50"
-                  />
-                  <span>{{ baseBranch }}</span>
-                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-text-primary lg:text-3xl">
+                  {{ prTitle || 'Run Details' }}
+                </h1>
               </div>
+            </div>
+
+            <!-- Verdict & Risk Badges -->
+            <div
+              v-if="verdictBadge || riskBadge"
+              class="flex flex-wrap gap-2"
+            >
+              <div
+                v-if="verdictBadge"
+                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg"
+                :class="`bg-gradient-to-r ${verdictBadge.gradient}`"
+              >
+                <Icon :name="verdictBadge.icon" class="size-4" />
+                {{ verdictBadge.label }}
+              </div>
+              <div
+                v-if="riskBadge"
+                class="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold"
+                :class="[
+                  riskBadge.color,
+                  riskBadge.variant === 'error' ? 'border-error/20 bg-error/10' :
+                  riskBadge.variant === 'warning' ? 'border-warning/20 bg-warning/10' :
+                  riskBadge.variant === 'success' ? 'border-success/20 bg-success/10' :
+                  'border-border-subtle bg-bg-surface'
+                ]"
+              >
+                <Icon :name="riskBadge.icon" class="size-4" />
+                {{ riskBadge.label }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Labels -->
+          <div
+            v-if="labels.length > 0"
+            class="mb-6 flex flex-wrap gap-2"
+          >
+            <BaseLabel
+              v-for="label in labels"
+              :key="label.name"
+              :name="label.name"
+              :color="label.color"
+              size="md"
+            />
+          </div>
+
+          <!-- Context Row -->
+          <div class="flex flex-wrap items-center gap-6 text-sm">
+            <div class="flex items-center gap-2.5">
+              <div class="flex size-8 items-center justify-center rounded-lg border border-border-subtle bg-bg-surface">
+                <Icon name="lucide:folder-git-2" class="size-4 text-text-muted" />
+              </div>
+              <span class="font-semibold text-text-primary">{{ repositoryName }}</span>
+            </div>
+
+            <div
+              v-if="headBranch"
+              class="flex items-center gap-2 font-mono text-sm text-text-secondary"
+            >
+              <Icon name="lucide:git-branch" class="size-4 text-text-muted" />
+              <span>{{ headBranch }}</span>
+              <Icon name="lucide:arrow-right" class="size-3.5 text-text-muted/50" />
+              <span>{{ baseBranch }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Divider -->
-        <div class="h-px bg-border-subtle w-full" />
-
-        <!-- Primary Meta Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 gap-px border-t border-border-subtle bg-border-subtle lg:grid-cols-4">
           <!-- Author -->
-          <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              Author
-            </div>
-            <div class="flex items-center gap-2 h-8">
+          <div class="bg-bg-elevated p-6">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Author</p>
+            <div class="flex items-center gap-3">
               <template v-if="author">
-                <BaseAvatar 
-                  :src="author.avatar_url" 
-                  :name="author.login" 
-                  size="sm" 
-                  class="ring-1 ring-border-subtle"
+                <BaseAvatar
+                  :src="author.avatar_url"
+                  :name="author.login"
+                  size="md"
+                  class="ring-2 ring-border-subtle"
                 />
-                <span class="text-sm font-medium text-text-primary">{{ author.login }}</span>
+                <span class="text-sm font-semibold text-text-primary">{{ author.login }}</span>
               </template>
-              <span
-                v-else
-                class="text-sm text-text-secondary"
-              >System</span>
+              <span v-else class="text-sm italic text-text-muted">System</span>
             </div>
           </div>
 
           <!-- Assignees -->
-          <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              Assignees
-            </div>
-            <div
-              v-if="assignees.length > 0"
-              class="flex items-center -space-x-2 h-8"
-            >
+          <div class="bg-bg-elevated p-6">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Assignees</p>
+            <div v-if="assignees.length > 0" class="-space-x-2 flex items-center">
               <BaseAvatar
                 v-for="user in assignees"
                 :key="user.login"
                 :src="user.avatar_url"
                 :name="user.login"
-                size="sm"
-                class="ring-2 ring-bg-elevated hover:z-10 transition-all"
+                size="md"
+                class="ring-2 ring-bg-elevated transition-transform hover:z-10 hover:scale-110"
                 :title="user.login"
               />
             </div>
-            <div
-              v-else
-              class="h-8 flex items-center text-sm text-text-muted italic"
-            >
-              None assigned
-            </div>
+            <span v-else class="text-sm italic text-text-muted">None assigned</span>
           </div>
 
           <!-- Started -->
-          <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              Started
-            </div>
-            <div class="h-8 flex items-center text-sm font-medium text-text-primary">
+          <div class="bg-bg-elevated p-6">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Started</p>
+            <div class="flex items-center gap-2 text-sm font-semibold text-text-primary">
+              <Icon name="lucide:clock" class="size-4 text-text-muted" />
               {{ formatRelativeTime(run.started_at || run.created_at) }}
             </div>
           </div>
 
-          <!-- Status -->
-          <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              Status
-            </div>
-            <div class="h-8 flex items-center text-sm font-medium text-text-primary capitalize">
-              {{ run.status.replace('_', ' ') }}
+          <!-- Findings Summary -->
+          <div class="bg-bg-elevated p-6">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Findings</p>
+            <div class="flex items-center gap-3">
+              <div
+                class="flex size-10 items-center justify-center rounded-xl"
+                :class="hasFindings ? 'bg-error/10' : 'bg-success/10'"
+              >
+                <Icon
+                  :name="hasFindings ? 'lucide:alert-circle' : 'lucide:check-circle'"
+                  class="size-5"
+                  :class="hasFindings ? 'text-error' : 'text-success'"
+                />
+              </div>
+              <div>
+                <p class="text-xl font-bold" :class="hasFindings ? 'text-error' : 'text-success'">
+                  {{ findingsCount }}
+                </p>
+                <p class="text-xs text-text-muted">{{ hasFindings ? 'issues found' : 'no issues' }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Findings Summary -->
-        <div class="px-4 sm:px-6 lg:px-8 pb-6 lg:pb-8">
-          <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-            Findings
-          </div>
-          <div
-            class="text-sm font-medium"
-            :class="hasFindings ? 'text-error' : 'text-success'"
-          >
-            {{ findingsCount }} issues found
-          </div>
-        </div>
-
-        <!-- Metrics Grid (Secondary) -->
+        <!-- Metrics Row -->
         <div
           v-if="metrics"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 p-4 sm:p-6 lg:p-8 border-t border-border-subtle bg-bg-surface/50"
+          class="grid grid-cols-2 gap-6 border-t border-border-subtle bg-bg-surface/50 p-6 lg:grid-cols-4"
         >
           <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-              Files Changed
-            </div>
-            <div class="text-lg font-mono text-text-primary">
-              {{ metrics.files_changed }}
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Files Changed</p>
+            <div class="flex items-center gap-2">
+              <Icon name="lucide:file-diff" class="size-5 text-accent" />
+              <span class="font-mono text-2xl font-bold text-text-primary">{{ metrics.files_changed }}</span>
             </div>
           </div>
-          
           <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-              Lines
-            </div>
-            <div class="text-lg font-mono flex items-center gap-2">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Lines Changed</p>
+            <div class="flex items-center gap-2 font-mono text-lg font-semibold">
               <span class="text-success">+{{ metrics.lines_added }}</span>
               <span class="text-text-muted/30">|</span>
               <span class="text-error">-{{ metrics.lines_deleted }}</span>
             </div>
           </div>
-
           <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-              Tokens
-            </div>
-            <div class="text-lg font-mono text-text-primary">
-              {{ metrics.tokens_used_estimated.toLocaleString() }}
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Tokens Used</p>
+            <div class="flex items-center gap-2">
+              <Icon name="lucide:zap" class="size-5 text-warning" />
+              <span class="font-mono text-2xl font-bold text-text-primary">{{ metrics.tokens_used_estimated.toLocaleString() }}</span>
             </div>
           </div>
-
           <div>
-            <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-              Duration
-            </div>
-            <div class="text-lg font-mono text-text-primary">
-              {{ duration || '-' }}
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Duration</p>
+            <div class="flex items-center gap-2">
+              <Icon name="lucide:timer" class="size-5 text-accent" />
+              <span class="font-mono text-2xl font-bold text-text-primary">{{ duration || '-' }}</span>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Review Summary Card -->
-      <div 
+      <section
         v-if="run.status === RunStatus.Completed || run.status === RunStatus.Failed"
-        class="bg-bg-elevated border border-border-subtle rounded-xl mb-8 shadow-sm transition-all duration-200"
+        class="mb-8 overflow-hidden rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm"
       >
-        <button 
-          class="w-full flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 hover:bg-bg-surface/50 transition-colors rounded-xl focus-ring"
+        <button
+          class="flex w-full items-center justify-between gap-4 p-6 text-left transition-colors hover:bg-bg-surface/50"
           @click="isReviewExpanded = !isReviewExpanded"
         >
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center text-accent">
-              <Icon
-                name="lucide:file-text"
-                class="w-4 h-4"
-              />
+          <div class="flex items-center gap-4">
+            <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-sm">
+              <Icon name="lucide:file-text" class="size-6 text-accent" />
             </div>
-            <h2 class="text-lg font-semibold text-text-primary">
-              Review Summary
-            </h2>
+            <h2 class="text-xl font-bold text-text-primary">Review Summary</h2>
           </div>
-
-          <div class="flex items-center gap-2 flex-wrap">
-            <BaseBadge
-              v-if="verdictBadge"
-              size="sm"
-              :variant="verdictBadge.variant"
-              class="gap-1.5"
-            >
-              <Icon
-                :name="verdictBadge.icon"
-                class="w-3.5 h-3.5"
-              />
-              <span>{{ verdictBadge.label }}</span>
-            </BaseBadge>
-
-            <BaseBadge
-              v-if="riskBadge"
-              size="sm"
-              :variant="riskBadge.variant"
-              class="gap-1.5"
-            >
-              <Icon
-                :name="riskBadge.icon"
-                class="w-3.5 h-3.5"
-              />
-              <span>{{ riskBadge.label }}</span>
-            </BaseBadge>
-
-            <Icon 
-              name="lucide:chevron-down" 
-              class="w-5 h-5 text-text-muted transition-transform duration-200"
-              :class="{ 'rotate-180': isReviewExpanded }"
-            />
-          </div>
+          <Icon
+            name="lucide:chevron-down"
+            class="size-5 text-text-muted transition-transform duration-300"
+            :class="{ 'rotate-180': isReviewExpanded }"
+          />
         </button>
 
-        <div
-          v-show="isReviewExpanded"
-          class="px-4 sm:px-6 pb-6"
+        <Transition
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-all duration-150 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
         >
-          <div
-            v-if="reviewSummary"
-            class="space-y-4 pt-2 border-t border-border-subtle"
-          >
-            <p class="text-text-secondary leading-relaxed mt-4 whitespace-pre-line">
-              {{ reviewSummary.overview }}
-            </p>
+          <div v-if="isReviewExpanded" class="border-t border-border-subtle px-6 pb-6">
+            <div v-if="reviewSummary" class="space-y-6 pt-6">
+              <!-- Overview -->
+              <BaseMarkdown
+                v-if="reviewSummary.overview"
+                :content="reviewSummary.overview"
+                class="text-sm leading-relaxed"
+              />
 
-            <div
-              v-if="reviewSummary.strengths?.length || reviewSummary.concerns?.length"
-              class="grid gap-6 sm:grid-cols-2"
-            >
+              <!-- Strengths & Concerns Grid -->
               <div
-                v-if="reviewSummary.strengths?.length"
-                class="space-y-2"
+                v-if="reviewSummary.strengths?.length || reviewSummary.concerns?.length"
+                class="grid gap-6 lg:grid-cols-2"
               >
-                <h3 class="text-sm font-medium text-text-primary flex items-center gap-2">
-                  <Icon
-                    name="lucide:check-circle"
-                    class="w-4 h-4 text-success"
-                  />
-                  <span>Strengths</span>
-                </h3>
-                <ul class="space-y-1.5">
-                  <li
-                    v-for="(strength, index) in reviewSummary.strengths"
-                    :key="index"
-                    class="flex items-start gap-2 text-sm text-text-secondary"
-                  >
-                    <span class="mt-1 w-1 h-1 rounded-full bg-border-muted shrink-0" />
-                    <span>{{ strength }}</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="space-y-2">
-                <h3 class="text-sm font-medium text-text-primary flex items-center gap-2">
-                  <Icon
-                    name="lucide:alert-triangle"
-                    class="w-4 h-4 text-warning"
-                  />
-                  <span>Concerns</span>
-                </h3>
-                <ul
-                  v-if="reviewSummary.concerns?.length"
-                  class="space-y-1.5"
-                >
-                  <li
-                    v-for="(concern, index) in reviewSummary.concerns"
-                    :key="index"
-                    class="flex items-start gap-2 text-sm text-text-secondary"
-                  >
-                    <span class="mt-1 w-1 h-1 rounded-full bg-border-muted shrink-0" />
-                    <span>{{ concern }}</span>
-                  </li>
-                </ul>
+                <!-- Strengths -->
                 <div
-                  v-else
-                  class="text-sm text-text-muted italic"
+                  v-if="reviewSummary.strengths?.length"
+                  class="rounded-xl border border-success/20 bg-success/5 p-5"
                 >
-                  No concerns identified
+                  <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
+                    <div class="flex size-8 items-center justify-center rounded-lg bg-success/10">
+                      <Icon name="lucide:check-circle" class="size-4 text-success" />
+                    </div>
+                    Strengths
+                  </h3>
+                  <ul class="space-y-2.5">
+                    <li
+                      v-for="(strength, index) in reviewSummary.strengths"
+                      :key="index"
+                      class="flex items-start gap-3 text-sm leading-relaxed text-text-secondary"
+                    >
+                      <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-success" />
+                      {{ strength }}
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Concerns -->
+                <div
+                  class="rounded-xl border p-5"
+                  :class="reviewSummary.concerns?.length ? 'border-warning/20 bg-warning/5' : 'border-border-subtle bg-bg-surface'"
+                >
+                  <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
+                    <div
+                      class="flex size-8 items-center justify-center rounded-lg"
+                      :class="reviewSummary.concerns?.length ? 'bg-warning/10' : 'bg-bg-elevated'"
+                    >
+                      <Icon
+                        name="lucide:alert-triangle"
+                        class="size-4"
+                        :class="reviewSummary.concerns?.length ? 'text-warning' : 'text-text-muted'"
+                      />
+                    </div>
+                    Concerns
+                  </h3>
+                  <ul v-if="reviewSummary.concerns?.length" class="space-y-2.5">
+                    <li
+                      v-for="(concern, index) in reviewSummary.concerns"
+                      :key="index"
+                      class="flex items-start gap-3 text-sm leading-relaxed text-text-secondary"
+                    >
+                      <span class="mt-1.5 size-1.5 shrink-0 rounded-full bg-warning" />
+                      {{ concern }}
+                    </li>
+                  </ul>
+                  <p v-else class="text-sm italic text-text-muted">No concerns identified</p>
                 </div>
               </div>
+
+              <!-- Recommendations -->
+              <div
+                v-if="reviewSummary.recommendations?.length"
+                class="rounded-xl border border-accent/20 bg-accent/5 p-5"
+              >
+                <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
+                  <div class="flex size-8 items-center justify-center rounded-lg bg-accent/10">
+                    <Icon name="lucide:lightbulb" class="size-4 text-accent" />
+                  </div>
+                  Recommendations
+                </h3>
+                <ul class="space-y-3">
+                  <li
+                    v-for="(rec, index) in reviewSummary.recommendations"
+                    :key="index"
+                    class="flex items-start gap-3 text-sm leading-relaxed text-text-secondary"
+                  >
+                    <Icon name="lucide:check-circle" class="mt-0.5 size-4 shrink-0 text-accent" />
+                    {{ rec }}
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            <div
-              v-if="reviewSummary.recommendations?.length"
-              class="space-y-2"
-            >
-              <h3 class="text-sm font-medium text-text-primary">
-                Recommendations
-              </h3>
-              <ul class="space-y-1.5">
-                <li 
-                  v-for="(rec, index) in reviewSummary.recommendations" 
-                  :key="index"
-                  class="flex items-start gap-2 text-sm text-text-secondary"
-                >
-                  <Icon
-                    name="lucide:check-circle"
-                    class="w-4 h-4 text-success mt-0.5 shrink-0"
-                  />
-                  <span>{{ rec }}</span>
-                </li>
-              </ul>
+            <!-- Pending State -->
+            <div v-else class="flex items-center justify-center gap-3 py-12 text-text-muted">
+              <Icon name="lucide:loader" class="size-5 animate-spin" />
+              <span class="text-sm">Review summary pending...</span>
             </div>
           </div>
-
-          <div
-            v-else
-            class="flex items-center gap-2 text-text-muted text-sm pt-2"
-          >
-            <Icon
-              name="lucide:clock"
-              class="w-4 h-4"
-            />
-            <span>Review summary pending...</span>
-          </div>
-        </div>
-      </div>
+        </Transition>
+      </section>
 
       <!-- Findings Section -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-4">
-          <h2 class="text-lg font-semibold text-text-primary">
-            Findings
-          </h2>
-          
+      <section class="space-y-6">
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-text-primary">Findings</h2>
+            <p class="mt-1 text-sm text-text-secondary">
+              {{ hasFindings ? `${findingsCount} issue${findingsCount !== 1 ? 's' : ''} identified` : 'No issues found' }}
+            </p>
+          </div>
+
           <!-- Severity Filter Tabs -->
-          <div
-            v-if="hasFindings"
-            class="flex flex-wrap items-center gap-1 p-1 bg-bg-elevated rounded-lg border border-border-subtle"
-          >
-            <button
-              v-for="tab in severityTabs"
-              :key="tab.value"
-              class="px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200 flex items-center gap-2"
-              :class="[
-                selectedSeverity === tab.value 
-                  ? 'bg-bg-surface text-text-primary shadow-sm' 
-                  : 'text-text-muted hover:text-text-primary hover:bg-bg-surface/50'
-              ]"
-              @click="selectedSeverity = tab.value"
-            >
-              <span>{{ tab.label }}</span>
-              <span 
-                class="px-1.5 py-0.5 rounded-full bg-bg-surface text-[10px]"
-                :class="selectedSeverity === tab.value ? tab.color : 'text-text-muted group-hover:text-text-primary'"
+          <div v-if="hasFindings" class="w-full overflow-x-auto sm:w-auto">
+            <div class="flex min-w-max gap-1 rounded-xl border border-border-subtle bg-bg-elevated p-1.5">
+              <button
+                v-for="tab in severityTabs"
+                :key="tab.value"
+                type="button"
+                class="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200"
+                :class="selectedSeverity === tab.value
+                  ? 'bg-bg-surface text-text-primary shadow-sm'
+                  : 'text-text-muted hover:bg-bg-surface/50 hover:text-text-secondary'"
+                @click="selectedSeverity = tab.value"
               >
-                {{ tab.count }}
-              </span>
-            </button>
+                <span>{{ tab.label }}</span>
+                <span
+                  class="flex size-5 items-center justify-center rounded-full text-xs font-bold"
+                  :class="selectedSeverity === tab.value ? [tab.bgColor, tab.color] : 'bg-bg-surface text-text-muted'"
+                >
+                  {{ tab.count }}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
+        <!-- Findings List -->
         <div v-if="hasFindings">
-          <div v-if="filteredFindings.length > 0">
-            <DomainFindingList :findings="filteredFindings" />
-          </div>
-          
-          <!-- Empty State for Filter -->
-          <BaseEmptyState
-            v-else
-            icon="lucide:filter"
-            :variant="EmptyStateVariant.Info"
-            title="No matches found"
-            description="There are no findings with this severity level."
-          >
-            <button 
-              class="mt-4 text-sm text-accent hover:text-accent-hover font-medium"
+          <DomainReviewsFindingList v-if="filteredFindings.length > 0" :findings="filteredFindings" />
+
+          <!-- Empty Filter State -->
+          <div v-else class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center">
+            <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-bg-surface">
+              <Icon name="lucide:filter" class="size-8 text-text-muted" />
+            </div>
+            <h3 class="mb-2 text-lg font-bold text-text-primary">No matches found</h3>
+            <p class="mb-6 text-sm text-text-secondary">No findings with this severity level.</p>
+            <button
+              class="rounded-lg bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
               @click="selectedSeverity = 'all'"
             >
-              Clear filters
+              <Icon name="lucide:x-circle" class="mr-2 inline size-4" />
+              Clear filter
             </button>
-          </BaseEmptyState>
+          </div>
         </div>
 
-        <BaseEmptyState
+        <!-- No Findings - Completed -->
+        <div
           v-else-if="run.status === RunStatus.Completed"
-          icon="lucide:check-circle-2"
-          :variant="EmptyStateVariant.Success"
-          title="No findings detected"
-          description="Great job! No issues were found in this run."
-        />
-
-        <BaseEmptyState
-          v-else-if="run.status === RunStatus.Queued || run.status === RunStatus.InProgress"
-          icon="lucide:loader-2"
-          title="Analysis in progress"
-          description="Waiting for the review to complete..."
+          class="rounded-2xl border border-success/20 bg-bg-elevated p-12 text-center"
         >
-          <div class="mt-4 flex justify-center">
-            <Icon
-              name="lucide:loader"
-              class="w-6 h-6 animate-spin text-accent"
-            />
+          <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-success/10">
+            <Icon name="lucide:check-circle-2" class="size-10 text-success" />
           </div>
-        </BaseEmptyState>
-        
-        <BaseEmptyState
-          v-else
-          icon="lucide:search"
-          title="No findings"
-          description="No findings have been recorded for this run."
-        />
-      </div>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">No findings detected</h3>
+          <p class="text-sm text-text-secondary">Great job! No issues were found in this run.</p>
+        </div>
+
+        <!-- In Progress -->
+        <div
+          v-else-if="run.status === RunStatus.Queued || run.status === RunStatus.InProgress"
+          class="rounded-2xl border border-accent/20 bg-bg-elevated p-12 text-center"
+        >
+          <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-accent/10">
+            <Icon name="lucide:loader" class="size-10 animate-spin text-accent" />
+          </div>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">Analysis in progress</h3>
+          <p class="text-sm text-text-secondary">Waiting for the review to complete...</p>
+        </div>
+
+        <!-- Generic Empty -->
+        <div v-else class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center">
+          <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-bg-surface">
+            <Icon name="lucide:search" class="size-10 text-text-muted" />
+          </div>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">No findings</h3>
+          <p class="text-sm text-text-secondary">No findings have been recorded for this run.</p>
+        </div>
+      </section>
     </template>
-  </div>
+  </BaseContainer>
 </template>

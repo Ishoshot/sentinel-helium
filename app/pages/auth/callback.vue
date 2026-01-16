@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
-import { useWorkspaces } from '~/composables/useWorkspaces'
+import { useAuth } from '~/composables/auth/useAuth'
+import { useWorkspaces } from '~/composables/workspace/useWorkspaces'
 
 /**
  * OAuth callback page - handles the redirect from OAuth provider
