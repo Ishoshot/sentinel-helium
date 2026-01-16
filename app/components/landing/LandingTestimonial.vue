@@ -6,24 +6,24 @@
 const testimonials = [
   {
     quote: 'Sentinel caught a critical SQL injection vulnerability in our authentication flow. The review was fast, clear, and immediately actionable.',
-    author: 'Sarah Chen',
-    role: 'Staff Engineer',
-    company: 'Acme Labs',
-    initials: 'SC',
+    author: 'Oluwatobi Ishola Akinleye',
+    role: 'Engineering Lead',
+    company: 'Blaaiz',
+    initials: 'OI',
   },
   {
     quote: 'We deployed Sentinel across 12 repositories in under an hour. The consistency in review quality has been remarkable.',
-    author: 'Marcus Rodriguez',
-    role: 'Engineering Lead',
-    company: 'Nexus Systems',
-    initials: 'MR',
+    author: 'Gbenga Onikade',
+    role: 'Chief Technology Officer',
+    company: 'Blaaiz',
+    initials: 'GO',
   },
   {
     quote: 'The BYOK model was a game-changer for us. We control our AI spend while getting intelligent reviews on every PR.',
-    author: 'Emily Park',
-    role: 'CTO',
-    company: 'Streamline',
-    initials: 'EP',
+    author: 'Philips Akinleye',
+    role: 'Chief Technology Officer',
+    company: 'Payaza',
+    initials: 'PA',
   },
 ]
 </script>
@@ -61,8 +61,8 @@ const testimonials = [
 
           <!-- Author -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <span class="text-xs font-semibold text-white">{{ testimonial.initials }}</span>
+            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+              <span class="text-xs font-semibold text-slate-900">{{ testimonial.initials }}</span>
             </div>
             <div>
               <div class="text-sm font-semibold text-slate-900">{{ testimonial.author }}</div>
