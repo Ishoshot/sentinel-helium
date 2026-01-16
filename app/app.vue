@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuth } from '~/composables/useAuth'
+import { useAuth } from '~/composables/auth/useAuth'
 
 /**
  * Root application component

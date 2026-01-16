@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ToastType } from '~/types'
+import { useAppToast } from '~/composables/shared/useAppToast'
 
 /**
  * ToastContainer - Renders toast notifications

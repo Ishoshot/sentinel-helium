@@ -120,7 +120,7 @@ const directionClasses = computed(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-50 w-full min-w-[12rem] max-w-[calc(100vw-2rem)] bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
+        class="absolute z-[100] w-full min-w-[12rem] max-w-[calc(100vw-2rem)] rounded-xl shadow-2xl overflow-hidden ring-1 ring-black/5 bg-white dark:bg-[#1a1a24] dark:ring-white/10"
         :class="[alignmentClasses, directionClasses, menuWidth]"
       >
         <!-- Search -->
@@ -137,7 +137,7 @@ const directionClasses = computed(() => {
           >
         </div>
 
-        <div class="py-1 max-h-64 overflow-y-auto">
+        <div class="py-2 max-h-64 overflow-y-auto">
           <slot>
             <template
               v-for="(item, index) in displayItems"
@@ -146,40 +146,42 @@ const directionClasses = computed(() => {
               <!-- Separator -->
               <div
                 v-if="item.separator"
-                class="my-1 border-t border-border-subtle"
+                class="my-2 mx-3 border-t border-slate-200 dark:border-white/10"
               />
 
               <!-- Menu item -->
               <button
                 v-else
-                class="w-full flex items-center justify-between px-3 py-2 text-sm transition-default"
+                class="w-full flex items-center justify-between px-3 py-2.5 mx-2 text-sm rounded-lg transition-all duration-150"
                 :class="[
                   item.danger
-                    ? 'text-error hover:bg-error-light'
-                    : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary',
-                  item.active ? 'bg-bg-surface text-text-primary font-medium' : ''
+                    ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10',
+                  item.active ? 'bg-slate-100 dark:bg-white/10 font-medium' : ''
                 ]"
+                style="width: calc(100% - 1rem);"
                 @click="handleItemClick(item)"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
                   <Icon
                     v-if="item.icon"
                     :name="item.icon"
                     class="w-4 h-4"
+                    :class="item.danger ? '' : 'text-slate-500 dark:text-slate-400'"
                   />
                   <span>{{ item.label }}</span>
                 </div>
                 <Icon
                   v-if="item.active"
                   name="lucide:check"
-                  class="w-4 h-4 text-accent"
+                  class="w-4 h-4 text-blue-600 dark:text-blue-400"
                 />
               </button>
             </template>
 
             <div
               v-if="displayItems.length === 0 && !($slots.default)"
-              class="px-3 py-2 text-sm text-text-muted text-center"
+              class="px-3 py-3 text-sm text-slate-500 dark:text-slate-400 text-center"
             >
               No results
             </div>
