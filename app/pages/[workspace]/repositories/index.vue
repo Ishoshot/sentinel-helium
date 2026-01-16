@@ -3,9 +3,13 @@ import type { UpdateRepositoryData } from '~/types'
 import { MemberRole } from '~/types'
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useMembers } from '~/composables/useMembers'
-import { useGitHub } from '~/composables/useGitHub'
 import { useStorage } from '@vueuse/core'
+import { useAppToast } from '~/composables/shared/useAppToast'
+import { useMembers } from '~/composables/members/useMembers'
+import { useGitHub } from '~/composables/integrations/useGitHub'
+import DomainRepositoriesRepositoryList from '~/components/domain/repositories/RepositoryList.vue'
+import DomainRepositoriesRepositoryGrid from '~/components/domain/repositories/RepositoryGrid.vue'
+import DomainRepositoriesRepositorySettingsModal from '~/components/domain/repositories/RepositorySettingsModal.vue'
 
 /**
  * Repositories page - list and manage GitHub repositories
@@ -150,15 +154,15 @@ function goToIntegrations() {
 </script>
 
 <template>
-  <div>
+  <BaseContainer>
     <!-- Page header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-text-primary">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between mb-10">
+      <div class="flex-1">
+        <h1 class="text-3xl font-bold text-text-primary tracking-tight mb-2">
           Repositories
         </h1>
-        <p class="mt-1 text-text-secondary">
-          Manage repositories connected to Sentinel
+        <p class="text-sm text-text-secondary">
+          Manage and configure repositories for automated code reviews
         </p>
       </div>
 
@@ -167,109 +171,147 @@ function goToIntegrations() {
         class="flex flex-wrap items-center gap-3"
       >
         <!-- View toggle -->
-        <div class="flex items-center bg-bg-surface border border-border-subtle rounded-lg p-1">
+        <div class="flex items-center bg-bg-elevated border border-border-subtle rounded-xl p-1.5 shadow-sm">
           <button
-            class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-default"
-            :class="viewMode === 'list' 
-              ? 'bg-bg-elevated text-text-primary shadow-sm' 
-              : 'text-text-muted hover:text-text-primary'"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+            :class="viewMode === 'list'
+              ? 'bg-bg-surface text-text-primary shadow-sm scale-105'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-surface/50'"
             @click="viewMode = 'list'"
           >
             <Icon
               name="lucide:list"
               class="w-4 h-4"
             />
-            List
+            <span class="hidden sm:inline">List</span>
           </button>
           <button
-            class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-default"
-            :class="viewMode === 'grid' 
-              ? 'bg-bg-elevated text-text-primary shadow-sm' 
-              : 'text-text-muted hover:text-text-primary'"
+            class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+            :class="viewMode === 'grid'
+              ? 'bg-bg-surface text-text-primary shadow-sm scale-105'
+              : 'text-text-muted hover:text-text-primary hover:bg-bg-surface/50'"
             @click="viewMode = 'grid'"
           >
             <Icon
               name="lucide:grid-2x2"
               class="w-4 h-4"
             />
-            Grid
+            <span class="hidden sm:inline">Grid</span>
           </button>
         </div>
 
-        <BaseButton
+        <button
           v-if="canManage"
-          variant="secondary"
-          :loading="isSyncing"
+          type="button"
+          class="group relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="isSyncing
+            ? 'bg-bg-elevated border border-border-subtle text-text-secondary'
+            : 'bg-bg-elevated border border-border-subtle text-text-secondary hover:border-accent hover:text-accent hover:shadow-sm hover:scale-105'"
+          :disabled="isSyncing"
           @click="handleSync"
         >
           <Icon
-            v-if="!isSyncing"
             name="lucide:refresh-cw"
-            class="w-4 h-4 mr-1.5"
+            class="w-4 h-4 transition-transform duration-300"
+            :class="{ 'animate-spin': isSyncing, 'group-hover:rotate-180': !isSyncing }"
           />
-          Sync from GitHub
-        </BaseButton>
+          <span>{{ isSyncing ? 'Syncing...' : 'Sync from GitHub' }}</span>
+        </button>
       </div>
     </div>
 
     <!-- Not connected state -->
-    <BaseCard v-if="!isConnected && !isLoading && !isInitializing">
-      <BaseEmptyState
-        icon="lucide:github"
-        title="GitHub not connected"
-        description="Connect your GitHub account to sync repositories and enable automated code reviews."
-      >
+    <div
+      v-if="!isConnected && !isLoading && !isInitializing"
+      class="flex items-center justify-center py-20"
+    >
+      <div class="text-center max-w-md">
+        <div class="w-20 h-20 rounded-2xl bg-bg-elevated border border-border-subtle flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <Icon
+            name="lucide:github"
+            class="w-10 h-10 text-text-muted"
+          />
+        </div>
+        <h3 class="text-2xl font-bold text-text-primary mb-3">
+          GitHub not connected
+        </h3>
+        <p class="text-sm text-text-secondary mb-8 leading-relaxed">
+          Connect your GitHub account to sync repositories and enable automated code reviews.
+        </p>
         <BaseButton @click="goToIntegrations">
           <Icon
             name="lucide:link"
-            class="w-4 h-4 mr-1.5"
+            class="w-4 h-4 mr-2"
           />
           Connect GitHub
         </BaseButton>
-      </BaseEmptyState>
-    </BaseCard>
+      </div>
+    </div>
 
     <!-- Loading state -->
     <div
       v-else-if="isLoading || isInitializing"
-      class="space-y-4"
+      class="space-y-5"
     >
-      <BaseSkeleton class="h-24 w-full rounded-xl" />
-      <BaseSkeleton class="h-24 w-full rounded-xl" />
-      <BaseSkeleton class="h-24 w-full rounded-xl" />
+      <BaseSkeleton
+        class="h-32 w-full rounded-2xl"
+        :class="viewMode === 'grid' ? '' : ''"
+      />
+      <BaseSkeleton
+        class="h-32 w-full rounded-2xl"
+        :class="viewMode === 'grid' ? '' : ''"
+      />
+      <BaseSkeleton
+        class="h-32 w-full rounded-2xl"
+        :class="viewMode === 'grid' ? '' : ''"
+      />
     </div>
 
     <!-- Empty state -->
-    <BaseCard v-else-if="!hasRepositories">
-      <BaseEmptyState
-        icon="lucide:folder-git-2"
-        title="No repositories found"
-        description="Sentinel doesn't have access to any repositories yet. Make sure you've granted access to repositories when installing the GitHub App."
-      >
-        <BaseButton
+    <div
+      v-else-if="!hasRepositories"
+      class="flex items-center justify-center py-20"
+    >
+      <div class="text-center max-w-md">
+        <div class="w-20 h-20 rounded-2xl bg-bg-elevated border border-border-subtle flex items-center justify-center mx-auto mb-6 shadow-sm">
+          <Icon
+            name="lucide:folder-git-2"
+            class="w-10 h-10 text-text-muted"
+          />
+        </div>
+        <h3 class="text-2xl font-bold text-text-primary mb-3">
+          No repositories found
+        </h3>
+        <p class="text-sm text-text-secondary mb-8 leading-relaxed">
+          Sentinel doesn't have access to any repositories yet. Make sure you've granted access to repositories when installing the GitHub App.
+        </p>
+        <button
           v-if="canManage"
-          :loading="isSyncing"
+          type="button"
+          class="group relative inline-flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-xl bg-accent text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent-hover hover:shadow-lg hover:scale-105"
+          :disabled="isSyncing"
           @click="handleSync"
         >
           <Icon
             name="lucide:refresh-cw"
-            class="w-4 h-4 mr-1.5"
+            class="w-4 h-4 transition-transform duration-300"
+            :class="{ 'animate-spin': isSyncing, 'group-hover:rotate-180': !isSyncing }"
           />
-          Sync Repositories
-        </BaseButton>
-      </BaseEmptyState>
-    </BaseCard>
+          <span>{{ isSyncing ? 'Syncing...' : 'Sync Repositories' }}</span>
+        </button>
+      </div>
+    </div>
 
     <!-- Repository list/grid -->
     <template v-else>
-      <DomainRepositoryList
+      <DomainRepositoriesRepositoryList
         v-if="viewMode === 'list'"
         :repositories="repositories"
         :can-manage="canManage"
         @toggle-auto-review="handleToggleAutoReview"
         @open-settings="handleOpenSettings"
       />
-      <DomainRepositoryGrid
+      <DomainRepositoriesRepositoryGrid
         v-else
         :repositories="repositories"
         :can-manage="canManage"
@@ -279,12 +321,12 @@ function goToIntegrations() {
     </template>
 
     <!-- Repository settings modal -->
-    <DomainRepositorySettingsModal
+    <DomainRepositoriesRepositorySettingsModal
       v-model="showSettingsModal"
       :repository="selectedRepository"
       :is-updating="isUpdating"
       :can-manage="canManage"
       @save="handleSaveSettings"
     />
-  </div>
+  </BaseContainer>
 </template>
