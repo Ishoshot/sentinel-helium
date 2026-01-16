@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useNotifications } from '~/composables/useNotifications'
+import { useNotifications } from '~/composables/user/useNotifications'
+import DomainUserUserMenu from '~/components/domain/user/UserMenu.vue'
+import DomainWorkspaceWorkspaceSwitcher from '~/components/domain/workspace/WorkspaceSwitcher.vue'
 
 /**
  * Default layout - full app shell with sidebar and header
@@ -11,6 +13,7 @@ const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
 const route = useRoute()
 const isMobileNavOpen = ref(false)
+const isSidebarCollapsed = ref(false)
 
 // Notifications
 const {
@@ -25,10 +28,16 @@ const {
   markAsUnread,
 } = useNotifications()
 
-// Fetch unread count on mount
+// Fetch unread count on mount and load sidebar state
 onMounted(() => {
   if (userStore.isAuthenticated) {
     fetchUnreadCount()
+  }
+
+  // Load sidebar collapsed state from localStorage
+  const savedState = localStorage.getItem('sidebarCollapsed')
+  if (savedState !== null) {
+    isSidebarCollapsed.value = savedState === 'true'
   }
 })
 
@@ -56,6 +65,18 @@ const mainNavItems = computed(() => {
   ]
 })
 
+// Help/Learn navigation item
+const helpNavItem = computed(() => {
+  const workspace = workspaceStore.currentWorkspaceSlug || (route.params.workspace as string)
+  if (!workspace) return null
+
+  return {
+    label: 'Learn',
+    to: `/${workspace}/learn`,
+    icon: 'lucide:book-open',
+  }
+})
+
 // Workspace management items
 const workspaceNavItems = computed(() => {
   const workspace = workspaceStore.currentWorkspaceSlug || (route.params.workspace as string)
@@ -78,6 +99,11 @@ const workspaceNavItems = computed(() => {
       icon: 'lucide:key',
     },
     {
+      label: 'Billing',
+      to: `/${workspace}/settings/billing`,
+      icon: 'lucide:credit-card',
+    },
+    {
       label: 'Settings',
       to: `/${workspace}/settings`,
       icon: 'lucide:settings',
@@ -87,11 +113,28 @@ const workspaceNavItems = computed(() => {
 
 // Check if nav item is active
 function isActive(path: string): boolean {
-  // Exact match for most routes
+  // Exact match
   if (route.path === path) return true
-  // For settings, only highlight if on exact settings page (not sub-pages like integrations)
-  if (path.endsWith('/settings') && route.path.includes('/settings/')) return false
-  // For integrations, match the exact route
+
+  // For workspace root (Overview), only match exactly, not nested routes
+  if (path.split('/').length === 2) {
+    // This is a workspace root path like /workspace-slug
+    return false
+  }
+
+  // For nested routes, check if current path starts with the nav item path
+  // But exclude settings page when on settings sub-pages
+  if (path.endsWith('/settings') && !route.path.endsWith('/settings')) {
+    // We're on a settings sub-page, don't highlight the main settings item
+    return false
+  }
+
+  // For other routes, highlight if we're on a nested page
+  // e.g., /workspace/repositories should be active when on /workspace/repositories/123
+  if (route.path.startsWith(path + '/')) {
+    return true
+  }
+
   return false
 }
 
@@ -137,90 +180,163 @@ function toggleMobileNav() {
 function closeMobileNav() {
   isMobileNavOpen.value = false
 }
+
+function toggleSidebar() {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value
+  localStorage.setItem('sidebarCollapsed', isSidebarCollapsed.value.toString())
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-bg-app">
     <!-- Sidebar -->
-    <aside class="fixed top-0 left-0 bottom-0 w-64 bg-bg-elevated border-r border-border-subtle z-40 hidden lg:flex flex-col">
+    <aside
+      class="fixed top-0 left-0 bottom-0 bg-bg-elevated border-r border-border-subtle z-40 hidden lg:flex flex-col transition-all duration-300"
+      :class="isSidebarCollapsed ? 'w-16' : 'w-56'"
+    >
       <!-- Workspace Switcher (Header) -->
-      <div class="h-16 px-5 mt-1 flex items-center">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 bg-text-primary rounded-lg flex items-center justify-center">
+      <div class="h-16 mt-1 flex items-center transition-all duration-300" :class="isSidebarCollapsed ? 'px-2 justify-center' : 'px-5'">
+        <NuxtLink to="/" class="flex items-center">
+          <SentinelLogo v-if="!isSidebarCollapsed" size="md" />
+          <div
+            v-else
+            class="w-8 h-8 bg-text-primary rounded-lg flex items-center justify-center shrink-0"
+          >
             <Icon
               name="lucide:shield-check"
               class="w-4 h-4 text-white"
             />
           </div>
-          <span class="text-lg font-semibold text-text-primary">Sentinel</span>
-        </div>
+        </NuxtLink>
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto px-4 py-5">
+      <nav class="flex-1 overflow-y-auto py-5 transition-all duration-300" :class="isSidebarCollapsed ? 'px-2' : 'px-4'">
         <!-- Main Navigation -->
-        <div class="space-y-3">
+        <div class="space-y-3" :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''">
           <NuxtLink
             v-for="item in mainNavItems"
             :key="item.to"
             :to="item.to"
-            class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
+            :title="isSidebarCollapsed ? item.label : undefined"
+            class="group flex items-center gap-3 rounded-xl text-sm transition-all duration-200 border-l-2"
             :class="[
+              isSidebarCollapsed ? 'p-2.5 justify-center' : 'px-3 py-2.5',
               isActive(item.to)
-                ? 'bg-accent/10 text-accent font-medium'
-                : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
+                ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary hover:translate-x-0.5 border-transparent'
             ]"
           >
             <Icon
               :name="item.icon"
-              class="w-5 h-5"
+              class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
             />
-            <span>{{ item.label }}</span>
+            <span
+              class="whitespace-nowrap overflow-hidden transition-all duration-300"
+              :class="isSidebarCollapsed ? 'opacity-0 max-w-0 w-0' : 'opacity-100 max-w-full'"
+            >
+              {{ item.label }}
+            </span>
           </NuxtLink>
         </div>
 
+        <!-- Divider -->
+        <div v-if="!isSidebarCollapsed" class="h-px bg-border-subtle my-6 mx-4" />
+
         <!-- Workspace Section -->
-        <div class="mt-20">
-          <p class="px-3 mb-4 text-xs font-medium text-text-muted uppercase tracking-wider">
+        <div :class="isSidebarCollapsed ? 'mt-6' : 'mt-8'">
+          <p
+            class="px-3 mb-3 text-xs font-semibold text-text-muted uppercase tracking-wide overflow-hidden transition-all duration-300"
+            :class="isSidebarCollapsed ? 'opacity-0 max-h-0 mb-0' : 'opacity-100 max-h-8'"
+          >
             Workspace
           </p>
-          <div class="space-y-3">
+          <div class="space-y-3" :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''">
             <NuxtLink
               v-for="item in workspaceNavItems"
               :key="item.to"
               :to="item.to"
-              class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
+              :title="isSidebarCollapsed ? item.label : undefined"
+              class="group flex items-center gap-3 rounded-xl text-sm transition-all duration-200 border-l-2"
               :class="[
+                isSidebarCollapsed ? 'p-2.5 justify-center' : 'px-3 py-2.5',
                 isActive(item.to)
-                  ? 'bg-accent/10 text-accent font-medium'
-                  : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
+                  ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                  : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary hover:translate-x-0.5 border-transparent'
               ]"
             >
               <Icon
                 :name="item.icon"
-                class="w-5 h-5"
+                class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
               />
-              <span>{{ item.label }}</span>
+              <span
+                class="whitespace-nowrap overflow-hidden transition-all duration-300"
+                :class="isSidebarCollapsed ? 'opacity-0 max-w-0 w-0' : 'opacity-100 max-w-full'"
+              >
+                {{ item.label }}
+              </span>
             </NuxtLink>
           </div>
+        </div>
+
+        <!-- Learn/Help Link -->
+        <div :class="isSidebarCollapsed ? 'mt-6' : 'mt-8'">
+          <NuxtLink
+            v-if="helpNavItem"
+            :to="helpNavItem.to"
+            :title="isSidebarCollapsed ? helpNavItem.label : undefined"
+            class="group flex items-center gap-3 rounded-xl text-sm transition-all duration-200 border-l-2"
+            :class="[
+              isSidebarCollapsed ? 'p-2.5 justify-center' : 'px-3 py-2.5',
+              isActive(helpNavItem.to)
+                ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary hover:translate-x-0.5 border-transparent'
+            ]"
+          >
+            <Icon
+              :name="helpNavItem.icon"
+              class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+            />
+            <span
+              class="whitespace-nowrap overflow-hidden transition-all duration-300"
+              :class="isSidebarCollapsed ? 'opacity-0 max-w-0 w-0' : 'opacity-100 max-w-full'"
+            >
+              {{ helpNavItem.label }}
+            </span>
+          </NuxtLink>
         </div>
       </nav>
 
       <!-- User Section -->
-      <div class="p-4 border-t border-border-subtle">
-        <DomainUserMenu
-          v-if="userStore.isAuthenticated"
-          :user="userStore.user!"
-        />
+      <div class="border-t border-border-subtle">
+        <div
+          class="overflow-hidden border-b bg-bg-surface/50 transition-all duration-300"
+          :class="isSidebarCollapsed ? 'opacity-0 max-h-0 p-0 border-transparent' : 'opacity-100 max-h-20 p-3 border-border-subtle'"
+        >
+          <DomainUserUserMenu
+            v-if="userStore.isAuthenticated"
+            :user="userStore.user!"
+          />
+        </div>
+        <button
+          class="w-full p-3 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-surface transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated"
+          :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+          @click="toggleSidebar"
+        >
+          <Icon
+            :name="isSidebarCollapsed ? 'lucide:chevron-right' : 'lucide:chevron-left'"
+            class="w-5 h-5 transition-transform duration-200"
+          />
+        </button>
       </div>
     </aside>
 
     <!-- Mobile Navigation Drawer -->
     <Transition
-      enter-active-class="transition duration-200 ease-out"
+      enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition duration-150 ease-in"
+      leave-active-class="transition-all duration-200 ease-in"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
@@ -229,27 +345,21 @@ function closeMobileNav() {
         class="fixed inset-0 z-50 lg:hidden"
       >
         <div
-          class="absolute inset-0 bg-black/40"
+          class="absolute inset-0 bg-black/50 backdrop-blur-sm"
           @click="closeMobileNav"
         />
         <div class="relative h-full w-[80vw] max-w-xs bg-bg-elevated border-r border-border-subtle flex flex-col">
           <div class="h-16 px-5 flex items-center justify-between border-b border-border-subtle">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 bg-text-primary rounded-lg flex items-center justify-center">
-                <Icon
-                  name="lucide:shield-check"
-                  class="w-4 h-4 text-white"
-                />
-              </div>
-              <span class="text-lg font-semibold text-text-primary">Sentinel</span>
-            </div>
+            <NuxtLink to="/" class="flex items-center">
+              <SentinelLogo size="xs" />
+            </NuxtLink>
             <button
               class="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-default"
               @click="closeMobileNav"
             >
               <Icon
                 name="lucide:x"
-                class="w-5 h-5"
+                class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
               />
             </button>
           </div>
@@ -259,30 +369,33 @@ function closeMobileNav() {
               v-if="workspaceStore.hasCurrentWorkspace"
               class="mb-6"
             >
-              <DomainWorkspaceSwitcher />
+              <DomainWorkspaceWorkspaceSwitcher />
             </div>
             <div class="space-y-3">
               <NuxtLink
                 v-for="item in mainNavItems"
                 :key="item.to"
                 :to="item.to"
-                class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
+                class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 border-l-2"
                 :class="[
                   isActive(item.to)
-                    ? 'bg-accent/10 text-accent font-medium'
-                    : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
+                    ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                    : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary border-transparent'
                 ]"
               >
                 <Icon
                   :name="item.icon"
-                  class="w-5 h-5"
+                  class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
                 />
                 <span>{{ item.label }}</span>
               </NuxtLink>
             </div>
 
-            <div class="mt-10">
-              <p class="px-3 mb-4 text-xs font-medium text-text-muted uppercase tracking-wider">
+            <!-- Divider -->
+            <div class="h-px bg-border-subtle my-6 mx-4" />
+
+            <div class="mt-6">
+              <p class="px-3 mb-3 text-xs font-semibold text-text-muted uppercase tracking-wide">
                 Workspace
               </p>
               <div class="space-y-3">
@@ -290,25 +403,45 @@ function closeMobileNav() {
                   v-for="item in workspaceNavItems"
                   :key="item.to"
                   :to="item.to"
-                  class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-default"
+                  class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 border-l-2"
                   :class="[
                     isActive(item.to)
-                      ? 'bg-accent/10 text-accent font-medium'
-                      : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
+                      ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                      : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary border-transparent'
                   ]"
                 >
                   <Icon
                     :name="item.icon"
-                    class="w-5 h-5"
+                    class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
                   />
                   <span>{{ item.label }}</span>
                 </NuxtLink>
               </div>
             </div>
+
+            <!-- Learn/Help Link (Mobile) -->
+            <div class="mt-6">
+              <NuxtLink
+                v-if="helpNavItem"
+                :to="helpNavItem.to"
+                class="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 border-l-2"
+                :class="[
+                  isActive(helpNavItem.to)
+                    ? 'bg-accent/10 text-accent font-medium shadow-sm border-accent'
+                    : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary border-transparent'
+                ]"
+              >
+                <Icon
+                  :name="helpNavItem.icon"
+                  class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
+                />
+                <span>{{ helpNavItem.label }}</span>
+              </NuxtLink>
+            </div>
           </nav>
 
           <div class="p-4 border-t border-border-subtle">
-            <DomainUserMenu
+            <DomainUserUserMenu
               v-if="userStore.isAuthenticated"
               :user="userStore.user!"
             />
@@ -318,7 +451,10 @@ function closeMobileNav() {
     </Transition>
 
     <!-- Main Area -->
-    <div class="lg:pl-64">
+    <div
+      class="transition-all duration-300"
+      :class="isSidebarCollapsed ? 'lg:pl-16' : 'lg:pl-56'"
+    >
       <!-- Top Header -->
       <header class="sticky top-0 h-16 bg-bg-elevated border-b border-border-subtle z-30">
         <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
@@ -330,10 +466,10 @@ function closeMobileNav() {
             >
               <Icon
                 name="lucide:menu"
-                class="w-5 h-5"
+                class="w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110"
               />
             </button>
-            <DomainWorkspaceSwitcher
+            <DomainWorkspaceWorkspaceSwitcher
               v-if="workspaceStore.hasCurrentWorkspace"
               class="hidden sm:flex"
             />
@@ -361,11 +497,9 @@ function closeMobileNav() {
               </template>
             </nav>
           </div>
-
-
           <!-- Right: Actions -->
           <div class="flex items-center gap-4">
-            <DomainNotificationDropdown
+            <DomainUserNotificationDropdown
               v-if="userStore.isAuthenticated"
               :notifications="notifications"
               :unread-count="unreadCount"
@@ -381,7 +515,7 @@ function closeMobileNav() {
       </header>
 
       <!-- Main Content -->
-      <main class="p-4 sm:p-6 lg:p-8">
+      <main class="min-h-screen">
         <slot />
       </main>
     </div>
