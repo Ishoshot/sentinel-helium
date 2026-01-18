@@ -1,24 +1,39 @@
 <script setup lang="ts">
 /**
- * Landing page trusted logos section
- * Displays company names as social proof
+ * Landing page trusted logos section 
+ * Clean, minimal display of tech/company logos
  */
 
-const companies = ['Vercel', 'Linear', 'Raycast', 'Resend', 'Cal.com']
+const technologies = [
+  { name: 'PHP', icon: 'simple-icons:php' },
+  { name: 'Laravel', icon: 'simple-icons:laravel' },
+  { name: 'React', icon: 'simple-icons:react' },
+  { name: 'Vue', icon: 'simple-icons:vuedotjs' },
+  { name: 'TypeScript', icon: 'simple-icons:typescript' },
+  { name: 'Python', icon: 'simple-icons:python' },
+  { name: 'Go', icon: 'simple-icons:go' },
+]
 </script>
 
 <template>
-  <section class="py-16 border-y border-gray-100">
+  <section class="py-12 lg:py-16 bg-slate-50 border-slate-200">
     <div class="max-w-6xl mx-auto px-6">
-      <p class="text-center text-sm text-gray-400 mb-10 tracking-wide uppercase">
-        Trusted by engineering teams at
+      <p class="text-center text-xs uppercase tracking-[0.15em] text-slate-400 mb-8">
+        Works with your stack
       </p>
-      <div class="flex flex-wrap items-center justify-center gap-x-16 gap-y-6">
-        <span
-          v-for="company in companies"
-          :key="company"
-          class="text-xl font-semibold text-gray-300 tracking-tight transition-colors hover:text-gray-400"
-        >{{ company }}</span>
+      <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+        <div
+          v-for="tech in technologies"
+          :key="tech.name"
+          class="flex items-center gap-3 text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          <Icon
+            :name="tech.icon"
+            class="w-8 h-8"
+          />
+          <span class="text-sm font-medium">{{ tech.name }}</span>
+        </div>
+        <span class="text-sm text-slate-400 italic">and many more...</span>
       </div>
     </div>
   </section>

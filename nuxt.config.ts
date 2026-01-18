@@ -3,6 +3,20 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
+  // Hybrid rendering: SSR for public pages, SPA for authenticated dashboard
+  routeRules: {
+    // Public pages - SSR for SEO and social sharing
+    "/": { ssr: true },
+    "/login": { ssr: true },
+
+    // Dashboard routes - SPA mode (no hydration issues, no SSR needed)
+    "/:workspace/**": { ssr: false },
+
+    // Auth flows - SPA (client-only, no SEO value)
+    "/auth/**": { ssr: false },
+    "/invitations/**": { ssr: false },
+  },
+
   // Nitro configuration for Railway deployment
   nitro: {
     preset: "node-server",

@@ -1,4 +1,4 @@
-import { hasToken } from '~/services/api'
+import { hasToken } from '~/services/core/api'
 
 /**
  * Auth middleware - protects routes that require authentication

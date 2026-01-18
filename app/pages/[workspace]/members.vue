@@ -2,8 +2,12 @@
 import { MemberRole } from '~/types'
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useMembers } from '~/composables/useMembers'
-import { useInvitations } from '~/composables/useInvitations'
+import { useAppToast } from '~/composables/shared/useAppToast'
+import { useMembers } from '~/composables/members/useMembers'
+import { useInvitations } from '~/composables/members/useInvitations'
+import DomainMembersMemberCard from '~/components/domain/members/MemberCard.vue'
+import DomainMembersInvitationCard from '~/components/domain/members/InvitationCard.vue'
+import DomainMembersInviteMemberModal from '~/components/domain/members/InviteMemberModal.vue'
 
 /**
  * Workspace members page - Premium team management experience
@@ -227,7 +231,7 @@ async function handleResendInvitation(invitationId: number) {
 </script>
 
 <template>
-  <div>
+  <BaseContainer>
     <!-- Page Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
@@ -380,7 +384,7 @@ async function handleResendInvitation(invitationId: number) {
             </h2>
           </div>
           <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMemberCard
+            <DomainMembersMemberCard
               :member="groupedMembers.owner"
               :can-manage="canManage"
               :current-user-id="userStore.user?.id || 0"
@@ -408,7 +412,7 @@ async function handleResendInvitation(invitationId: number) {
             </span>
           </div>
           <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMemberCard
+            <DomainMembersMemberCard
               v-for="member in groupedMembers.admins"
               :key="member.id"
               :member="member"
@@ -438,7 +442,7 @@ async function handleResendInvitation(invitationId: number) {
             </span>
           </div>
           <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMemberCard
+            <DomainMembersMemberCard
               v-for="member in groupedMembers.members"
               :key="member.id"
               :member="member"
@@ -471,7 +475,7 @@ async function handleResendInvitation(invitationId: number) {
             v-if="filteredInvitations.length > 0"
             class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
           >
-            <DomainInvitationCard
+            <DomainMembersInvitationCard
               v-for="invitation in filteredInvitations"
               :key="invitation.id"
               :invitation="invitation"
@@ -543,7 +547,7 @@ async function handleResendInvitation(invitationId: number) {
     </template>
 
     <!-- Invite Modal -->
-    <DomainInviteMemberModal
+    <DomainMembersInviteMemberModal
       v-model="showInviteModal"
       :loading="invitationsLoading"
       :error="inviteError"
@@ -662,5 +666,5 @@ async function handleResendInvitation(invitationId: number) {
         </div>
       </template>
     </BaseModal>
-  </div>
+  </BaseContainer>
 </template>

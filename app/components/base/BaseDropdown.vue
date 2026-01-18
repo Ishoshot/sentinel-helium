@@ -120,7 +120,7 @@ const directionClasses = computed(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-50 w-full min-w-[12rem] max-w-[calc(100vw-2rem)] bg-bg-elevated border border-border-subtle rounded-lg shadow-elevated overflow-hidden"
+        class="absolute z-[100] w-full min-w-[12rem] max-w-[calc(100vw-2rem)] rounded-xl shadow-elevated overflow-hidden ring-1 ring-border-subtle bg-bg-elevated"
         :class="[alignmentClasses, directionClasses, menuWidth]"
       >
         <!-- Search -->
@@ -137,7 +137,7 @@ const directionClasses = computed(() => {
           >
         </div>
 
-        <div class="py-1 max-h-64 overflow-y-auto">
+        <div class="py-2 max-h-64 overflow-y-auto">
           <slot>
             <template
               v-for="(item, index) in displayItems"
@@ -146,26 +146,28 @@ const directionClasses = computed(() => {
               <!-- Separator -->
               <div
                 v-if="item.separator"
-                class="my-1 border-t border-border-subtle"
+                class="my-2 mx-3 border-t border-border-subtle"
               />
 
               <!-- Menu item -->
               <button
                 v-else
-                class="w-full flex items-center justify-between px-3 py-2 text-sm transition-default"
+                class="w-full flex items-center justify-between px-3 py-2.5 mx-2 text-sm rounded-lg transition-all duration-150"
                 :class="[
                   item.danger
                     ? 'text-error hover:bg-error-light'
                     : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary',
-                  item.active ? 'bg-bg-surface text-text-primary font-medium' : ''
+                  item.active ? 'bg-bg-surface font-medium' : ''
                 ]"
+                style="width: calc(100% - 1rem);"
                 @click="handleItemClick(item)"
               >
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
                   <Icon
                     v-if="item.icon"
                     :name="item.icon"
                     class="w-4 h-4"
+                    :class="item.danger ? '' : 'text-text-muted'"
                   />
                   <span>{{ item.label }}</span>
                 </div>
@@ -179,7 +181,7 @@ const directionClasses = computed(() => {
 
             <div
               v-if="displayItems.length === 0 && !($slots.default)"
-              class="px-3 py-2 text-sm text-text-muted text-center"
+              class="px-3 py-3 text-sm text-text-muted text-center"
             >
               No results
             </div>

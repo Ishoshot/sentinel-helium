@@ -2,8 +2,11 @@
 import { MemberRole } from '~/types'
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useMembers } from '~/composables/useMembers'
-import { useGitHub } from '~/composables/useGitHub'
+import { useAppToast } from '~/composables/shared/useAppToast'
+import { useMembers } from '~/composables/members/useMembers'
+import { useGitHub } from '~/composables/integrations/useGitHub'
+import DomainIntegrationsGitHubConnectionCard from '~/components/domain/integrations/GitHubConnectionCard.vue'
+import DomainIntegrationsIntegrationCard from '~/components/domain/integrations/IntegrationCard.vue'
 
 /**
  * Integrations settings page - Premium workspace integrations hub
@@ -239,7 +242,7 @@ function goToRepositories() {
         </div>
 
         <!-- GitHub Integration Card -->
-        <DomainGitHubConnectionCard
+        <DomainIntegrationsGitHubConnectionCard
           :connection="connection"
           :is-loading="isLoadingConnection"
           :is-connecting="isConnecting || isSyncing"
@@ -316,7 +319,7 @@ function goToRepositories() {
 
         <!-- Integration Stack - vertical layout -->
         <div class="space-y-4">
-          <DomainIntegrationCard
+          <DomainIntegrationsIntegrationCard
             v-for="integration in comingSoonIntegrations"
             :key="integration.name"
             :name="integration.name"

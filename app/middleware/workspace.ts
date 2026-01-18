@@ -1,6 +1,6 @@
 import type { Workspace } from "~/types";
 import { useWorkspaceStore } from "~/stores/useWorkspaceStore";
-import { useWorkspaces } from "~/composables/useWorkspaces";
+import { useWorkspaces } from "~/composables/workspace/useWorkspaces";
 
 /**
  * Workspace middleware - validates workspace access and sets current workspace

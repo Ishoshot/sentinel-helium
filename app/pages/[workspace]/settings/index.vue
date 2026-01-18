@@ -2,8 +2,8 @@
 import { MemberRole } from '~/types'
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useWorkspaces } from '~/composables/useWorkspaces'
-import { useMembers } from '~/composables/useMembers'
+import { useWorkspaces } from '~/composables/workspace/useWorkspaces'
+import { useMembers } from '~/composables/members/useMembers'
 
 /**
  * Workspace settings page - manage workspace configuration

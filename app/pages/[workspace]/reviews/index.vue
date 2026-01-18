@@ -1,61 +1,64 @@
 <script setup lang="ts">
-import { useRuns, type WorkspaceRunsParams } from '~/composables/useRuns'
-import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
-import { useGitHubService } from '~/services/githubService'
-import type { Repository } from '~/types'
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore';
+import { useGitHubService } from '~/services/integrations/githubService';
+import { useRuns, type WorkspaceRunsParams } from '~/composables/reviews/useRuns';
+import type { Repository } from '~/types';
+import { useAppToast } from '~/composables/shared/useAppToast';
 
 definePageMeta({
   middleware: ['auth', 'workspace'],
-})
+});
 
-const workspaceStore = useWorkspaceStore()
-const githubService = useGitHubService()
+const workspaceStore = useWorkspaceStore();
+const githubService = useGitHubService();
+const toast = useAppToast();
 
-const workspaceId = computed(() => workspaceStore.currentWorkspaceId)
-const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '')
+const workspaceId = computed(() => workspaceStore.currentWorkspaceId);
+const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '');
 
 // Composables
-const { runs, isLoading, error, fetchWorkspaceRuns, pagination } = useRuns(workspaceId)
+const {
+  runs,
+  prGroups,
+  repositoryGroups,
+  isLoading,
+  error,
+  fetchWorkspaceRuns,
+  pagination,
+} = useRuns(workspaceId);
 
-// State for repositories (for filter dropdown)
-const repositories = ref<Repository[]>([])
-const isLoadingRepos = ref(false)
-const isInitializing = ref(true)
+// State
+const repositories = ref<Repository[]>([]);
+const isLoadingRepos = ref(false);
+const isInitializing = ref(true);
+// View mode
+const viewMode = ref<'all' | 'pr' | 'repository'>('all');
 
 // Filter state
-const search = ref('')
-const statusFilter = ref<string | null>(null)
-const riskFilter = ref<string | null>(null)
-const repositoryFilter = ref<number | null>(null)
-const authorFilter = ref<string | null>(null)
-const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, to: null })
-const sortOrder = ref<'asc' | 'desc'>('desc')
-const sortBy = ref<'created_at' | 'completed_at' | 'findings_count'>('created_at')
-
-const dateRangeDisplay = computed(() => {
-  if (dateRange.value.from && dateRange.value.to) {
-    return `${dateRange.value.from} - ${dateRange.value.to}`
-  }
-  if (dateRange.value.from) return `From ${dateRange.value.from}`
-  if (dateRange.value.to) return `Until ${dateRange.value.to}`
-  return null
-})
+const search = ref('');
+const statusFilter = ref<string | null>(null);
+const riskFilter = ref<string | null>(null);
+const repositoryFilter = ref<number | null>(null);
+const authorFilter = ref<string | null>(null);
+const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, to: null });
+const sortOrder = ref<'asc' | 'desc'>('desc');
+const sortBy = ref<'created_at' | 'completed_at' | 'findings_count'>('created_at');
 
 // Debounced search
-const debouncedSearch = refDebounced(search, 300)
+const debouncedSearch = refDebounced(search, 300);
 
-// Load repositories for filter
-const fetchRepositories = async () => {
-  if (!workspaceId.value) return
-  isLoadingRepos.value = true
-  try {
-    repositories.value = await githubService.listRepositories(workspaceId.value)
-  } catch (e) {
-    console.error('Failed to load repositories', e)
-  } finally {
-    isLoadingRepos.value = false
-  }
-}
+// Check if any filters are active
+const hasActiveFilters = computed(() =>
+  Boolean(
+    search.value.trim() ||
+      statusFilter.value ||
+      riskFilter.value ||
+      repositoryFilter.value ||
+      authorFilter.value ||
+      dateRange.value.from ||
+      dateRange.value.to
+  )
+);
 
 // Build query params
 const queryParams = computed<WorkspaceRunsParams>(() => ({
@@ -69,620 +72,229 @@ const queryParams = computed<WorkspaceRunsParams>(() => ({
   toDate: dateRange.value.to || undefined,
   sortBy: sortBy.value,
   sortOrder: sortOrder.value,
-}))
+  groupBy: viewMode.value === 'all' ? null : viewMode.value,
+}));
+
+// Load repositories for filter
+const fetchRepositories = async () => {
+  if (!workspaceId.value) return;
+  isLoadingRepos.value = true;
+  try {
+    repositories.value = await githubService.listRepositories(workspaceId.value);
+  } catch (e) {
+    console.error('Failed to load repositories', e);
+    toast.error('Failed to load repositories');
+  } finally {
+    isLoadingRepos.value = false;
+  }
+};
+
+// Unified fetch that handles all view modes
+const fetchData = async (params: WorkspaceRunsParams = {}, showToast = false) => {
+  await fetchWorkspaceRuns(params);
+
+  if (showToast && !error.value) {
+    toast.success('Reviews refreshed successfully');
+  }
+};
 
 // Fetch runs when params change
 watch(queryParams, async (params) => {
-  await fetchWorkspaceRuns(params)
-}, { immediate: false })
+  await fetchData(params);
+}, { immediate: false });
 
 // Initial fetch
 onMounted(async () => {
   try {
     if (workspaceId.value) {
       await Promise.all([
-        fetchWorkspaceRuns(queryParams.value),
+        fetchData(queryParams.value),
         fetchRepositories()
-      ])
+      ]);
     }
   } finally {
-    isInitializing.value = false
+    isInitializing.value = false;
   }
-})
+});
 
 // Filter handlers
-const handleStatusChange = (value: string | null) => statusFilter.value = value
-const handleRiskChange = (value: string | null) => riskFilter.value = value
-const handleRepositoryChange = (value: number | null) => repositoryFilter.value = value
-
 const clearFilters = () => {
-  search.value = ''
-  statusFilter.value = null
-  riskFilter.value = null
-  repositoryFilter.value = null
-  authorFilter.value = null
-  dateRange.value = { from: null, to: null }
-}
+  search.value = '';
+  statusFilter.value = null;
+  riskFilter.value = null;
+  repositoryFilter.value = null;
+  authorFilter.value = null;
+  dateRange.value = { from: null, to: null };
+};
 
 // Pagination
 const loadPage = async (page: number) => {
-  await fetchWorkspaceRuns({ ...queryParams.value, page })
-}
+  await fetchData({ ...queryParams.value, page });
+};
 
-// Check if any filters are active
-const hasActiveFilters = computed(() =>
-  Boolean(
-    search.value.trim() ||
-      statusFilter.value ||
-      riskFilter.value ||
-      repositoryFilter.value ||
-      authorFilter.value ||
-      dateRangeDisplay.value
-  )
-)
+// Current view item type for pagination
+const currentItemType = computed(() => {
+  if (viewMode.value === 'pr') return 'pull requests';
+  if (viewMode.value === 'repository') return 'repositories';
+  return 'reviews';
+});
 
-// Options for dropdowns
-const statusOptions = [
-  { label: 'All Statuses', value: null },
-  { label: 'Queued', value: 'queued' },
-  { label: 'In Progress', value: 'in_progress' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Failed', value: 'failed' },
-  { label: 'Skipped', value: 'skipped' }
-]
+// Check if current view has data
+const hasData = computed(() => {
+  if (viewMode.value === 'all') return runs.value.length > 0;
+  if (viewMode.value === 'pr') return prGroups.value.length > 0;
+  return repositoryGroups.value.length > 0;
+});
 
-const riskOptions = [
-  { label: 'All Risks', value: null },
-  { label: 'Critical', value: 'critical' },
-  { label: 'High', value: 'high' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Low', value: 'low' }
-]
+// Show no-data empty state (when no filters and no data)
+const showNoDataState = computed(() =>
+  !hasData.value && !hasActiveFilters.value && !isLoading.value && !isInitializing.value
+);
 
-const repositoryOptions = computed(() => [
-  { label: 'All Repositories', value: null },
-  ...repositories.value.map(r => ({ label: r.full_name, value: r.id }))
-])
-
-const sortOptions = [
-  { label: 'Newest First', value: 'created_at-desc' },
-  { label: 'Oldest First', value: 'created_at-asc' },
-  { label: 'Most Findings', value: 'findings_count-desc' },
-  { label: 'Least Findings', value: 'findings_count-asc' },
-]
-
-const currentSort = computed({
-  get: () => `${sortBy.value}-${sortOrder.value}`,
-  set: (val) => {
-    const [field, order] = val.split('-') as [typeof sortBy.value, typeof sortOrder.value]
-    sortBy.value = field
-    sortOrder.value = order
-  }
-})
+// Show no-matches empty state (when filters applied but no results)
+const showNoMatchesState = computed(() =>
+  !hasData.value && hasActiveFilters.value && !isLoading.value && !isInitializing.value
+);
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
-    <!-- Header -->
-    <div class="px-4 sm:px-6 lg:px-8 py-6 border-b border-border-subtle bg-bg-app shrink-0">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h1 class="text-2xl font-semibold text-text-primary">
-            Code Reviews
-          </h1>
-          <p class="mt-1 text-text-secondary">
-            All reviews across your repositories
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
-          <BaseButton
-            variant="secondary"
-            :disabled="isLoading"
-            @click="fetchWorkspaceRuns(queryParams)"
-          >
-            <Icon
-              name="lucide:refresh-cw"
-              class="w-4 h-4 mr-2"
-              :class="{ 'animate-spin': isLoading }"
-            />
-            Refresh
-          </BaseButton>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-        <!-- Search -->
-        <div class="relative w-full sm:w-64">
-          <Icon
-            name="lucide:search"
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"
-          />
-          <input
-            v-model="search"
-            type="search"
-            placeholder="Search reviews..."
-            class="w-full h-9 pl-9 pr-9 text-sm bg-bg-surface border border-border-subtle rounded-md placeholder:text-text-muted transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
-            @keydown.escape="search = ''"
-          >
-
-          <button
-            v-if="search.trim()"
-            type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
-            aria-label="Clear search"
-            @click="search = ''"
-          >
-            <Icon
-              name="lucide:x"
-              class="w-4 h-4"
-            />
-          </button>
-        </div>
-
-        <div class="hidden lg:block h-6 w-px bg-border-subtle mx-1" />
-
-        <!-- Status Filter -->
-        <BaseDropdown
-          :model-value="statusFilter"
-          :options="statusOptions"
-          placeholder="Status"
-          class="w-full sm:w-40"
-          @update:model-value="handleStatusChange"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
-            >
-              <span class="truncate">{{ statusOptions.find(o => o.value === statusFilter)?.label || 'Status' }}</span>
-              <Icon
-                name="lucide:chevron-down"
-                class="w-4 h-4 text-text-muted"
-              />
-            </button>
-          </template>
-        </BaseDropdown>
-
-        <!-- Risk Filter -->
-        <BaseDropdown
-          :model-value="riskFilter"
-          :options="riskOptions"
-          placeholder="Risk Level"
-          class="w-full sm:w-40"
-          @update:model-value="handleRiskChange"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
-            >
-              <span class="truncate">{{ riskOptions.find(o => o.value === riskFilter)?.label || 'Risk Level' }}</span>
-              <Icon
-                name="lucide:chevron-down"
-                class="w-4 h-4 text-text-muted"
-              />
-            </button>
-          </template>
-        </BaseDropdown>
-
-        <!-- Repository Filter -->
-        <BaseDropdown
-          :model-value="repositoryFilter"
-          :options="repositoryOptions"
-          placeholder="Repository"
-          class="w-full sm:w-48"
-          searchable
-          @update:model-value="handleRepositoryChange"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
-            >
-              <span class="truncate">{{ repositoryOptions.find(o => o.value === repositoryFilter)?.label || 'Repository' }}</span>
-              <Icon
-                name="lucide:chevron-down"
-                class="w-4 h-4 text-text-muted"
-              />
-            </button>
-          </template>
-        </BaseDropdown>
-
-        <!-- Author Filter -->
-        <BaseDropdown
-          :model-value="null"
-          :options="[]"
-          placeholder="Author"
-          class="w-full sm:w-40"
-          menu-width="w-56"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
-            >
-              <span class="truncate">{{ authorFilter?.trim() || 'Author' }}</span>
-              <Icon
-                name="lucide:user"
-                class="w-4 h-4 text-text-muted"
-              />
-            </button>
-          </template>
-          
-          <div class="p-3 w-full">
-            <div class="space-y-2">
-              <label class="text-xs font-medium text-text-secondary">Filter by Author</label>
-              <input 
-                v-model.lazy="authorFilter"
-                type="text"
-                placeholder="Username (e.g. octocat)"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded placeholder:text-text-muted transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
-                @keydown.enter="($event.target as HTMLInputElement).blur()"
-              >
-              <p class="text-[10px] text-text-muted">
-                Press Enter to apply
-              </p>
-            </div>
-            <div class="pt-2 mt-2 border-t border-border-subtle flex justify-end">
-              <button 
-                type="button"
-                class="text-xs text-accent hover:text-accent-hover font-medium"
-                @click="authorFilter = null"
-              >
-                Clear
-              </button>
-            </div>
+  <BaseContainer>
+    <div class="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
+      <!-- Header -->
+      <div class="px-4 sm:px-6 lg:px-8 py-8 border-b border-border-subtle bg-bg-app shrink-0">
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between mb-6">
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-text-primary tracking-tight">
+              Code Reviews
+            </h1>
+            <p class="mt-2 text-sm text-text-secondary">
+              Monitor and manage all code reviews across your repositories
+            </p>
           </div>
-        </BaseDropdown>
-
-        <!-- Date Filter -->
-        <BaseDropdown
-          :model-value="null"
-          :options="[]"
-          placeholder="Date Range"
-          class="w-full sm:w-48"
-          menu-width="w-70"
-        >
-          <template #trigger>
+          <div class="flex items-center gap-3">
             <button
               type="button"
-              class="h-9 px-3 flex items-center gap-2 bg-bg-surface border border-border-subtle rounded-md text-sm w-full justify-between transition-default hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app focus:border-transparent"
+              class="group relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              :class="isLoading
+                ? 'bg-bg-elevated border border-border-subtle text-text-secondary'
+                : 'bg-bg-elevated border border-border-subtle text-text-secondary hover:border-accent hover:text-accent hover:shadow-sm hover:scale-105'"
+              :disabled="isLoading"
+              @click="fetchData(queryParams, true)"
             >
-              <span class="truncate">
-                {{ dateRangeDisplay ?? 'Date Range' }}
-              </span>
               <Icon
-                name="lucide:calendar"
-                class="w-4 h-4 text-text-muted"
+                name="lucide:refresh-cw"
+                class="w-4 h-4 transition-transform duration-300"
+                :class="{ 'animate-spin': isLoading, 'group-hover:rotate-180': !isLoading }"
               />
+              <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
             </button>
-          </template>
-          
-          <div class="p-3 space-y-3 w-full">
-            <div class="space-y-1.5">
-              <label class="text-xs font-medium text-text-secondary">From</label>
-              <input 
-                v-model="dateRange.from"
-                type="date"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
-              >
-            </div>
-            <div class="space-y-1.5">
-              <label class="text-xs font-medium text-text-secondary">To</label>
-              <input 
-                v-model="dateRange.to"
-                type="date"
-                class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-elevated focus:border-transparent"
-                :min="dateRange.from || undefined"
-              >
-            </div>
-            <div class="pt-2 border-t border-border-subtle flex justify-end">
-              <button 
-                type="button"
-                class="text-xs text-accent hover:text-accent-hover font-medium"
-                @click="dateRange = { from: null, to: null }"
-              >
-                Clear
-              </button>
-            </div>
           </div>
-        </BaseDropdown>
-
-        <div class="hidden lg:block lg:flex-1" />
-
-        <!-- Sort -->
-        <BaseDropdown
-          v-model="currentSort"
-          :options="sortOptions"
-          class="w-full sm:w-44"
-        >
-          <template #trigger>
-            <button
-              type="button"
-              class="h-9 px-3 flex items-center gap-2 rounded-md text-text-secondary text-sm font-medium transition-default hover:bg-bg-surface hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
-            >
-              <Icon
-                name="lucide:arrow-up-down"
-                class="w-4 h-4"
-              />
-              <span>{{ sortOptions.find(o => o.value === currentSort)?.label }}</span>
-            </button>
-          </template>
-        </BaseDropdown>
-      </div>
-
-      <!-- Active Filters -->
-      <div
-        v-if="hasActiveFilters"
-        class="flex flex-col gap-2 mt-4 sm:flex-row sm:items-center"
-      >
-        <span class="text-xs font-medium text-text-secondary">Active filters:</span>
-        <div class="flex flex-wrap items-center gap-2">
-          <BaseBadge
-            v-if="search.trim()"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Search: {{ search.trim() }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear search filter"
-              @click="search = ''"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <BaseBadge
-            v-if="statusFilter"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Status: {{ statusOptions.find(o => o.value === statusFilter)?.label }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear status filter"
-              @click="statusFilter = null"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <BaseBadge
-            v-if="riskFilter"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Risk: {{ riskOptions.find(o => o.value === riskFilter)?.label }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear risk filter"
-              @click="riskFilter = null"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <BaseBadge
-            v-if="repositoryFilter"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Repository: {{ repositoryOptions.find(o => o.value === repositoryFilter)?.label ?? repositories.find(r => r.id === repositoryFilter)?.full_name ?? repositories.find(r => r.id === repositoryFilter)?.name }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear repository filter"
-              @click="repositoryFilter = null"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <BaseBadge
-            v-if="authorFilter?.trim()"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Author: {{ authorFilter?.trim() }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear author filter"
-              @click="authorFilter = null"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <BaseBadge
-            v-if="dateRangeDisplay"
-            variant="default"
-            size="sm"
-            class="pl-2 pr-1 gap-1"
-          >
-            Date: {{ dateRangeDisplay }}
-            <button
-              type="button"
-              class="p-0.5 rounded-full text-text-muted hover:text-text-secondary hover:bg-bg-app transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-surface"
-              aria-label="Clear date filter"
-              @click="dateRange = { from: null, to: null }"
-            >
-              <Icon
-                name="lucide:x"
-                class="w-3 h-3"
-              />
-            </button>
-          </BaseBadge>
-
-          <button
-            type="button"
-            class="ml-1 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium text-accent hover:text-accent-hover hover:bg-bg-surface transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-app"
-            @click="clearFilters"
-          >
-            Clear all
-          </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Content Area -->
-    <div class="flex-1 overflow-auto bg-bg-app px-4 sm:px-6 lg:px-8 py-6">
-      <!-- Loading State (Initial) -->
-      <div
-        v-if="(isLoading || isInitializing) && runs.length === 0"
-        class="space-y-4"
-      >
-        <BaseSkeleton class="h-24 w-full rounded-xl" />
-        <BaseSkeleton class="h-24 w-full rounded-xl" />
-        <BaseSkeleton class="h-24 w-full rounded-xl" />
-      </div>
-
-      <!-- Error State -->
-      <BaseCard
-        v-else-if="error"
-        class="bg-error/5 border-error/10"
-      >
-        <div class="flex flex-col items-center justify-center py-12 text-center">
-          <div class="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center mb-4">
-            <Icon
-              name="lucide:alert-circle"
-              class="w-6 h-6"
-            />
-          </div>
-          <h3 class="text-lg font-semibold text-text-primary mb-1">
-            Failed to load reviews
-          </h3>
-          <p class="text-text-secondary mb-6 max-w-md">
-            {{ error }}
-          </p>
-          <BaseButton
-            variant="secondary"
-            @click="fetchWorkspaceRuns(queryParams)"
-          >
-            Try Again
-          </BaseButton>
+        <!-- View Mode Toggle -->
+        <div class="mb-8">
+          <DomainReviewsRunsViewModeToggle v-model="viewMode" />
         </div>
-      </BaseCard>
 
-      <!-- Empty State (No Runs at all) -->
-      <div
-        v-else-if="runs.length === 0 && !hasActiveFilters && !isLoading && !isInitializing"
-        class="h-full flex flex-col items-center justify-center"
-      >
-        <BaseEmptyState
-          icon="lucide:git-pull-request"
-          title="No reviews yet"
-          description="Code reviews will appear here when pull requests are opened in your connected repositories."
-        >
-          <NuxtLink
-            :to="`/${workspaceSlug}/repositories`"
-          >
-            <BaseButton variant="primary">
-              <Icon
-                name="lucide:folder-git-2"
-                class="w-4 h-4 mr-1.5"
-              />
-              View Repositories
-            </BaseButton>
-          </NuxtLink>
-        </BaseEmptyState>
+        <!-- Filters -->
+        <DomainReviewsRunsFilterBar
+          v-model:search="search"
+          v-model:statusFilter="statusFilter"
+          v-model:riskFilter="riskFilter"
+          v-model:repositoryFilter="repositoryFilter"
+          v-model:authorFilter="authorFilter"
+          v-model:dateRange="dateRange"
+          v-model:sortBy="sortBy"
+          v-model:sortOrder="sortOrder"
+          :repositories="repositories"
+          :is-loading-repos="isLoadingRepos"
+          @clear-filters="clearFilters"
+        />
       </div>
 
-      <!-- Content -->
-      <template v-else>
-        <!-- Empty State (No Matches) -->
+      <!-- Content Area -->
+      <div class="flex-1 overflow-auto bg-bg-app px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading State (Initial) -->
         <div
-          v-if="runs.length === 0"
-          class="h-64 flex items-center justify-center"
+          v-if="(isLoading || isInitializing) && !hasData"
+          class="space-y-5"
         >
-          <BaseEmptyState
-            compact
-            icon="lucide:search-x"
-            title="No matching reviews"
-            description="Try adjusting your search or filters."
-          >
-            <BaseButton
-              variant="secondary"
-              size="sm"
-              @click="clearFilters"
-            >
-              Clear all filters
-            </BaseButton>
-          </BaseEmptyState>
+          <BaseSkeleton class="h-32 w-full rounded-2xl" />
+          <BaseSkeleton class="h-32 w-full rounded-2xl" />
+          <BaseSkeleton class="h-32 w-full rounded-2xl" />
         </div>
 
-        <!-- Runs List -->
+        <!-- Error State -->
+        <DomainReviewsRunsEmptyState
+          v-else-if="error"
+          type="error"
+          :error-message="error"
+          @retry="fetchData(queryParams, true)"
+        />
+
+        <!-- Empty State (No Data) -->
+        <DomainReviewsRunsEmptyState
+          v-else-if="showNoDataState"
+          type="no-data"
+          :workspace-slug="workspaceSlug"
+        />
+
+        <!-- Empty State (No Matches) -->
+        <DomainReviewsRunsEmptyState
+          v-else-if="showNoMatchesState"
+          type="no-matches"
+          :view-mode="viewMode"
+          @clear-filters="clearFilters"
+        />
+
+        <!-- Content by View Mode -->
         <div
           v-else
-          class="space-y-6 pb-8"
+          class="space-y-8 pb-8"
         >
-          <DomainRunsTable
+          <!-- All Runs View (Default) -->
+          <DomainReviewsRunsTable
+            v-if="viewMode === 'all'"
             :runs="runs"
             :workspace-slug="workspaceSlug"
           />
 
-          <!-- Pagination -->
+          <!-- By Pull Request View -->
           <div
-            v-if="pagination.lastPage > 1"
-            class="flex items-center justify-between pt-4 border-t border-border-subtle"
+            v-else-if="viewMode === 'pr'"
+            class="space-y-4"
           >
-            <p class="text-sm text-text-muted">
-              Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} reviews
-            </p>
-            <div class="flex items-center gap-2">
-              <BaseButton
-                variant="secondary"
-                size="sm"
-                :disabled="pagination.currentPage === 1"
-                @click="loadPage(pagination.currentPage - 1)"
-              >
-                <Icon
-                  name="lucide:chevron-left"
-                  class="w-4 h-4"
-                />
-                Previous
-              </BaseButton>
-              <BaseButton
-                variant="secondary"
-                size="sm"
-                :disabled="pagination.currentPage === pagination.lastPage"
-                @click="loadPage(pagination.currentPage + 1)"
-              >
-                Next
-                <Icon
-                  name="lucide:chevron-right"
-                  class="w-4 h-4"
-                />
-              </BaseButton>
-            </div>
+            <DomainReviewsPullRequestGroup
+              v-for="group in prGroups"
+              :key="`${group.repository.id}-${group.pull_request_number}`"
+              :group="group"
+            />
           </div>
+
+          <!-- By Repository View -->
+          <div
+            v-else-if="viewMode === 'repository'"
+            class="space-y-4"
+          >
+            <DomainReviewsRepositoryGroup
+              v-for="group in repositoryGroups"
+              :key="group.repository.id"
+              :group="group"
+            />
+          </div>
+
+          <!-- Pagination -->
+          <DomainReviewsRunsPagination
+            :current-page="pagination.currentPage"
+            :last-page="pagination.lastPage"
+            :from="pagination.from"
+            :to="pagination.to"
+            :total="pagination.total"
+            :item-type="currentItemType"
+            @load-page="loadPage"
+          />
         </div>
-      </template>
+      </div>
     </div>
-  </div>
+  </BaseContainer>
 </template>

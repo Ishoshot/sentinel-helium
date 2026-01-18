@@ -35,7 +35,7 @@ const tabs = computed(() => [
 </script>
 
 <template>
-  <div>
+  <BaseContainer>
     <!-- Page header -->
     <div class="mb-6">
       <h1 class="text-2xl font-semibold text-text-primary">
@@ -48,7 +48,7 @@ const tabs = computed(() => [
 
     <!-- Tabs navigation -->
     <div class="border-b border-border-subtle mb-6">
-      <nav class="-mb-px flex flex-wrap gap-4">
+      <nav class="-mb-px flex flex-wrap gap-7">
         <NuxtLink
           v-for="tab in tabs"
           :key="tab.to"
@@ -65,5 +65,5 @@ const tabs = computed(() => [
 
     <!-- Child route content -->
     <NuxtPage />
-  </div>
+  </BaseContainer>
 </template>
