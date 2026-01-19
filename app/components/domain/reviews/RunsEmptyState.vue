@@ -83,10 +83,16 @@ const handleAction = () => {
           :class="[config.iconSize, type !== 'error' && 'text-text-muted']"
         />
       </div>
-      <h3 class="font-bold text-text-primary mb-2" :class="type === 'no-data' ? 'text-2xl mb-3' : 'text-xl'">
+      <h3
+        class="font-bold text-text-primary mb-2"
+        :class="type === 'no-data' ? 'text-2xl mb-3' : 'text-xl'"
+      >
         {{ config.title }}
       </h3>
-      <p class="text-sm text-text-secondary leading-relaxed" :class="type === 'no-data' ? 'mb-8' : 'mb-6'">
+      <p
+        class="text-sm text-text-secondary leading-relaxed"
+        :class="type === 'no-data' ? 'mb-8' : 'mb-6'"
+      >
         {{ config.description }}
       </p>
       <NuxtLink

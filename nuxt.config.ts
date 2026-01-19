@@ -1,8 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-// Declare process for environment variable access
-declare const process: { env: Record<string, string | undefined> };
-
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
@@ -70,13 +67,12 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl:
-        process.env.NUXT_PUBLIC_API_BASE_URL || "http://sentinel.test/api",
-      reverbAppKey:
-        process.env.NUXT_PUBLIC_REVERB_APP_KEY || "sentinel-local-key",
-      reverbHost: process.env.NUXT_PUBLIC_REVERB_HOST || "localhost",
-      reverbPort: process.env.NUXT_PUBLIC_REVERB_PORT || "8080",
-      reverbScheme: process.env.NUXT_PUBLIC_REVERB_SCHEME || "http",
+      // Nuxt automatically maps NUXT_PUBLIC_* env vars to these values
+      apiBaseUrl: "http://sentinel.test/api",
+      reverbAppKey: "sentinel-local-key",
+      reverbHost: "localhost",
+      reverbPort: "8080",
+      reverbScheme: "http",
     },
   },
 

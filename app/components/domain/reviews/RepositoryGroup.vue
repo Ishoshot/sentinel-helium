@@ -105,7 +105,10 @@ const languageColor = computed(() => {
       leave-from-class="max-h-[4000px] opacity-100"
       leave-to-class="max-h-0 opacity-0"
     >
-      <div v-if="isExpanded" class="border-t border-border-subtle bg-bg-surface/30">
+      <div
+        v-if="isExpanded"
+        class="border-t border-border-subtle bg-bg-surface/30"
+      >
         <div class="space-y-3 p-4">
           <DomainReviewsPullRequestGroup
             v-for="prGroup in group.pull_requests"

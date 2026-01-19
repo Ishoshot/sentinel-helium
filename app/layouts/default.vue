@@ -214,9 +214,18 @@ function toggleSidebar() {
       :class="isSidebarCollapsed ? 'w-16' : 'w-56'"
     >
       <!-- Workspace Switcher (Header) -->
-      <div class="h-16 mt-1 pt-3 flex items-center transition-all duration-300" :class="isSidebarCollapsed ? 'px-2 justify-center' : 'px-5'">
-        <NuxtLink to="/" class="flex items-center">
-          <SentinelLogo v-if="!isSidebarCollapsed" size="lg" />
+      <div
+        class="h-16 mt-1 pt-3 flex items-center transition-all duration-300"
+        :class="isSidebarCollapsed ? 'px-2 justify-center' : 'px-5'"
+      >
+        <NuxtLink
+          to="/"
+          class="flex items-center"
+        >
+          <SentinelLogo
+            v-if="!isSidebarCollapsed"
+            size="lg"
+          />
           <div
             v-else
             class="w-8 h-8 bg-text-primary rounded-lg flex items-center justify-center shrink-0"
@@ -230,9 +239,15 @@ function toggleSidebar() {
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 overflow-y-auto py-8 transition-all duration-300" :class="isSidebarCollapsed ? 'px-2' : 'px-4'">
+      <nav
+        class="flex-1 overflow-y-auto py-8 transition-all duration-300"
+        :class="isSidebarCollapsed ? 'px-2' : 'px-4'"
+      >
         <!-- Main Navigation -->
-        <div class="space-y-3" :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''">
+        <div
+          class="space-y-3"
+          :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''"
+        >
           <NuxtLink
             v-for="item in mainNavItems"
             :key="item.to"
@@ -260,7 +275,10 @@ function toggleSidebar() {
         </div>
 
         <!-- Divider -->
-        <div v-if="!isSidebarCollapsed" class="h-px bg-border-subtle my-6 mx-4" />
+        <div
+          v-if="!isSidebarCollapsed"
+          class="h-px bg-border-subtle my-6 mx-4"
+        />
 
         <!-- Workspace Section -->
         <div :class="isSidebarCollapsed ? 'mt-6' : 'mt-8'">
@@ -270,7 +288,10 @@ function toggleSidebar() {
           >
             Workspace
           </p>
-          <div class="space-y-3" :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''">
+          <div
+            class="space-y-3"
+            :class="isSidebarCollapsed ? 'flex flex-col items-center' : ''"
+          >
             <NuxtLink
               v-for="item in workspaceNavItems"
               :key="item.to"
@@ -369,7 +390,10 @@ function toggleSidebar() {
         />
         <div class="relative h-full w-[80vw] max-w-xs bg-bg-elevated border-r border-border-subtle flex flex-col">
           <div class="h-16 px-5 flex items-center justify-between border-b border-border-subtle">
-            <NuxtLink to="/" class="flex items-center">
+            <NuxtLink
+              to="/"
+              class="flex items-center"
+            >
               <SentinelLogo size="xs" />
             </NuxtLink>
             <button

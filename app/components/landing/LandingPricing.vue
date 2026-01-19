@@ -114,7 +114,9 @@ const tiers = planConfigs.map(plan => ({
 
       <!-- Comparison table with blur overlay -->
       <div class="mt-20 relative">
-        <h3 class="text-xl font-semibold text-slate-900 mb-8">Compare plans</h3>
+        <h3 class="text-xl font-semibold text-slate-900 mb-8">
+          Compare plans
+        </h3>
 
         <!-- Desktop table with blur -->
         <div class="hidden lg:block relative">
@@ -136,11 +138,13 @@ const tiers = planConfigs.map(plan => ({
               </thead>
               <tbody>
                 <tr
-                  v-for="(feature, index) in comparisonFeatures.slice(0, 5)"
+                  v-for="feature in comparisonFeatures.slice(0, 5)"
                   :key="feature.name"
                   class="border-b border-slate-100"
                 >
-                  <td class="py-4 pr-4 text-sm text-slate-600">{{ feature.name }}</td>
+                  <td class="py-4 pr-4 text-sm text-slate-600">
+                    {{ feature.name }}
+                  </td>
                   <td class="text-center py-4 px-4">
                     <template v-if="typeof feature.foundation === 'boolean'">
                       <Icon
@@ -217,7 +221,9 @@ const tiers = planConfigs.map(plan => ({
           <!-- Blur overlay with CTA -->
           <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-[2px]">
             <div class="text-center py-8">
-              <p class="text-slate-600 mb-4">View detailed feature comparison</p>
+              <p class="text-slate-600 mb-4">
+                View detailed feature comparison
+              </p>
               <NuxtLink
                 to="/pricing"
                 class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors shadow-lg"
@@ -234,7 +240,9 @@ const tiers = planConfigs.map(plan => ({
 
         <!-- Mobile CTA -->
         <div class="lg:hidden text-center py-8 px-6 bg-slate-50 rounded-xl border border-slate-200">
-          <p class="text-sm text-slate-600 mb-4">Compare all features in detail</p>
+          <p class="text-sm text-slate-600 mb-4">
+            Compare all features in detail
+          </p>
           <NuxtLink
             to="/pricing"
             class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors"

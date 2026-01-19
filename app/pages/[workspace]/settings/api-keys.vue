@@ -137,11 +137,18 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
           <div class="max-w-2xl">
             <div class="mb-4 flex items-center gap-3">
               <div class="flex size-12 items-center justify-center rounded-2xl bg-accent/10">
-                <Icon name="lucide:key" class="size-6 text-accent" />
+                <Icon
+                  name="lucide:key"
+                  class="size-6 text-accent"
+                />
               </div>
               <div>
-                <h1 class="text-2xl font-bold text-text-primary">API Keys</h1>
-                <p class="text-sm text-text-muted">Bring Your Own Keys (BYOK)</p>
+                <h1 class="text-2xl font-bold text-text-primary">
+                  API Keys
+                </h1>
+                <p class="text-sm text-text-muted">
+                  Bring Your Own Keys (BYOK)
+                </p>
               </div>
             </div>
             <p class="text-sm leading-relaxed text-text-secondary">
@@ -156,12 +163,20 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
             class="flex gap-3"
           >
             <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 px-5 py-4 backdrop-blur-sm">
-              <p class="text-2xl font-bold text-text-primary">{{ stats.total }}</p>
-              <p class="text-xs text-text-muted">Repositories</p>
+              <p class="text-2xl font-bold text-text-primary">
+                {{ stats.total }}
+              </p>
+              <p class="text-xs text-text-muted">
+                Repositories
+              </p>
             </div>
             <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 px-5 py-4 backdrop-blur-sm">
-              <p class="text-2xl font-bold text-text-primary">{{ stats.autoReviewEnabled }}</p>
-              <p class="text-xs text-text-muted">Auto-Review On</p>
+              <p class="text-2xl font-bold text-text-primary">
+                {{ stats.autoReviewEnabled }}
+              </p>
+              <p class="text-xs text-text-muted">
+                Auto-Review On
+              </p>
             </div>
           </div>
         </div>
@@ -185,15 +200,23 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
     >
       <div class="mx-auto max-w-md text-center">
         <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-bg-surface">
-          <Icon name="lucide:github" class="size-10 text-text-muted" />
+          <Icon
+            name="lucide:github"
+            class="size-10 text-text-muted"
+          />
         </div>
-        <h2 class="mb-2 text-xl font-semibold text-text-primary">GitHub not connected</h2>
+        <h2 class="mb-2 text-xl font-semibold text-text-primary">
+          GitHub not connected
+        </h2>
         <p class="mb-6 text-sm text-text-muted">
           Connect your GitHub account to access repositories and configure API keys.
         </p>
         <NuxtLink :to="`/${workspaceSlug}/settings/integrations`">
           <BaseButton>
-            <Icon name="lucide:link" class="size-4" />
+            <Icon
+              name="lucide:link"
+              class="size-4"
+            />
             Go to Integrations
           </BaseButton>
         </NuxtLink>
@@ -214,7 +237,7 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
             type="text"
             placeholder="Search repositories..."
             class="w-full rounded-xl border border-border-subtle bg-bg-elevated py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-          />
+          >
         </div>
         <p class="text-sm text-text-muted">
           {{ filteredRepositories.length }} of {{ repositories.length }} repositories
@@ -239,7 +262,10 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-bg-surface">
-                  <Icon name="lucide:folder-git-2" class="size-5 text-text-secondary" />
+                  <Icon
+                    name="lucide:folder-git-2"
+                    class="size-5 text-text-secondary"
+                  />
                 </div>
                 <div class="min-w-0">
                   <h3 class="truncate text-sm font-semibold text-text-primary">
@@ -274,7 +300,10 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
               class="flex w-full items-center justify-center gap-2 rounded-xl border border-border-subtle bg-bg-surface px-4 py-2.5 text-sm font-medium text-text-primary transition-all duration-200 hover:border-accent hover:bg-accent hover:text-white"
               @click="handleManageKeys(repo.id)"
             >
-              <Icon name="lucide:settings-2" class="size-4" />
+              <Icon
+                name="lucide:settings-2"
+                class="size-4"
+              />
               Configure
             </button>
           </div>
@@ -287,9 +316,14 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
         class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center"
       >
         <div class="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-bg-surface">
-          <Icon name="lucide:search-x" class="size-6 text-text-muted" />
+          <Icon
+            name="lucide:search-x"
+            class="size-6 text-text-muted"
+          />
         </div>
-        <h3 class="mb-1 text-sm font-medium text-text-primary">No repositories found</h3>
+        <h3 class="mb-1 text-sm font-medium text-text-primary">
+          No repositories found
+        </h3>
         <p class="text-sm text-text-muted">
           Try adjusting your search query
         </p>
@@ -303,15 +337,23 @@ async function handleSaveSettings(data: UpdateRepositoryData) {
     >
       <div class="mx-auto max-w-md text-center">
         <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-bg-surface">
-          <Icon name="lucide:folder-git-2" class="size-10 text-text-muted" />
+          <Icon
+            name="lucide:folder-git-2"
+            class="size-10 text-text-muted"
+          />
         </div>
-        <h2 class="mb-2 text-xl font-semibold text-text-primary">No repositories found</h2>
+        <h2 class="mb-2 text-xl font-semibold text-text-primary">
+          No repositories found
+        </h2>
         <p class="mb-6 text-sm text-text-muted">
           Sync your repositories to start configuring API keys for automated code reviews.
         </p>
         <NuxtLink :to="`/${workspaceSlug}/repositories`">
           <BaseButton>
-            <Icon name="lucide:refresh-cw" class="size-4" />
+            <Icon
+              name="lucide:refresh-cw"
+              class="size-4"
+            />
             Go to Repositories
           </BaseButton>
         </NuxtLink>

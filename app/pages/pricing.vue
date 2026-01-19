@@ -211,7 +211,9 @@ const faqs = [
                   :class="{ 'bg-blue-50': tier.highlighted }"
                 >
                   <div>{{ tier.name }}</div>
-                  <div class="text-xs font-normal text-slate-500 mt-1">{{ tier.price }}</div>
+                  <div class="text-xs font-normal text-slate-500 mt-1">
+                    {{ tier.price }}
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -221,7 +223,9 @@ const faqs = [
                 :key="feature.name"
                 class="border-b border-slate-100 last:border-0"
               >
-                <td class="py-4 px-6 text-sm text-slate-600">{{ feature.name }}</td>
+                <td class="py-4 px-6 text-sm text-slate-600">
+                  {{ feature.name }}
+                </td>
                 <td class="text-center py-4 px-4">
                   <template v-if="typeof feature.foundation === 'boolean'">
                     <Icon
@@ -297,7 +301,9 @@ const faqs = [
 
         <!-- Mobile comparison hint -->
         <div class="lg:hidden text-center">
-          <p class="text-sm text-slate-500 mb-6">View full comparison on desktop</p>
+          <p class="text-sm text-slate-500 mb-6">
+            View full comparison on desktop
+          </p>
           <div class="space-y-4">
             <NuxtLink
               v-for="tier in tiers"
@@ -307,8 +313,12 @@ const faqs = [
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="font-semibold text-slate-900">{{ tier.name }}</div>
-                  <div class="text-sm text-slate-500">{{ tier.price }} {{ tier.period }}</div>
+                  <div class="font-semibold text-slate-900">
+                    {{ tier.name }}
+                  </div>
+                  <div class="text-sm text-slate-500">
+                    {{ tier.price }} {{ tier.period }}
+                  </div>
                 </div>
                 <Icon
                   name="ph:arrow-right"

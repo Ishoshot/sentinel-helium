@@ -232,7 +232,6 @@ const currentStep = computed(() => {
         </span>
       </div>
     </div>
-
   </div>
 
   <!-- Fullscreen variant (for generation page) -->

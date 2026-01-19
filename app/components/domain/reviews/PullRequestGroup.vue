@@ -156,7 +156,10 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
       leave-from-class="max-h-[2000px] opacity-100"
       leave-to-class="max-h-0 opacity-0"
     >
-      <div v-if="isExpanded" class="border-t border-border-subtle">
+      <div
+        v-if="isExpanded"
+        class="border-t border-border-subtle"
+      >
         <div class="divide-y divide-border-subtle/50">
           <button
             v-for="run in group.runs"
@@ -198,7 +201,10 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
                     <span v-if="run.metrics">
                       {{ run.metrics.files_changed }} files
                     </span>
-                    <span v-if="run.metadata?.sender_login" class="flex items-center gap-1">
+                    <span
+                      v-if="run.metadata?.sender_login"
+                      class="flex items-center gap-1"
+                    >
                       <span class="text-border-subtle">•</span>
                       {{ run.metadata.sender_login }}
                     </span>

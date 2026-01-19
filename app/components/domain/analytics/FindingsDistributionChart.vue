@@ -58,12 +58,18 @@ const chartOptions: ChartOptions = {
     description="Distribution of findings across severity levels"
     height="400px"
   />
-  <BaseCard v-else-if="isLoading" padding="lg">
+  <BaseCard
+    v-else-if="isLoading"
+    padding="lg"
+  >
     <div class="flex items-center justify-center h-64">
       <BaseSpinner size="lg" />
     </div>
   </BaseCard>
-  <BaseCard v-else padding="lg">
+  <BaseCard
+    v-else
+    padding="lg"
+  >
     <BaseEmptyState
       icon="lucide:pie-chart"
       title="No findings yet"

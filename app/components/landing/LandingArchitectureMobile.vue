@@ -39,10 +39,28 @@ import {
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3" />
-              <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.5" />
-              <stop offset="100%" stop-color="#10b981" stop-opacity="0.3" />
+            <linearGradient
+              id="lineGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="0%"
+            >
+              <stop
+                offset="0%"
+                stop-color="#3b82f6"
+                stop-opacity="0.3"
+              />
+              <stop
+                offset="50%"
+                stop-color="#8b5cf6"
+                stop-opacity="0.5"
+              />
+              <stop
+                offset="100%"
+                stop-color="#10b981"
+                stop-opacity="0.3"
+              />
             </linearGradient>
           </defs>
           <!-- Horizontal flow line -->
@@ -81,7 +99,6 @@ import {
               class="architecture-card cursor-pointer group relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-slate-300 hover:scale-[1.02]"
               :style="{ animationDelay: `${(layerIndex * 200) + (itemIndex * 100)}ms` }"
             >
-
               <!-- Card header -->
               <div class="relative px-4 py-3 border-b border-slate-100 flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -125,7 +142,6 @@ import {
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -150,20 +166,36 @@ import {
       <!-- Bottom stats -->
       <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">< 30s</div>
-          <div class="text-sm text-slate-500 mt-1">Avg review time</div>
+          <div class="text-3xl font-bold text-slate-900">
+            &lt; 30s
+          </div>
+          <div class="text-sm text-slate-500 mt-1">
+            Avg review time
+          </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">99.9%</div>
-          <div class="text-sm text-slate-500 mt-1">Uptime SLA</div>
+          <div class="text-3xl font-bold text-slate-900">
+            99.9%
+          </div>
+          <div class="text-sm text-slate-500 mt-1">
+            Uptime SLA
+          </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">6</div>
-          <div class="text-sm text-slate-500 mt-1">AI providers</div>
+          <div class="text-3xl font-bold text-slate-900">
+            6
+          </div>
+          <div class="text-sm text-slate-500 mt-1">
+            AI providers
+          </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">BYOK</div>
-          <div class="text-sm text-slate-500 mt-1">Your API keys</div>
+          <div class="text-3xl font-bold text-slate-900">
+            BYOK
+          </div>
+          <div class="text-sm text-slate-500 mt-1">
+            Your API keys
+          </div>
         </div>
       </div>
     </div>

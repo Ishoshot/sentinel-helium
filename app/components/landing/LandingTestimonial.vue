@@ -65,7 +65,9 @@ const testimonials = [
               <span class="text-xs font-semibold text-slate-900">{{ testimonial.initials }}</span>
             </div>
             <div>
-              <div class="text-sm font-semibold text-slate-900">{{ testimonial.author }}</div>
+              <div class="text-sm font-semibold text-slate-900">
+                {{ testimonial.author }}
+              </div>
               <div class="text-xs text-slate-500">
                 {{ testimonial.role }}, {{ testimonial.company }}
               </div>

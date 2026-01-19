@@ -91,12 +91,18 @@ const chartOptions: ChartOptions = {
     description="Percentage of findings resolved and total counts over time"
     height="400px"
   />
-  <BaseCard v-else-if="isLoading" padding="lg">
+  <BaseCard
+    v-else-if="isLoading"
+    padding="lg"
+  >
     <div class="flex items-center justify-center h-64">
       <BaseSpinner size="lg" />
     </div>
   </BaseCard>
-  <BaseCard v-else padding="lg">
+  <BaseCard
+    v-else
+    padding="lg"
+  >
     <BaseEmptyState
       icon="lucide:check-circle"
       title="No resolution data"

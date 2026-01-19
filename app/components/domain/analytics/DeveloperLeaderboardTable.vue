@@ -34,11 +34,17 @@ const formatDuration = (seconds: number): string => {
         </p>
       </div>
 
-      <div v-if="isLoading" class="flex items-center justify-center py-12">
+      <div
+        v-if="isLoading"
+        class="flex items-center justify-center py-12"
+      >
         <BaseSpinner size="lg" />
       </div>
 
-      <div v-else-if="data.length > 0" class="space-y-3">
+      <div
+        v-else-if="data.length > 0"
+        class="space-y-3"
+      >
         <div
           v-for="(developer, index) in data"
           :key="developer.id"
@@ -53,12 +59,15 @@ const formatDuration = (seconds: number): string => {
             :src="developer.avatar_url"
             :alt="developer.name"
             class="w-10 h-10 rounded-full"
-          />
+          >
           <div
             v-else
             class="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center"
           >
-            <Icon name="lucide:user" class="w-5 h-5 text-accent" />
+            <Icon
+              name="lucide:user"
+              class="w-5 h-5 text-accent"
+            />
           </div>
 
           <div class="flex-1 min-w-0">
@@ -75,21 +84,27 @@ const formatDuration = (seconds: number): string => {
               <p class="font-semibold text-text-primary">
                 {{ developer.runs_count }}
               </p>
-              <p class="text-xs text-text-muted">Runs</p>
+              <p class="text-xs text-text-muted">
+                Runs
+              </p>
             </div>
 
             <div class="text-center">
               <p class="font-semibold text-text-primary">
                 {{ developer.successful_runs }}
               </p>
-              <p class="text-xs text-text-muted">Success</p>
+              <p class="text-xs text-text-muted">
+                Success
+              </p>
             </div>
 
             <div class="text-center">
               <p class="font-semibold text-text-primary">
                 {{ formatDuration(developer.avg_duration) }}
               </p>
-              <p class="text-xs text-text-muted">Avg Time</p>
+              <p class="text-xs text-text-muted">
+                Avg Time
+              </p>
             </div>
           </div>
         </div>

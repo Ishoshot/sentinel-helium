@@ -7,7 +7,10 @@
 <template>
   <div class="landing-light min-h-screen bg-white relative overflow-hidden">
     <!-- Subtle grid pattern -->
-    <div class="absolute inset-0 opacity-[0.7]" style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;" />
+    <div
+      class="absolute inset-0 opacity-[0.7]"
+      style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;"
+    />
 
     <!-- Content -->
     <div class="relative z-10 min-h-screen flex flex-col">
