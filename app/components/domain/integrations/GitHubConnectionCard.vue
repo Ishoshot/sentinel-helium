@@ -523,6 +523,7 @@ const features = [
               as="a"
               :href="`https://github.com/settings/installations/${installation?.installation_id}`"
               target="_blank"
+              rel="noopener noreferrer"
             >
               <Icon
                 name="lucide:external-link"
