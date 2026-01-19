@@ -99,7 +99,7 @@ const columns = [1, 2, 3, 4].map(col => ({
                 }"
               >
                 <div
-                  class="architecture-card"
+                  class="architecture-card cursor-pointer"
                   :class="colorConfig[card.color]?.border"
                 >
                   <!-- Stripe pattern -->

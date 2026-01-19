@@ -78,7 +78,7 @@ import {
             <div
               v-for="(item, itemIndex) in layer.items"
               :key="item.id"
-              class="architecture-card group relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-slate-300 hover:scale-[1.02]"
+              class="architecture-card cursor-pointer group relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-slate-300 hover:scale-[1.02]"
               :style="{ animationDelay: `${(layerIndex * 200) + (itemIndex * 100)}ms` }"
             >
 
