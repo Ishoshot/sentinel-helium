@@ -33,12 +33,14 @@ const {
   repositories,
   isConnected,
   isLoading,
+  isConnecting,
   isSyncing,
   error,
   fetchConnection,
   fetchRepositories,
   syncRepositories,
   updateRepository,
+  connect,
 } = useGitHub(workspaceId)
 
 // Check permissions
@@ -216,6 +218,26 @@ function goToIntegrations() {
             :class="{ 'animate-spin': isSyncing, 'group-hover:rotate-180': !isSyncing }"
           />
           <span>{{ isSyncing ? 'Syncing...' : 'Sync from GitHub' }}</span>
+        </button>
+
+        <button
+          v-if="canManage"
+          type="button"
+          class="group relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl bg-accent text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 hover:bg-accent-hover hover:shadow-sm hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isConnecting"
+          @click="connect"
+        >
+          <Icon
+            v-if="isConnecting"
+            name="lucide:loader-2"
+            class="w-4 h-4 animate-spin"
+          />
+          <Icon
+            v-else
+            name="lucide:plus"
+            class="w-4 h-4"
+          />
+          <span>{{ isConnecting ? 'Redirecting...' : 'Add Repositories' }}</span>
         </button>
       </div>
     </div>

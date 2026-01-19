@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { planConfigs } from '~/config/plans'
+
 /**
  * Help Center / Learn page
  * Explains Sentinel concepts and terminology
@@ -145,37 +147,15 @@ const integrationsContent = [
   },
 ]
 
-const billingContent = [
-  {
-    plan: 'Foundation',
-    price: 'Free',
-    description: 'Perfect for personal projects and trying out Sentinel.',
-    features: ['20 reviews/month', '2 team members', 'GitHub integration', 'Basic findings'],
-    color: 'slate',
-  },
-  {
-    plan: 'Illuminate',
-    price: '$20/mo',
-    description: 'For growing teams wanting deeper insights.',
-    features: ['500 reviews/month', '5 team members', 'Custom guidelines', 'Priority processing'],
-    color: 'blue',
-    popular: true,
-  },
-  {
-    plan: 'Orchestrate',
-    price: '$50/mo',
-    description: 'For professional teams at scale.',
-    features: ['2,000 reviews/month', 'Unlimited members', 'API access', 'Advanced analytics'],
-    color: 'purple',
-  },
-  {
-    plan: 'Sanctum',
-    price: '$200/mo',
-    description: 'For organizations requiring governance.',
-    features: ['Unlimited reviews', 'SSO & SAML', 'Audit logs', 'Dedicated support'],
-    color: 'amber',
-  },
-]
+// Use shared plan configs as single source of truth
+const billingContent = planConfigs.map(plan => ({
+  plan: plan.name,
+  price: plan.price === 0 ? 'Free' : `$${plan.price}/mo`,
+  description: plan.description,
+  features: plan.features,
+  color: plan.color,
+  popular: plan.highlighted,
+}))
 </script>
 
 <template>

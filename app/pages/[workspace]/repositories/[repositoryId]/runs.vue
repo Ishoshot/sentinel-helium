@@ -4,7 +4,7 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useRuns } from '~/composables/reviews/useRuns'
 import { useDataFilter } from '~/composables/shared/useDataFilter'
 import type { Repository } from '~/types'
-import DomainReviewsRunList from '~/components/domain/reviews/RunList.vue'
+import DomainReviewsRunsTable from '~/components/domain/reviews/RunsTable.vue'
 import DomainReviewsRunFilterBar from '~/components/domain/reviews/RunFilterBar.vue'
 
 definePageMeta({
@@ -213,11 +213,12 @@ const goBack = () => {
             </button>
           </div>
 
-          <!-- Filtered Runs List -->
-          <DomainReviewsRunList
+          <!-- Filtered Runs Table -->
+          <DomainReviewsRunsTable
             v-else
             :runs="filteredRuns"
             :workspace-slug="workspaceSlug"
+            hide-repository
           />
         </div>
       </div>
