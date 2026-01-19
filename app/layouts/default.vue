@@ -2,8 +2,10 @@
 import { useUserStore } from '~/stores/useUserStore'
 import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useNotifications } from '~/composables/user/useNotifications'
+import { useGettingStarted } from '~/composables/useGettingStarted'
 import DomainUserUserMenu from '~/components/domain/user/UserMenu.vue'
 import DomainWorkspaceWorkspaceSwitcher from '~/components/domain/workspace/WorkspaceSwitcher.vue'
+import GettingStartedPanel from '~/components/GettingStartedPanel.vue'
 
 /**
  * Default layout - full app shell with sidebar and header
@@ -28,10 +30,20 @@ const {
   markAsUnread,
 } = useNotifications()
 
+// Getting Started Panel
+const {
+  isGettingStartedOpen,
+  toggleGettingStarted,
+  closeGettingStarted,
+  checkAndShowForFirstTime,
+} = useGettingStarted()
+
 // Fetch unread count on mount and load sidebar state
 onMounted(() => {
   if (userStore.isAuthenticated) {
     fetchUnreadCount()
+    // Auto-show getting started for first-time users
+    checkAndShowForFirstTime()
   }
 
   // Load sidebar collapsed state from localStorage
@@ -61,6 +73,11 @@ const mainNavItems = computed(() => {
       label: 'Code Reviews',
       to: `/${workspace}/reviews`,
       icon: 'lucide:git-pull-request',
+    },
+    {
+      label: 'Briefings',
+      to: `/${workspace}/briefings`,
+      icon: 'lucide:sparkles',
     },
   ]
 })
@@ -152,6 +169,8 @@ const breadcrumbs = computed(() => {
     repositories: 'Repositories',
     reviews: 'Code Reviews',
     integrations: 'Integrations',
+    briefings: 'Briefings',
+    generations: 'Generations',
   }
 
   // Build breadcrumbs for each segment after workspace
@@ -498,7 +517,22 @@ function toggleSidebar() {
             </nav>
           </div>
           <!-- Right: Actions -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <!-- Getting Started Toggle -->
+            <button
+              v-if="userStore.isAuthenticated"
+              type="button"
+              class="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-default"
+              title="Getting Started Guide"
+              @click="toggleGettingStarted"
+            >
+              <Icon
+                name="lucide:life-buoy"
+                class="w-5 h-5"
+              />
+            </button>
+
+            <!-- Notifications -->
             <DomainUserNotificationDropdown
               v-if="userStore.isAuthenticated"
               :notifications="notifications"
@@ -519,5 +553,11 @@ function toggleSidebar() {
         <slot />
       </main>
     </div>
+
+    <!-- Getting Started Panel -->
+    <GettingStartedPanel
+      :is-open="isGettingStartedOpen"
+      @close="closeGettingStarted"
+    />
   </div>
 </template>
