@@ -94,6 +94,14 @@ const limitItems = computed(() => [
     icon: "lucide:git-pull-request",
   },
   {
+    label: "Commands / month",
+    value:
+      props.plan.monthly_commands_limit === null
+        ? "Unlimited"
+        : props.plan.monthly_commands_limit.toLocaleString(),
+    icon: "lucide:terminal",
+  },
+  {
     label: "Team members",
     value:
       props.plan.team_size_limit === null

@@ -35,6 +35,7 @@ export interface Plan {
   tier: PlanTier;
   description: string | null;
   monthly_runs_limit: number | null;
+  monthly_commands_limit: number | null;
   team_size_limit: number | null;
   features: PlanFeatures;
   price_monthly_cents: number | null;

@@ -492,6 +492,18 @@ watch(showPromotionModal, (isOpen) => {
                 <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
                     <Icon
+                      name="lucide:terminal"
+                      class="size-4"
+                    />
+                    <span class="text-xs font-medium">Commands / month</span>
+                  </div>
+                  <p class="text-2xl font-bold text-text-primary">
+                    {{ currentPlan.monthly_commands_limit === null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
+                  </p>
+                </div>
+                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+                  <div class="mb-2 flex items-center gap-2 text-text-muted">
+                    <Icon
                       name="lucide:calendar"
                       class="size-4"
                     />
