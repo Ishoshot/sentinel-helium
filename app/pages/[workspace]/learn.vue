@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { planConfigs } from '~/config/plans'
+
 /**
  * Help Center / Learn page
  * Explains Sentinel concepts and terminology
@@ -145,37 +147,15 @@ const integrationsContent = [
   },
 ]
 
-const billingContent = [
-  {
-    plan: 'Foundation',
-    price: 'Free',
-    description: 'Perfect for personal projects and trying out Sentinel.',
-    features: ['20 reviews/month', '2 team members', 'GitHub integration', 'Basic findings'],
-    color: 'slate',
-  },
-  {
-    plan: 'Illuminate',
-    price: '$20/mo',
-    description: 'For growing teams wanting deeper insights.',
-    features: ['500 reviews/month', '5 team members', 'Custom guidelines', 'Priority processing'],
-    color: 'blue',
-    popular: true,
-  },
-  {
-    plan: 'Orchestrate',
-    price: '$50/mo',
-    description: 'For professional teams at scale.',
-    features: ['2,000 reviews/month', 'Unlimited members', 'API access', 'Advanced analytics'],
-    color: 'purple',
-  },
-  {
-    plan: 'Sanctum',
-    price: '$200/mo',
-    description: 'For organizations requiring governance.',
-    features: ['Unlimited reviews', 'SSO & SAML', 'Audit logs', 'Dedicated support'],
-    color: 'amber',
-  },
-]
+// Use shared plan configs as single source of truth
+const billingContent = planConfigs.map(plan => ({
+  plan: plan.name,
+  price: plan.price === 0 ? 'Free' : `$${plan.price}/mo`,
+  description: plan.description,
+  features: plan.features,
+  color: plan.color,
+  popular: plan.highlighted,
+}))
 </script>
 
 <template>
@@ -246,8 +226,12 @@ const billingContent = [
                   />
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-slate-900 mb-2">{{ item.title }}</h3>
-                  <p class="text-slate-600 leading-relaxed">{{ item.description }}</p>
+                  <h3 class="text-lg font-semibold text-slate-900 mb-2">
+                    {{ item.title }}
+                  </h3>
+                  <p class="text-slate-600 leading-relaxed">
+                    {{ item.description }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -262,7 +246,9 @@ const billingContent = [
                   />
                 </div>
                 <div>
-                  <h4 class="font-semibold text-slate-900 mb-1">Quick Tip</h4>
+                  <h4 class="font-semibold text-slate-900 mb-1">
+                    Quick Tip
+                  </h4>
                   <p class="text-slate-600 text-sm">
                     Start by connecting your GitHub account and selecting a repository. Sentinel will automatically review your next pull request!
                   </p>
@@ -301,17 +287,23 @@ const billingContent = [
                       'text-amber-600': concept.color === 'amber',
                     }"
                   />
-                  <h3 class="text-lg font-semibold text-slate-900">{{ concept.term }}</h3>
+                  <h3 class="text-lg font-semibold text-slate-900">
+                    {{ concept.term }}
+                  </h3>
                 </div>
               </div>
               <div class="p-6 space-y-4">
-                <p class="text-slate-600 leading-relaxed">{{ concept.definition }}</p>
+                <p class="text-slate-600 leading-relaxed">
+                  {{ concept.definition }}
+                </p>
                 <div class="flex items-start gap-2 text-sm">
                   <Icon
                     name="ph:arrow-bend-down-right"
                     class="w-4 h-4 text-slate-400 mt-0.5 shrink-0"
                   />
-                  <p class="text-slate-500 italic">{{ concept.example }}</p>
+                  <p class="text-slate-500 italic">
+                    {{ concept.example }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -347,11 +339,15 @@ const billingContent = [
                       'text-amber-600': item.color === 'amber',
                     }"
                   />
-                  <h3 class="text-lg font-semibold text-slate-900">{{ item.term }}</h3>
+                  <h3 class="text-lg font-semibold text-slate-900">
+                    {{ item.term }}
+                  </h3>
                 </div>
               </div>
               <div class="p-6 space-y-4">
-                <p class="text-slate-600 leading-relaxed">{{ item.definition }}</p>
+                <p class="text-slate-600 leading-relaxed">
+                  {{ item.definition }}
+                </p>
                 <ul class="space-y-2">
                   <li
                     v-for="detail in item.details"
@@ -386,8 +382,12 @@ const billingContent = [
                     class="w-5 h-5 text-slate-600"
                   />
                 </div>
-                <h3 class="font-semibold text-slate-900 mb-2">{{ item.term }}</h3>
-                <p class="text-sm text-slate-600 leading-relaxed">{{ item.definition }}</p>
+                <h3 class="font-semibold text-slate-900 mb-2">
+                  {{ item.term }}
+                </h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  {{ item.definition }}
+                </p>
               </div>
             </div>
 
@@ -398,7 +398,9 @@ const billingContent = [
                   name="ph:github-logo-bold"
                   class="w-6 h-6"
                 />
-                <h3 class="font-semibold">Setting up GitHub</h3>
+                <h3 class="font-semibold">
+                  Setting up GitHub
+                </h3>
               </div>
               <ol class="space-y-3 text-slate-300 text-sm">
                 <li class="flex items-start gap-3">
@@ -440,7 +442,9 @@ const billingContent = [
                   Popular
                 </div>
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-semibold text-slate-900">{{ plan.plan }}</h3>
+                  <h3 class="font-semibold text-slate-900">
+                    {{ plan.plan }}
+                  </h3>
                   <span
                     class="text-lg font-bold"
                     :class="{
@@ -451,7 +455,9 @@ const billingContent = [
                     }"
                   >{{ plan.price }}</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4">{{ plan.description }}</p>
+                <p class="text-sm text-slate-500 mb-4">
+                  {{ plan.description }}
+                </p>
                 <ul class="space-y-2">
                   <li
                     v-for="feature in plan.features"
@@ -478,7 +484,9 @@ const billingContent = [
                   />
                 </div>
                 <div>
-                  <h4 class="font-semibold text-slate-900 mb-1">About BYOK (Bring Your Own Key)</h4>
+                  <h4 class="font-semibold text-slate-900 mb-1">
+                    About BYOK (Bring Your Own Key)
+                  </h4>
                   <p class="text-slate-600 text-sm leading-relaxed">
                     All plans use a BYOK model for AI providers. You provide your own API keys for OpenAI, Anthropic, or other providers. This means you have complete control over your AI costs and full transparency into usage. Sentinel never charges you for AI tokens - you pay your provider directly.
                   </p>
@@ -493,8 +501,12 @@ const billingContent = [
     <!-- Help CTA -->
     <div class="bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-6 py-12 text-center">
-        <h2 class="text-xl font-semibold text-slate-900 mb-2">Still have questions?</h2>
-        <p class="text-slate-600 mb-6">We're here to help you get the most out of Sentinel.</p>
+        <h2 class="text-xl font-semibold text-slate-900 mb-2">
+          Still have questions?
+        </h2>
+        <p class="text-slate-600 mb-6">
+          We're here to help you get the most out of Sentinel.
+        </p>
         <a
           href="mailto:hello@usesentinel.ai"
           class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors"

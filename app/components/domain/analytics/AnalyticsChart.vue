@@ -62,17 +62,30 @@ const chartOptions = computed(() => ({
 <template>
   <BaseCard padding="none">
     <div class="p-5">
-      <div v-if="title || description" class="mb-4">
-        <h3 v-if="title" class="text-lg font-semibold text-text-primary">
+      <div
+        v-if="title || description"
+        class="mb-4"
+      >
+        <h3
+          v-if="title"
+          class="text-lg font-semibold text-text-primary"
+        >
           {{ title }}
         </h3>
-        <p v-if="description" class="mt-1 text-sm text-text-muted">
+        <p
+          v-if="description"
+          class="mt-1 text-sm text-text-muted"
+        >
           {{ description }}
         </p>
       </div>
 
       <div :style="{ height }">
-        <Chart :type="type" :data="data" :options="chartOptions" />
+        <Chart
+          :type="type"
+          :data="data"
+          :options="chartOptions"
+        />
       </div>
     </div>
   </BaseCard>

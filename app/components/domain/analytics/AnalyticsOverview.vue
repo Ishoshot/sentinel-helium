@@ -53,7 +53,11 @@ const overviewCards = computed(() => [
 <template>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <template v-if="isLoading">
-      <BaseCard v-for="i in 4" :key="i" padding="lg">
+      <BaseCard
+        v-for="i in 4"
+        :key="i"
+        padding="lg"
+      >
         <div class="flex items-center justify-center h-20">
           <BaseSpinner />
         </div>
@@ -61,8 +65,8 @@ const overviewCards = computed(() => [
     </template>
 
     <DomainWorkspaceStatCard
-      v-else
       v-for="card in overviewCards"
+      v-else
       :key="card.label"
       :label="card.label"
       :value="card.value"

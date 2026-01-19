@@ -94,6 +94,14 @@ const limitItems = computed(() => [
     icon: "lucide:git-pull-request",
   },
   {
+    label: "Commands / month",
+    value:
+      props.plan.monthly_commands_limit === null
+        ? "Unlimited"
+        : props.plan.monthly_commands_limit.toLocaleString(),
+    icon: "lucide:terminal",
+  },
+  {
     label: "Team members",
     value:
       props.plan.team_size_limit === null
@@ -186,7 +194,10 @@ function handleAction() {
           class="mt-2"
         >
           <span class="inline-flex items-center gap-1 rounded-full bg-success-light px-2.5 py-1 text-xs font-medium text-success">
-            <Icon name="lucide:badge-percent" class="size-3" />
+            <Icon
+              name="lucide:badge-percent"
+              class="size-3"
+            />
             {{ yearlySavingsLabel }}
           </span>
         </div>
@@ -200,7 +211,10 @@ function handleAction() {
           class="flex items-center justify-between"
         >
           <div class="flex items-center gap-2 text-sm text-text-muted">
-            <Icon :name="item.icon" class="size-4" />
+            <Icon
+              :name="item.icon"
+              class="size-4"
+            />
             <span>{{ item.label }}</span>
           </div>
           <span class="text-sm font-semibold text-text-primary">
@@ -254,8 +268,14 @@ function handleAction() {
           :disabled="!canManage || actionDisabled || isCurrent || actionLoading"
           @click="handleAction"
         >
-          <span v-if="actionLoading" class="flex items-center justify-center gap-2">
-            <Icon name="lucide:loader-2" class="size-4 animate-spin" />
+          <span
+            v-if="actionLoading"
+            class="flex items-center justify-center gap-2"
+          >
+            <Icon
+              name="lucide:loader-2"
+              class="size-4 animate-spin"
+            />
             Processing...
           </span>
           <span v-else>

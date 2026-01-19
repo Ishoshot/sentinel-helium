@@ -8,7 +8,10 @@
 <template>
   <section class="py-24 lg:py-32 relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
     <!-- Subtle pattern overlay -->
-    <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;" />
+    <div
+      class="absolute inset-0 opacity-10"
+      style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;"
+    />
 
     <!-- Glow effects -->
     <div class="absolute top-0 left-1/4 w-[500px] h-[300px] bg-white rounded-full blur-[150px] opacity-10 pointer-events-none" />

@@ -68,8 +68,8 @@ export function useGitHub(workspaceId: Ref<number | null>) {
       const response = await githubService.connect(workspaceId.value);
 
       if (response.installation_url) {
-        // Redirect to GitHub to install the app
-        window.location.href = response.installation_url;
+        // Open GitHub in a new tab to install/configure the app
+        window.open(response.installation_url, '_blank', 'noopener,noreferrer');
         return;
       }
 

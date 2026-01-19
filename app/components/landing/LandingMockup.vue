@@ -61,8 +61,12 @@ const recentRuns = [
                 />
               </div>
               <div>
-                <div class="text-sm font-medium text-slate-900">acme/api</div>
-                <div class="text-xs text-slate-500">Pull Request #234</div>
+                <div class="text-sm font-medium text-slate-900">
+                  acme/api
+                </div>
+                <div class="text-xs text-slate-500">
+                  Pull Request #234
+                </div>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -92,7 +96,9 @@ const recentRuns = [
                 }"
               />
               <div class="flex-1 min-w-0">
-                <div class="text-sm text-slate-900 truncate">{{ finding.message }}</div>
+                <div class="text-sm text-slate-900 truncate">
+                  {{ finding.message }}
+                </div>
                 <div class="flex items-center gap-2 mt-1">
                   <span class="text-xs text-slate-500">{{ finding.file }}</span>
                   <span class="text-xs text-slate-400">line {{ finding.line }}</span>
@@ -111,7 +117,9 @@ const recentRuns = [
       <div class="absolute -left-4 lg:-left-20 top-1/2 -translate-y-1/2 hidden lg:block landing-float-delayed z-10">
         <div class="w-64 rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl">
           <div class="px-4 py-3 border-b border-slate-100">
-            <div class="text-xs font-medium text-slate-900">Recent Runs</div>
+            <div class="text-xs font-medium text-slate-900">
+              Recent Runs
+            </div>
           </div>
           <div class="p-3 space-y-2">
             <div
@@ -128,8 +136,12 @@ const recentRuns = [
                   }"
                 />
                 <div class="min-w-0">
-                  <div class="text-xs text-slate-900 truncate">{{ run.repo }}</div>
-                  <div class="text-[10px] text-slate-500">{{ run.pr }}</div>
+                  <div class="text-xs text-slate-900 truncate">
+                    {{ run.repo }}
+                  </div>
+                  <div class="text-[10px] text-slate-500">
+                    {{ run.pr }}
+                  </div>
                 </div>
               </div>
               <div class="text-[10px] text-slate-400 flex-shrink-0">
@@ -143,11 +155,17 @@ const recentRuns = [
       <!-- Floating card - Stats (positioned to the right) -->
       <div class="absolute -right-4 lg:-right-16 top-1/3 hidden lg:block landing-float-delayed-2 z-10">
         <div class="w-48 rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xl p-4">
-          <div class="text-xs text-slate-500 mb-3">This week</div>
+          <div class="text-xs text-slate-500 mb-3">
+            This week
+          </div>
           <div class="space-y-3">
             <div>
-              <div class="text-2xl font-semibold text-slate-900">127</div>
-              <div class="text-xs text-slate-500">Reviews completed</div>
+              <div class="text-2xl font-semibold text-slate-900">
+                127
+              </div>
+              <div class="text-xs text-slate-500">
+                Reviews completed
+              </div>
             </div>
             <div class="flex items-center gap-2">
               <div class="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden">
@@ -155,7 +173,9 @@ const recentRuns = [
               </div>
               <span class="text-xs text-emerald-600">85%</span>
             </div>
-            <div class="text-xs text-slate-500">issues resolved</div>
+            <div class="text-xs text-slate-500">
+              issues resolved
+            </div>
           </div>
         </div>
       </div>
@@ -163,7 +183,9 @@ const recentRuns = [
 
     <!-- Trust section -->
     <div class="mt-16 text-center">
-      <p class="text-sm text-slate-500">Trusted by teams who want to ship fast</p>
+      <p class="text-sm text-slate-500">
+        Trusted by teams who want to ship fast
+      </p>
     </div>
   </div>
 </template>

@@ -96,7 +96,10 @@ function tripleArray(arr: Language[]): Language[] {
       <!-- Header -->
       <div class="text-center mb-16">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-sm font-medium mb-6">
-          <Icon name="ph:tree-structure-bold" class="w-4 h-4" />
+          <Icon
+            name="ph:tree-structure-bold"
+            class="w-4 h-4"
+          />
           <span>Semantic Analysis</span>
         </div>
         <h2 class="text-3xl lg:text-5xl font-semibold tracking-tight text-slate-900 mb-4">
@@ -173,29 +176,50 @@ function tripleArray(arr: Language[]): Language[] {
       <div class="mt-16 flex flex-wrap items-center justify-center gap-8 lg:gap-16">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-            <Icon name="ph:function-bold" class="w-6 h-6 text-blue-600" />
+            <Icon
+              name="ph:function-bold"
+              class="w-6 h-6 text-blue-600"
+            />
           </div>
           <div>
-            <div class="text-2xl font-bold text-slate-900">Functions</div>
-            <div class="text-sm text-slate-500">Extracted & analyzed</div>
+            <div class="text-2xl font-bold text-slate-900">
+              Functions
+            </div>
+            <div class="text-sm text-slate-500">
+              Extracted & analyzed
+            </div>
           </div>
         </div>
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
-            <Icon name="ph:tree-structure-bold" class="w-6 h-6 text-purple-600" />
+            <Icon
+              name="ph:tree-structure-bold"
+              class="w-6 h-6 text-purple-600"
+            />
           </div>
           <div>
-            <div class="text-2xl font-bold text-slate-900">Classes</div>
-            <div class="text-sm text-slate-500">Methods & properties</div>
+            <div class="text-2xl font-bold text-slate-900">
+              Classes
+            </div>
+            <div class="text-sm text-slate-500">
+              Methods & properties
+            </div>
           </div>
         </div>
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <Icon name="ph:package-bold" class="w-6 h-6 text-emerald-600" />
+            <Icon
+              name="ph:package-bold"
+              class="w-6 h-6 text-emerald-600"
+            />
           </div>
           <div>
-            <div class="text-2xl font-bold text-slate-900">Imports</div>
-            <div class="text-sm text-slate-500">Dependencies mapped</div>
+            <div class="text-2xl font-bold text-slate-900">
+              Imports
+            </div>
+            <div class="text-sm text-slate-500">
+              Dependencies mapped
+            </div>
           </div>
         </div>
       </div>

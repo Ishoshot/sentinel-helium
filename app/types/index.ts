@@ -37,3 +37,4 @@ export * from "./repositories";
 export * from "./reviews";
 export * from "./user";
 export * from "./analytics";
+export * from "./briefings";

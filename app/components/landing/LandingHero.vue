@@ -14,7 +14,6 @@ defineProps<{
     class="text-center max-w-5xl mx-auto transition-all duration-1000 ease-out margin-top"
     :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
   >
-
     <!-- Headline -->
     <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight leading-[1.1] text-gray-900">
       <span class="block">The fastest way to ship</span>

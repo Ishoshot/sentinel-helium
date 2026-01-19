@@ -88,7 +88,10 @@ function handleScroll() {
     <!-- Hero Section -->
     <section class="relative pt-24 lg:pt-32 pb-16 lg:pb-24 bg-white overflow-hidden">
       <!-- Subtle grid pattern -->
-      <div class="absolute inset-0 opacity-[0.7]" style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;" />
+      <div
+        class="absolute inset-0 opacity-[0.7]"
+        style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;"
+      />
 
       <div class="relative max-w-7xl mx-auto px-6 my-10">
         <LandingHero :visible="heroVisible" />

@@ -1,7 +1,37 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
+
+  // App configuration - favicons and meta
+  app: {
+    head: {
+      title: "Sentinel",
+      meta: [{ name: "theme-color", content: "#3b82f6" }],
+      link: [
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "16x16",
+          href: "/favicon-16x16.png",
+        },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "32x32",
+          href: "/favicon-32x32.png",
+        },
+        {
+          rel: "apple-touch-icon",
+          sizes: "180x180",
+          href: "/apple-touch-icon.png",
+        },
+        { rel: "manifest", href: "/site.webmanifest" },
+      ],
+    },
+  },
 
   // Hybrid rendering: SSR for public pages, SPA for authenticated dashboard
   routeRules: {
@@ -35,10 +65,14 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
 
-  // Runtime configuration
   runtimeConfig: {
     public: {
+      // Nuxt automatically maps NUXT_PUBLIC_* env vars to these values
       apiBaseUrl: "http://sentinel.test/api",
+      reverbAppKey: "sentinel-local-key",
+      reverbHost: "localhost",
+      reverbPort: "8080",
+      reverbScheme: "http",
     },
   },
 

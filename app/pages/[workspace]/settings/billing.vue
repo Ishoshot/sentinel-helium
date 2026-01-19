@@ -382,8 +382,14 @@ watch(showPromotionModal, (isOpen) => {
             />
 
             <!-- Decorative elements -->
-            <div class="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-gradient-to-br opacity-20 blur-3xl" :class="currentTierConfig.gradient" />
-            <div class="pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-gradient-to-br opacity-10 blur-2xl" :class="currentTierConfig.gradient" />
+            <div
+              class="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-gradient-to-br opacity-20 blur-3xl"
+              :class="currentTierConfig.gradient"
+            />
+            <div
+              class="pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-gradient-to-br opacity-10 blur-2xl"
+              :class="currentTierConfig.gradient"
+            />
 
             <div class="relative p-8">
               <!-- Header -->
@@ -415,14 +421,20 @@ watch(showPromotionModal, (isOpen) => {
                           v-if="statusConfig.pulse"
                           class="relative flex size-2"
                         >
-                          <span class="absolute inline-flex size-full animate-ping rounded-full opacity-75" :class="{
-                            'bg-warning': statusConfig.variant === 'warning',
-                            'bg-error': statusConfig.variant === 'error',
-                          }" />
-                          <span class="relative inline-flex size-2 rounded-full" :class="{
-                            'bg-warning': statusConfig.variant === 'warning',
-                            'bg-error': statusConfig.variant === 'error',
-                          }" />
+                          <span
+                            class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+                            :class="{
+                              'bg-warning': statusConfig.variant === 'warning',
+                              'bg-error': statusConfig.variant === 'error',
+                            }"
+                          />
+                          <span
+                            class="relative inline-flex size-2 rounded-full"
+                            :class="{
+                              'bg-warning': statusConfig.variant === 'warning',
+                              'bg-error': statusConfig.variant === 'error',
+                            }"
+                          />
                         </span>
                         <Icon
                           v-else
@@ -455,7 +467,10 @@ watch(showPromotionModal, (isOpen) => {
               <div class="mb-8 grid gap-4 sm:grid-cols-3">
                 <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon name="lucide:git-pull-request" class="size-4" />
+                    <Icon
+                      name="lucide:git-pull-request"
+                      class="size-4"
+                    />
                     <span class="text-xs font-medium">Reviews / month</span>
                   </div>
                   <p class="text-2xl font-bold text-text-primary">
@@ -464,7 +479,10 @@ watch(showPromotionModal, (isOpen) => {
                 </div>
                 <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon name="lucide:users" class="size-4" />
+                    <Icon
+                      name="lucide:users"
+                      class="size-4"
+                    />
                     <span class="text-xs font-medium">Team members</span>
                   </div>
                   <p class="text-2xl font-bold text-text-primary">
@@ -473,7 +491,22 @@ watch(showPromotionModal, (isOpen) => {
                 </div>
                 <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon name="lucide:calendar" class="size-4" />
+                    <Icon
+                      name="lucide:terminal"
+                      class="size-4"
+                    />
+                    <span class="text-xs font-medium">Commands / month</span>
+                  </div>
+                  <p class="text-2xl font-bold text-text-primary">
+                    {{ currentPlan.monthly_commands_limit === null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
+                  </p>
+                </div>
+                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+                  <div class="mb-2 flex items-center gap-2 text-text-muted">
+                    <Icon
+                      name="lucide:calendar"
+                      class="size-4"
+                    />
                     <span class="text-xs font-medium">Billing cycle</span>
                   </div>
                   <p class="text-2xl font-bold text-text-primary">
@@ -487,10 +520,17 @@ watch(showPromotionModal, (isOpen) => {
                 v-if="trialEndsLabel"
                 class="mb-6 flex items-center gap-3 rounded-xl border border-warning/20 bg-warning-light/50 p-4"
               >
-                <Icon name="lucide:hourglass" class="size-5 text-warning" />
+                <Icon
+                  name="lucide:hourglass"
+                  class="size-5 text-warning"
+                />
                 <div>
-                  <p class="text-sm font-medium text-warning">Trial period active</p>
-                  <p class="text-xs text-warning/80">Ends on {{ trialEndsLabel }}</p>
+                  <p class="text-sm font-medium text-warning">
+                    Trial period active
+                  </p>
+                  <p class="text-xs text-warning/80">
+                    Ends on {{ trialEndsLabel }}
+                  </p>
                 </div>
               </div>
 
@@ -502,7 +542,10 @@ watch(showPromotionModal, (isOpen) => {
                   :loading="isPortalLoading"
                   @click="handleOpenPortal"
                 >
-                  <Icon name="lucide:credit-card" class="size-4" />
+                  <Icon
+                    name="lucide:credit-card"
+                    class="size-4"
+                  />
                   Manage billing
                 </BaseButton>
                 <BaseButton
@@ -527,16 +570,29 @@ watch(showPromotionModal, (isOpen) => {
         <!-- Usage Card -->
         <div class="lg:col-span-2">
           <div class="h-full rounded-2xl border border-border-subtle bg-bg-elevated p-6">
-            <div v-if="isLoadingUsage && !usage" class="flex h-full items-center justify-center">
-              <Icon name="lucide:loader-2" class="size-8 animate-spin text-text-muted" />
+            <div
+              v-if="isLoadingUsage && !usage"
+              class="flex h-full items-center justify-center"
+            >
+              <Icon
+                name="lucide:loader-2"
+                class="size-8 animate-spin text-text-muted"
+              />
             </div>
 
-            <div v-else-if="usage" class="flex h-full flex-col">
+            <div
+              v-else-if="usage"
+              class="flex h-full flex-col"
+            >
               <!-- Header -->
               <div class="mb-6 flex items-start justify-between">
                 <div>
-                  <h3 class="text-lg font-semibold text-text-primary">Usage</h3>
-                  <p class="text-xs text-text-muted">{{ usagePeriodLabel }}</p>
+                  <h3 class="text-lg font-semibold text-text-primary">
+                    Usage
+                  </h3>
+                  <p class="text-xs text-text-muted">
+                    {{ usagePeriodLabel }}
+                  </p>
                 </div>
                 <div
                   v-if="daysRemaining !== null"
@@ -591,19 +647,40 @@ watch(showPromotionModal, (isOpen) => {
               <!-- Stats Row -->
               <div class="grid grid-cols-3 gap-3">
                 <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon name="lucide:git-pull-request" class="mx-auto mb-1 size-4 text-text-muted" />
-                  <p class="text-lg font-semibold text-text-primary">{{ usage.runs_count }}</p>
-                  <p class="text-[10px] text-text-muted">Reviews</p>
+                  <Icon
+                    name="lucide:git-pull-request"
+                    class="mx-auto mb-1 size-4 text-text-muted"
+                  />
+                  <p class="text-lg font-semibold text-text-primary">
+                    {{ usage.runs_count }}
+                  </p>
+                  <p class="text-[10px] text-text-muted">
+                    Reviews
+                  </p>
                 </div>
                 <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon name="lucide:search" class="mx-auto mb-1 size-4 text-text-muted" />
-                  <p class="text-lg font-semibold text-text-primary">{{ usage.findings_count }}</p>
-                  <p class="text-[10px] text-text-muted">Findings</p>
+                  <Icon
+                    name="lucide:search"
+                    class="mx-auto mb-1 size-4 text-text-muted"
+                  />
+                  <p class="text-lg font-semibold text-text-primary">
+                    {{ usage.findings_count }}
+                  </p>
+                  <p class="text-[10px] text-text-muted">
+                    Findings
+                  </p>
                 </div>
                 <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon name="lucide:message-square" class="mx-auto mb-1 size-4 text-text-muted" />
-                  <p class="text-lg font-semibold text-text-primary">{{ usage.annotations_count }}</p>
-                  <p class="text-[10px] text-text-muted">Annotations</p>
+                  <Icon
+                    name="lucide:message-square"
+                    class="mx-auto mb-1 size-4 text-text-muted"
+                  />
+                  <p class="text-lg font-semibold text-text-primary">
+                    {{ usage.annotations_count }}
+                  </p>
+                  <p class="text-[10px] text-text-muted">
+                    Annotations
+                  </p>
                 </div>
               </div>
 
@@ -614,11 +691,18 @@ watch(showPromotionModal, (isOpen) => {
                   class="flex items-start gap-3 rounded-xl border border-error/20 bg-error-light p-4"
                 >
                   <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-error/10">
-                    <Icon name="lucide:alert-triangle" class="size-4 text-error" />
+                    <Icon
+                      name="lucide:alert-triangle"
+                      class="size-4 text-error"
+                    />
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-error">Limit reached</p>
-                    <p class="text-xs text-error/80">Upgrade to continue reviewing</p>
+                    <p class="text-sm font-semibold text-error">
+                      Limit reached
+                    </p>
+                    <p class="text-xs text-error/80">
+                      Upgrade to continue reviewing
+                    </p>
                   </div>
                 </div>
 
@@ -627,11 +711,18 @@ watch(showPromotionModal, (isOpen) => {
                   class="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-light p-4"
                 >
                   <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/10">
-                    <Icon name="lucide:alert-circle" class="size-4 text-warning" />
+                    <Icon
+                      name="lucide:alert-circle"
+                      class="size-4 text-warning"
+                    />
                   </div>
                   <div>
-                    <p class="text-sm font-semibold text-warning">Approaching limit</p>
-                    <p class="text-xs text-warning/80">Consider upgrading soon</p>
+                    <p class="text-sm font-semibold text-warning">
+                      Approaching limit
+                    </p>
+                    <p class="text-xs text-warning/80">
+                      Consider upgrading soon
+                    </p>
                   </div>
                 </div>
               </div>
@@ -654,7 +745,9 @@ watch(showPromotionModal, (isOpen) => {
       <!-- Section Header -->
       <div class="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-text-primary">Choose your plan</h2>
+          <h2 class="text-2xl font-bold text-text-primary">
+            Choose your plan
+          </h2>
           <p class="mt-1 text-sm text-text-muted">
             Compare plans and find the perfect fit for your team.
           </p>
@@ -705,7 +798,7 @@ watch(showPromotionModal, (isOpen) => {
                 class="w-full rounded-xl border bg-bg-elevated py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 :class="promoCodeError ? 'border-error' : 'border-border-subtle'"
                 :disabled="!canManage || isProcessing"
-              />
+              >
             </div>
             <p
               v-if="promoCodeError"
@@ -759,12 +852,17 @@ watch(showPromotionModal, (isOpen) => {
         <!-- Illustration -->
         <div class="flex justify-center">
           <div class="flex size-16 items-center justify-center rounded-full bg-error-light">
-            <Icon name="lucide:heart-crack" class="size-8 text-error" />
+            <Icon
+              name="lucide:heart-crack"
+              class="size-8 text-error"
+            />
           </div>
         </div>
 
         <div class="text-center">
-          <h3 class="text-lg font-semibold text-text-primary">We're sad to see you go</h3>
+          <h3 class="text-lg font-semibold text-text-primary">
+            We're sad to see you go
+          </h3>
           <p class="mt-2 text-sm text-text-muted">
             Your subscription will remain active until the end of your billing period.
           </p>
@@ -772,19 +870,28 @@ watch(showPromotionModal, (isOpen) => {
 
         <div class="space-y-3">
           <div class="flex items-start gap-3 rounded-xl bg-bg-surface p-4">
-            <Icon name="lucide:check-circle" class="mt-0.5 size-4 text-success" />
+            <Icon
+              name="lucide:check-circle"
+              class="mt-0.5 size-4 text-success"
+            />
             <p class="text-sm text-text-secondary">
               Keep access until period ends
             </p>
           </div>
           <div class="flex items-start gap-3 rounded-xl bg-bg-surface p-4">
-            <Icon name="lucide:arrow-down-circle" class="mt-0.5 size-4 text-warning" />
+            <Icon
+              name="lucide:arrow-down-circle"
+              class="mt-0.5 size-4 text-warning"
+            />
             <p class="text-sm text-text-secondary">
               Downgrade to Foundation plan after
             </p>
           </div>
           <div class="flex items-start gap-3 rounded-xl border border-error/20 bg-error-light p-4">
-            <Icon name="lucide:alert-triangle" class="mt-0.5 size-4 text-error" />
+            <Icon
+              name="lucide:alert-triangle"
+              class="mt-0.5 size-4 text-error"
+            />
             <p class="text-sm text-error">
               Active repos and reviews will be limited
             </p>
@@ -805,7 +912,10 @@ watch(showPromotionModal, (isOpen) => {
             :loading="isCanceling"
             @click="handleCancelSubscription"
           >
-            <Icon name="lucide:x" class="size-4" />
+            <Icon
+              name="lucide:x"
+              class="size-4"
+            />
             Confirm cancellation
           </BaseButton>
         </div>
@@ -823,16 +933,24 @@ watch(showPromotionModal, (isOpen) => {
         <div class="flex justify-center">
           <div class="relative">
             <div class="flex size-16 items-center justify-center rounded-full bg-success-light">
-              <Icon name="lucide:ticket" class="size-8 text-success" />
+              <Icon
+                name="lucide:ticket"
+                class="size-8 text-success"
+              />
             </div>
             <div class="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-success text-white">
-              <Icon name="lucide:check" class="size-3.5" />
+              <Icon
+                name="lucide:check"
+                class="size-3.5"
+              />
             </div>
           </div>
         </div>
 
         <div class="text-center">
-          <h3 class="text-lg font-semibold text-text-primary">Great news!</h3>
+          <h3 class="text-lg font-semibold text-text-primary">
+            Great news!
+          </h3>
           <p class="mt-1 text-sm text-text-muted">
             Your promo code has been applied successfully.
           </p>
@@ -841,13 +959,17 @@ watch(showPromotionModal, (isOpen) => {
         <div class="rounded-xl border border-success/20 bg-success-light/50 p-4">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-xs text-text-muted">Promo code</p>
+              <p class="text-xs text-text-muted">
+                Promo code
+              </p>
               <p class="font-mono text-sm font-bold text-text-primary">
                 {{ promotionNotice?.code }}
               </p>
             </div>
             <div class="text-right">
-              <p class="text-xs text-text-muted">Discount</p>
+              <p class="text-xs text-text-muted">
+                Discount
+              </p>
               <p class="text-lg font-bold text-success">
                 {{ promotionNotice?.discount }}
               </p>
@@ -868,7 +990,10 @@ watch(showPromotionModal, (isOpen) => {
             variant="primary"
             @click="handlePromotionCheckout"
           >
-            <Icon name="lucide:external-link" class="size-4" />
+            <Icon
+              name="lucide:external-link"
+              class="size-4"
+            />
             Continue to checkout
           </BaseButton>
         </div>

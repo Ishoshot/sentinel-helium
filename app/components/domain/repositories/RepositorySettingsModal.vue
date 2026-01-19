@@ -241,7 +241,10 @@ function close() {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="flex size-10 items-center justify-center rounded-xl bg-accent/10">
-          <Icon name="lucide:settings-2" class="size-5 text-accent" />
+          <Icon
+            name="lucide:settings-2"
+            class="size-5 text-accent"
+          />
         </div>
         <div>
           <h2 class="text-lg font-semibold text-text-primary">
@@ -266,7 +269,10 @@ function close() {
         <div class="flex items-start justify-between gap-6">
           <div class="flex items-start gap-3">
             <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-              <Icon name="lucide:bot" class="size-5 text-accent" />
+              <Icon
+                name="lucide:bot"
+                class="size-5 text-accent"
+              />
             </div>
             <div>
               <p class="font-medium text-text-primary">
@@ -298,11 +304,18 @@ function close() {
         <div class="flex items-center justify-between gap-6">
           <div class="flex items-center gap-4">
             <div class="flex size-10 items-center justify-center rounded-lg bg-amber-500/10">
-              <Icon name="lucide:key" class="size-5 text-amber-500" />
+              <Icon
+                name="lucide:key"
+                class="size-5 text-amber-500"
+              />
             </div>
             <div>
-              <h4 class="font-medium text-text-primary">API Keys</h4>
-              <p class="text-xs text-text-muted">Configure AI provider keys for this repository</p>
+              <h4 class="font-medium text-text-primary">
+                API Keys
+              </h4>
+              <p class="text-xs text-text-muted">
+                Configure AI provider keys for this repository
+              </p>
             </div>
           </div>
           <button
@@ -311,7 +324,10 @@ function close() {
             class="inline-flex items-center gap-1.5 rounded-lg bg-text-primary px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-text-secondary"
             @click="showAddKeyForm = true"
           >
-            <Icon name="lucide:plus" class="size-3.5" />
+            <Icon
+              name="lucide:plus"
+              class="size-3.5"
+            />
             Add Key
           </button>
         </div>
@@ -332,7 +348,10 @@ function close() {
             <div class="border-b border-accent/10 bg-accent/5 px-4 py-3">
               <div class="flex items-center justify-between">
                 <h5 class="flex items-center gap-2 text-sm font-medium text-text-primary">
-                  <Icon name="lucide:plus-circle" class="size-4 text-accent" />
+                  <Icon
+                    name="lucide:plus-circle"
+                    class="size-4 text-accent"
+                  />
                   Add New API Key
                 </h5>
                 <button
@@ -340,7 +359,10 @@ function close() {
                   class="rounded-lg p-1 text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
                   @click="showAddKeyForm = false"
                 >
-                  <Icon name="lucide:x" class="size-4" />
+                  <Icon
+                    name="lucide:x"
+                    class="size-4"
+                  />
                 </button>
               </div>
             </div>
@@ -354,7 +376,10 @@ function close() {
                       v-model="newKeyProvider"
                       class="h-10 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-8 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                     >
-                      <option value="" disabled>
+                      <option
+                        value=""
+                        disabled
+                      >
                         Select provider...
                       </option>
                       <option
@@ -380,7 +405,7 @@ function close() {
                       :type="showKeyInput ? 'text' : 'password'"
                       class="h-10 w-full rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                       placeholder="sk-..."
-                    />
+                    >
                     <button
                       type="button"
                       class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-colors hover:text-text-primary"
@@ -432,7 +457,10 @@ function close() {
               </div>
 
               <p class="flex items-start gap-2 text-xs text-text-muted">
-                <Icon name="lucide:lock" class="mt-0.5 size-3 shrink-0" />
+                <Icon
+                  name="lucide:lock"
+                  class="mt-0.5 size-3 shrink-0"
+                />
                 Your key is encrypted and will never be displayed again.
               </p>
 
@@ -440,7 +468,10 @@ function close() {
                 v-if="hasSelectedProviderKey"
                 class="flex items-start gap-2 rounded-lg bg-warning/10 p-3 text-xs text-warning"
               >
-                <Icon name="lucide:alert-triangle" class="mt-0.5 size-4 shrink-0" />
+                <Icon
+                  name="lucide:alert-triangle"
+                  class="mt-0.5 size-4 shrink-0"
+                />
                 <span>A key for this provider already exists. Saving will replace it.</span>
               </div>
 
@@ -480,7 +511,10 @@ function close() {
           v-if="isLoadingKeys"
           class="flex justify-center py-8"
         >
-          <Icon name="lucide:loader-2" class="size-6 animate-spin text-text-muted" />
+          <Icon
+            name="lucide:loader-2"
+            class="size-6 animate-spin text-text-muted"
+          />
         </div>
 
         <div
@@ -493,7 +527,10 @@ function close() {
             class="group rounded-xl border border-border-subtle bg-bg-elevated px-5 py-4 transition-colors hover:border-border-muted"
           >
             <!-- Edit Mode -->
-            <div v-if="keyToEdit?.id === key.id" class="space-y-4">
+            <div
+              v-if="keyToEdit?.id === key.id"
+              class="space-y-4"
+            >
               <div class="flex items-center gap-3">
                 <div class="flex size-10 items-center justify-center rounded-lg bg-bg-surface">
                   <Icon
@@ -505,7 +542,9 @@ function close() {
                   <p class="text-sm font-medium text-text-primary">
                     {{ key.provider_label }}
                   </p>
-                  <p class="text-xs text-text-muted">Change AI model</p>
+                  <p class="text-xs text-text-muted">
+                    Change AI model
+                  </p>
                 </div>
               </div>
 
@@ -574,7 +613,10 @@ function close() {
             </div>
 
             <!-- View Mode -->
-            <div v-else class="flex items-center justify-between gap-6">
+            <div
+              v-else
+              class="flex items-center justify-between gap-6"
+            >
               <div class="flex items-center gap-3">
                 <div class="flex size-10 items-center justify-center rounded-lg bg-bg-surface">
                   <Icon
@@ -593,7 +635,10 @@ function close() {
                   </div>
                 </div>
               </div>
-              <div v-if="canManage" class="flex items-center gap-2">
+              <div
+                v-if="canManage"
+                class="flex items-center gap-2"
+              >
                 <button
                   type="button"
                   class="rounded-lg px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
@@ -618,10 +663,17 @@ function close() {
           class="flex flex-col items-center rounded-xl border border-dashed border-border-subtle p-8 text-center"
         >
           <div class="mb-3 flex size-12 items-center justify-center rounded-full bg-bg-surface">
-            <Icon name="lucide:key" class="size-6 text-text-muted" />
+            <Icon
+              name="lucide:key"
+              class="size-6 text-text-muted"
+            />
           </div>
-          <p class="text-sm font-medium text-text-primary">No API keys configured</p>
-          <p class="mt-1 text-xs text-text-muted">Add an API key to enable reviews for this repository</p>
+          <p class="text-sm font-medium text-text-primary">
+            No API keys configured
+          </p>
+          <p class="mt-1 text-xs text-text-muted">
+            Add an API key to enable reviews for this repository
+          </p>
         </div>
       </div>
 
@@ -629,11 +681,18 @@ function close() {
       <div class="space-y-4">
         <div class="flex items-center gap-4">
           <div class="flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
-            <Icon name="lucide:file-code" class="size-5 text-violet-500" />
+            <Icon
+              name="lucide:file-code"
+              class="size-5 text-violet-500"
+            />
           </div>
           <div>
-            <h4 class="font-medium text-text-primary">Sentinel Configuration</h4>
-            <p class="text-xs text-text-muted">Repository-specific review settings</p>
+            <h4 class="font-medium text-text-primary">
+              Sentinel Configuration
+            </h4>
+            <p class="text-xs text-text-muted">
+              Repository-specific review settings
+            </p>
           </div>
         </div>
 
@@ -644,13 +703,24 @@ function close() {
         >
           <div class="flex items-start gap-4">
             <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/10">
-              <Icon name="lucide:alert-triangle" class="size-4 text-warning" />
+              <Icon
+                name="lucide:alert-triangle"
+                class="size-4 text-warning"
+              />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-text-primary">Configuration Error</p>
-              <p class="mt-1 whitespace-pre-line text-sm text-text-secondary">{{ configError }}</p>
-              <p class="mt-2 text-xs text-text-muted">Reviews are skipped until this is fixed.</p>
-              <p class="text-xs text-text-muted">Last sync: {{ syncedAtLabel }}</p>
+              <p class="text-sm font-medium text-text-primary">
+                Configuration Error
+              </p>
+              <p class="mt-1 whitespace-pre-line text-sm text-text-secondary">
+                {{ configError }}
+              </p>
+              <p class="mt-2 text-xs text-text-muted">
+                Reviews are skipped until this is fixed.
+              </p>
+              <p class="text-xs text-text-muted">
+                Last sync: {{ syncedAtLabel }}
+              </p>
             </div>
           </div>
         </div>
@@ -663,37 +733,55 @@ function close() {
           <div class="flex items-start justify-between gap-6">
             <div class="flex items-start gap-4">
               <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-success/10">
-                <Icon name="lucide:check-circle" class="size-4 text-success" />
+                <Icon
+                  name="lucide:check-circle"
+                  class="size-4 text-success"
+                />
               </div>
               <div>
-                <p class="text-sm font-medium text-text-primary">Configuration Active</p>
-                <p class="text-xs text-text-muted">Last synced: {{ syncedAtLabel }}</p>
+                <p class="text-sm font-medium text-text-primary">
+                  Configuration Active
+                </p>
+                <p class="text-xs text-text-muted">
+                  Last synced: {{ syncedAtLabel }}
+                </p>
 
                 <!-- AI Provider Info -->
                 <div
                   v-if="config?.provider"
                   class="mt-3 space-y-1.5 border-t border-border-subtle pt-3"
                 >
-                  <p class="text-xs font-medium text-text-secondary">AI Provider Settings</p>
+                  <p class="text-xs font-medium text-text-secondary">
+                    AI Provider Settings
+                  </p>
                   <div
                     v-if="config.provider.preferred"
                     class="flex items-center gap-2 text-xs text-text-muted"
                   >
-                    <Icon name="lucide:bot" class="size-3.5" />
+                    <Icon
+                      name="lucide:bot"
+                      class="size-3.5"
+                    />
                     Provider: <span class="font-medium text-text-primary">{{ config.provider.preferred }}</span>
                   </div>
                   <div
                     v-if="config.provider.model"
                     class="flex items-center gap-2 text-xs text-text-muted"
                   >
-                    <Icon name="lucide:cpu" class="size-3.5" />
+                    <Icon
+                      name="lucide:cpu"
+                      class="size-3.5"
+                    />
                     Model: <span class="font-medium text-text-primary">{{ config.provider.model }}</span>
                   </div>
                   <div
                     v-if="config.provider.fallback !== undefined"
                     class="flex items-center gap-2 text-xs text-text-muted"
                   >
-                    <Icon name="lucide:shield-check" class="size-3.5" />
+                    <Icon
+                      name="lucide:shield-check"
+                      class="size-3.5"
+                    />
                     Fallback: <span class="font-medium text-text-primary">{{ config.provider.fallback ? 'Enabled' : 'Disabled' }}</span>
                   </div>
                 </div>
@@ -716,14 +804,21 @@ function close() {
         >
           <div class="flex items-start gap-4">
             <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-surface">
-              <Icon name="lucide:file-question" class="size-4 text-text-muted" />
+              <Icon
+                name="lucide:file-question"
+                class="size-4 text-text-muted"
+              />
             </div>
             <div>
-              <p class="text-sm text-text-secondary">Using Sentinel's default settings</p>
+              <p class="text-sm text-text-secondary">
+                Using Sentinel's default settings
+              </p>
               <p class="mt-1 text-xs text-text-muted">
                 Create <code class="rounded bg-bg-surface px-1.5 py-0.5 font-mono text-[10px]">.sentinel/config.yaml</code> to customize.
               </p>
-              <p class="mt-1 text-xs text-text-muted">Last checked: {{ syncedAtLabel }}</p>
+              <p class="mt-1 text-xs text-text-muted">
+                Last checked: {{ syncedAtLabel }}
+              </p>
             </div>
           </div>
         </div>
@@ -750,7 +845,10 @@ function close() {
             :disabled="!hasChanges || !canManage"
             @click="handleSave"
           >
-            <Icon name="lucide:check" class="size-4" />
+            <Icon
+              name="lucide:check"
+              class="size-4"
+            />
             Save Changes
           </BaseButton>
         </div>
@@ -768,11 +866,18 @@ function close() {
     <template #header>
       <div class="flex items-center gap-3">
         <div class="flex size-10 items-center justify-center rounded-xl bg-violet-500/10">
-          <Icon name="lucide:file-code" class="size-5 text-violet-500" />
+          <Icon
+            name="lucide:file-code"
+            class="size-5 text-violet-500"
+          />
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-text-primary">.sentinel/config.yaml</h2>
-          <p class="text-xs text-text-muted">Last synced: {{ syncedAtLabel }}</p>
+          <h2 class="text-lg font-semibold text-text-primary">
+            .sentinel/config.yaml
+          </h2>
+          <p class="text-xs text-text-muted">
+            Last synced: {{ syncedAtLabel }}
+          </p>
         </div>
       </div>
     </template>
@@ -792,8 +897,13 @@ function close() {
       v-else
       class="flex flex-col items-center py-12 text-center"
     >
-      <Icon name="lucide:file-x" class="mb-3 size-8 text-text-muted" />
-      <p class="text-sm text-text-muted">No configuration found.</p>
+      <Icon
+        name="lucide:file-x"
+        class="mb-3 size-8 text-text-muted"
+      />
+      <p class="text-sm text-text-muted">
+        No configuration found.
+      </p>
     </div>
 
     <template #footer>

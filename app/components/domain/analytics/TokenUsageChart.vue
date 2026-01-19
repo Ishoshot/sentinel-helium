@@ -63,12 +63,18 @@ const chartOptions: ChartOptions = {
     description="API token consumption over time"
     height="400px"
   />
-  <BaseCard v-else-if="isLoading" padding="lg">
+  <BaseCard
+    v-else-if="isLoading"
+    padding="lg"
+  >
     <div class="flex items-center justify-center h-64">
       <BaseSpinner size="lg" />
     </div>
   </BaseCard>
-  <BaseCard v-else padding="lg">
+  <BaseCard
+    v-else
+    padding="lg"
+  >
     <BaseEmptyState
       icon="lucide:activity"
       title="No token usage data"

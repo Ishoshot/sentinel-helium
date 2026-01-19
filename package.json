@@ -28,14 +28,17 @@
     "better-sqlite3": "^12.5.0",
     "chart.js": "^4.5.1",
     "eslint": "^9.39.2",
+    "laravel-echo": "^2.3.0",
     "marked": "^17.0.1",
     "nuxt": "^4.2.2",
     "primevue": "^4.5.4",
+    "pusher-js": "^8.4.0",
     "shiki": "3.21.0"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.83",
     "@iconify-json/ph": "^1.2.2",
+    "@types/node": "^25.0.9",
     "@typescript-eslint/parser": "^8.52.0",
     "eslint-plugin-vue": "^10.6.2",
     "vue-eslint-parser": "^10.2.0"

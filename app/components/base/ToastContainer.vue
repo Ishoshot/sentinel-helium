@@ -66,7 +66,7 @@ function getStyle(type: ToastType) {
         <div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-full border shadow-lg backdrop-blur-sm max-w-xs"
+          class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-full border shadow-lg backdrop-blur-sm max-w-md"
           :class="[getStyle(toast.type).bg, getStyle(toast.type).border]"
           role="alert"
         >

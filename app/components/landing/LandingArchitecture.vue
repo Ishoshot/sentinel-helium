@@ -99,7 +99,7 @@ const columns = [1, 2, 3, 4].map(col => ({
                 }"
               >
                 <div
-                  class="architecture-card"
+                  class="architecture-card cursor-pointer"
                   :class="colorConfig[card.color]?.border"
                 >
                   <!-- Stripe pattern -->
@@ -188,8 +188,12 @@ const columns = [1, 2, 3, 4].map(col => ({
           :key="stat.label"
           class="text-center"
         >
-          <div class="text-3xl font-bold text-slate-900">{{ stat.value }}</div>
-          <div class="text-sm text-slate-500 mt-1">{{ stat.label }}</div>
+          <div class="text-3xl font-bold text-slate-900">
+            {{ stat.value }}
+          </div>
+          <div class="text-sm text-slate-500 mt-1">
+            {{ stat.label }}
+          </div>
         </div>
       </div>
     </div>

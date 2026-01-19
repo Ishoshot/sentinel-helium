@@ -220,12 +220,25 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
     >
       <div class="mx-auto max-w-md text-center">
         <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-error/10">
-          <Icon name="lucide:alert-octagon" class="size-10 text-error" />
+          <Icon
+            name="lucide:alert-octagon"
+            class="size-10 text-error"
+          />
         </div>
-        <h3 class="mb-2 text-xl font-bold text-text-primary">Run not found</h3>
-        <p class="mb-8 text-sm text-text-secondary">{{ error }}</p>
-        <BaseButton variant="secondary" @click="goBack">
-          <Icon name="lucide:arrow-left" class="size-4" />
+        <h3 class="mb-2 text-xl font-bold text-text-primary">
+          Run not found
+        </h3>
+        <p class="mb-8 text-sm text-text-secondary">
+          {{ error }}
+        </p>
+        <BaseButton
+          variant="secondary"
+          @click="goBack"
+        >
+          <Icon
+            name="lucide:arrow-left"
+            class="size-4"
+          />
           Return to Runs
         </BaseButton>
       </div>
@@ -239,10 +252,15 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
       <div class="bg-gradient-to-r from-warning/10 via-warning/5 to-transparent p-6">
         <div class="flex items-start gap-4">
           <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-warning/10">
-            <Icon name="lucide:skip-forward" class="size-6 text-warning" />
+            <Icon
+              name="lucide:skip-forward"
+              class="size-6 text-warning"
+            />
           </div>
           <div class="flex-1">
-            <h3 class="mb-1 text-lg font-bold text-text-primary">Review Skipped</h3>
+            <h3 class="mb-1 text-lg font-bold text-text-primary">
+              Review Skipped
+            </h3>
             <p class="text-sm text-text-secondary leading-relaxed">
               {{ run.metadata.skip_message ?? run.metadata.skip_reason }}
             </p>
@@ -255,9 +273,15 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 :to="`/${workspaceSlug}/settings/api-keys`"
                 class="inline-flex items-center gap-2 rounded-lg bg-warning/10 px-4 py-2 text-sm font-semibold text-warning transition-colors hover:bg-warning/20"
               >
-                <Icon name="lucide:key" class="size-4" />
+                <Icon
+                  name="lucide:key"
+                  class="size-4"
+                />
                 Configure Provider Keys
-                <Icon name="lucide:arrow-right" class="size-4" />
+                <Icon
+                  name="lucide:arrow-right"
+                  class="size-4"
+                />
               </NuxtLink>
             </div>
           </div>
@@ -308,7 +332,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                     size="sm"
                     class="border border-border-subtle bg-bg-surface text-text-muted"
                   >
-                    <Icon name="lucide:file-edit" class="mr-1 size-3" />
+                    <Icon
+                      name="lucide:file-edit"
+                      class="mr-1 size-3"
+                    />
                     Draft
                   </BaseBadge>
                 </div>
@@ -328,7 +355,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-lg"
                 :class="`bg-gradient-to-r ${verdictBadge.gradient}`"
               >
-                <Icon :name="verdictBadge.icon" class="size-4" />
+                <Icon
+                  :name="verdictBadge.icon"
+                  class="size-4"
+                />
                 {{ verdictBadge.label }}
               </div>
               <div
@@ -342,7 +372,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                   'border-border-subtle bg-bg-surface'
                 ]"
               >
-                <Icon :name="riskBadge.icon" class="size-4" />
+                <Icon
+                  :name="riskBadge.icon"
+                  class="size-4"
+                />
                 {{ riskBadge.label }}
               </div>
             </div>
@@ -366,7 +399,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           <div class="flex flex-wrap items-center gap-6 text-sm">
             <div class="flex items-center gap-2.5">
               <div class="flex size-8 items-center justify-center rounded-lg border border-border-subtle bg-bg-surface">
-                <Icon name="lucide:folder-git-2" class="size-4 text-text-muted" />
+                <Icon
+                  name="lucide:folder-git-2"
+                  class="size-4 text-text-muted"
+                />
               </div>
               <span class="font-semibold text-text-primary">{{ repositoryName }}</span>
             </div>
@@ -375,9 +411,15 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
               v-if="headBranch"
               class="flex items-center gap-2 font-mono text-sm text-text-secondary"
             >
-              <Icon name="lucide:git-branch" class="size-4 text-text-muted" />
+              <Icon
+                name="lucide:git-branch"
+                class="size-4 text-text-muted"
+              />
               <span>{{ headBranch }}</span>
-              <Icon name="lucide:arrow-right" class="size-3.5 text-text-muted/50" />
+              <Icon
+                name="lucide:arrow-right"
+                class="size-3.5 text-text-muted/50"
+              />
               <span>{{ baseBranch }}</span>
             </div>
           </div>
@@ -387,7 +429,9 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         <div class="grid grid-cols-2 gap-px border-t border-border-subtle bg-border-subtle lg:grid-cols-4">
           <!-- Author -->
           <div class="bg-bg-elevated p-6">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Author</p>
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Author
+            </p>
             <div class="flex items-center gap-3">
               <template v-if="author">
                 <BaseAvatar
@@ -398,14 +442,22 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 />
                 <span class="text-sm font-semibold text-text-primary">{{ author.login }}</span>
               </template>
-              <span v-else class="text-sm italic text-text-muted">System</span>
+              <span
+                v-else
+                class="text-sm italic text-text-muted"
+              >System</span>
             </div>
           </div>
 
           <!-- Assignees -->
           <div class="bg-bg-elevated p-6">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Assignees</p>
-            <div v-if="assignees.length > 0" class="-space-x-2 flex items-center">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Assignees
+            </p>
+            <div
+              v-if="assignees.length > 0"
+              class="-space-x-2 flex items-center"
+            >
               <BaseAvatar
                 v-for="user in assignees"
                 :key="user.login"
@@ -416,21 +468,31 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 :title="user.login"
               />
             </div>
-            <span v-else class="text-sm italic text-text-muted">None assigned</span>
+            <span
+              v-else
+              class="text-sm italic text-text-muted"
+            >None assigned</span>
           </div>
 
           <!-- Started -->
           <div class="bg-bg-elevated p-6">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Started</p>
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Started
+            </p>
             <div class="flex items-center gap-2 text-sm font-semibold text-text-primary">
-              <Icon name="lucide:clock" class="size-4 text-text-muted" />
+              <Icon
+                name="lucide:clock"
+                class="size-4 text-text-muted"
+              />
               {{ formatRelativeTime(run.started_at || run.created_at) }}
             </div>
           </div>
 
           <!-- Findings Summary -->
           <div class="bg-bg-elevated p-6">
-            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">Findings</p>
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Findings
+            </p>
             <div class="flex items-center gap-3">
               <div
                 class="flex size-10 items-center justify-center rounded-xl"
@@ -443,10 +505,15 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 />
               </div>
               <div>
-                <p class="text-xl font-bold" :class="hasFindings ? 'text-error' : 'text-success'">
+                <p
+                  class="text-xl font-bold"
+                  :class="hasFindings ? 'text-error' : 'text-success'"
+                >
                   {{ findingsCount }}
                 </p>
-                <p class="text-xs text-text-muted">{{ hasFindings ? 'issues found' : 'no issues' }}</p>
+                <p class="text-xs text-text-muted">
+                  {{ hasFindings ? 'issues found' : 'no issues' }}
+                </p>
               </div>
             </div>
           </div>
@@ -458,14 +525,21 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           class="grid grid-cols-2 gap-6 border-t border-border-subtle bg-bg-surface/50 p-6 lg:grid-cols-4"
         >
           <div>
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Files Changed</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Files Changed
+            </p>
             <div class="flex items-center gap-2">
-              <Icon name="lucide:file-diff" class="size-5 text-accent" />
+              <Icon
+                name="lucide:file-diff"
+                class="size-5 text-accent"
+              />
               <span class="font-mono text-2xl font-bold text-text-primary">{{ metrics.files_changed }}</span>
             </div>
           </div>
           <div>
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Lines Changed</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Lines Changed
+            </p>
             <div class="flex items-center gap-2 font-mono text-lg font-semibold">
               <span class="text-success">+{{ metrics.lines_added }}</span>
               <span class="text-text-muted/30">|</span>
@@ -473,16 +547,26 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
             </div>
           </div>
           <div>
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Tokens Used</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Tokens Used
+            </p>
             <div class="flex items-center gap-2">
-              <Icon name="lucide:zap" class="size-5 text-warning" />
+              <Icon
+                name="lucide:zap"
+                class="size-5 text-warning"
+              />
               <span class="font-mono text-2xl font-bold text-text-primary">{{ metrics.tokens_used_estimated.toLocaleString() }}</span>
             </div>
           </div>
           <div>
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">Duration</p>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Duration
+            </p>
             <div class="flex items-center gap-2">
-              <Icon name="lucide:timer" class="size-5 text-accent" />
+              <Icon
+                name="lucide:timer"
+                class="size-5 text-accent"
+              />
               <span class="font-mono text-2xl font-bold text-text-primary">{{ duration || '-' }}</span>
             </div>
           </div>
@@ -500,9 +584,14 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
         >
           <div class="flex items-center gap-4">
             <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-sm">
-              <Icon name="lucide:file-text" class="size-6 text-accent" />
+              <Icon
+                name="lucide:file-text"
+                class="size-6 text-accent"
+              />
             </div>
-            <h2 class="text-xl font-bold text-text-primary">Review Summary</h2>
+            <h2 class="text-xl font-bold text-text-primary">
+              Review Summary
+            </h2>
           </div>
           <Icon
             name="lucide:chevron-down"
@@ -519,8 +608,14 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
-          <div v-if="isReviewExpanded" class="border-t border-border-subtle px-6 pb-6">
-            <div v-if="reviewSummary" class="space-y-6 pt-6">
+          <div
+            v-if="isReviewExpanded"
+            class="border-t border-border-subtle px-6 pb-6"
+          >
+            <div
+              v-if="reviewSummary"
+              class="space-y-6 pt-6"
+            >
               <!-- Overview -->
               <BaseMarkdown
                 v-if="reviewSummary.overview"
@@ -540,7 +635,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 >
                   <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
                     <div class="flex size-8 items-center justify-center rounded-lg bg-success/10">
-                      <Icon name="lucide:check-circle" class="size-4 text-success" />
+                      <Icon
+                        name="lucide:check-circle"
+                        class="size-4 text-success"
+                      />
                     </div>
                     Strengths
                   </h3>
@@ -574,7 +672,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                     </div>
                     Concerns
                   </h3>
-                  <ul v-if="reviewSummary.concerns?.length" class="space-y-2.5">
+                  <ul
+                    v-if="reviewSummary.concerns?.length"
+                    class="space-y-2.5"
+                  >
                     <li
                       v-for="(concern, index) in reviewSummary.concerns"
                       :key="index"
@@ -584,7 +685,12 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                       {{ concern }}
                     </li>
                   </ul>
-                  <p v-else class="text-sm italic text-text-muted">No concerns identified</p>
+                  <p
+                    v-else
+                    class="text-sm italic text-text-muted"
+                  >
+                    No concerns identified
+                  </p>
                 </div>
               </div>
 
@@ -595,7 +701,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
               >
                 <h3 class="mb-4 flex items-center gap-2 text-sm font-bold text-text-primary">
                   <div class="flex size-8 items-center justify-center rounded-lg bg-accent/10">
-                    <Icon name="lucide:lightbulb" class="size-4 text-accent" />
+                    <Icon
+                      name="lucide:lightbulb"
+                      class="size-4 text-accent"
+                    />
                   </div>
                   Recommendations
                 </h3>
@@ -605,7 +714,10 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                     :key="index"
                     class="flex items-start gap-3 text-sm leading-relaxed text-text-secondary"
                   >
-                    <Icon name="lucide:check-circle" class="mt-0.5 size-4 shrink-0 text-accent" />
+                    <Icon
+                      name="lucide:check-circle"
+                      class="mt-0.5 size-4 shrink-0 text-accent"
+                    />
                     {{ rec }}
                   </li>
                 </ul>
@@ -613,8 +725,14 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
             </div>
 
             <!-- Pending State -->
-            <div v-else class="flex items-center justify-center gap-3 py-12 text-text-muted">
-              <Icon name="lucide:loader" class="size-5 animate-spin" />
+            <div
+              v-else
+              class="flex items-center justify-center gap-3 py-12 text-text-muted"
+            >
+              <Icon
+                name="lucide:loader"
+                class="size-5 animate-spin"
+              />
               <span class="text-sm">Review summary pending...</span>
             </div>
           </div>
@@ -625,14 +743,19 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
       <section class="space-y-6">
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-2xl font-bold text-text-primary">Findings</h2>
+            <h2 class="text-2xl font-bold text-text-primary">
+              Findings
+            </h2>
             <p class="mt-1 text-sm text-text-secondary">
               {{ hasFindings ? `${findingsCount} issue${findingsCount !== 1 ? 's' : ''} identified` : 'No issues found' }}
             </p>
           </div>
 
           <!-- Severity Filter Tabs -->
-          <div v-if="hasFindings" class="w-full overflow-x-auto sm:w-auto">
+          <div
+            v-if="hasFindings"
+            class="w-full overflow-x-auto sm:w-auto"
+          >
             <div class="flex min-w-max gap-1 rounded-xl border border-border-subtle bg-bg-elevated p-1.5">
               <button
                 v-for="tab in severityTabs"
@@ -658,20 +781,36 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
 
         <!-- Findings List -->
         <div v-if="hasFindings">
-          <DomainReviewsFindingList v-if="filteredFindings.length > 0" :findings="filteredFindings" />
+          <DomainReviewsFindingList
+            v-if="filteredFindings.length > 0"
+            :findings="filteredFindings"
+          />
 
           <!-- Empty Filter State -->
-          <div v-else class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center">
+          <div
+            v-else
+            class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center"
+          >
             <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-bg-surface">
-              <Icon name="lucide:filter" class="size-8 text-text-muted" />
+              <Icon
+                name="lucide:filter"
+                class="size-8 text-text-muted"
+              />
             </div>
-            <h3 class="mb-2 text-lg font-bold text-text-primary">No matches found</h3>
-            <p class="mb-6 text-sm text-text-secondary">No findings with this severity level.</p>
+            <h3 class="mb-2 text-lg font-bold text-text-primary">
+              No matches found
+            </h3>
+            <p class="mb-6 text-sm text-text-secondary">
+              No findings with this severity level.
+            </p>
             <button
               class="rounded-lg bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition-colors hover:bg-accent/20"
               @click="selectedSeverity = 'all'"
             >
-              <Icon name="lucide:x-circle" class="mr-2 inline size-4" />
+              <Icon
+                name="lucide:x-circle"
+                class="mr-2 inline size-4"
+              />
               Clear filter
             </button>
           </div>
@@ -683,10 +822,17 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           class="rounded-2xl border border-success/20 bg-bg-elevated p-12 text-center"
         >
           <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-success/10">
-            <Icon name="lucide:check-circle-2" class="size-10 text-success" />
+            <Icon
+              name="lucide:check-circle-2"
+              class="size-10 text-success"
+            />
           </div>
-          <h3 class="mb-2 text-xl font-bold text-text-primary">No findings detected</h3>
-          <p class="text-sm text-text-secondary">Great job! No issues were found in this run.</p>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">
+            No findings detected
+          </h3>
+          <p class="text-sm text-text-secondary">
+            Great job! No issues were found in this run.
+          </p>
         </div>
 
         <!-- In Progress -->
@@ -695,19 +841,36 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
           class="rounded-2xl border border-accent/20 bg-bg-elevated p-12 text-center"
         >
           <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-accent/10">
-            <Icon name="lucide:loader" class="size-10 animate-spin text-accent" />
+            <Icon
+              name="lucide:loader"
+              class="size-10 animate-spin text-accent"
+            />
           </div>
-          <h3 class="mb-2 text-xl font-bold text-text-primary">Analysis in progress</h3>
-          <p class="text-sm text-text-secondary">Waiting for the review to complete...</p>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">
+            Analysis in progress
+          </h3>
+          <p class="text-sm text-text-secondary">
+            Waiting for the review to complete...
+          </p>
         </div>
 
         <!-- Generic Empty -->
-        <div v-else class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center">
+        <div
+          v-else
+          class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center"
+        >
           <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-bg-surface">
-            <Icon name="lucide:search" class="size-10 text-text-muted" />
+            <Icon
+              name="lucide:search"
+              class="size-10 text-text-muted"
+            />
           </div>
-          <h3 class="mb-2 text-xl font-bold text-text-primary">No findings</h3>
-          <p class="text-sm text-text-secondary">No findings have been recorded for this run.</p>
+          <h3 class="mb-2 text-xl font-bold text-text-primary">
+            No findings
+          </h3>
+          <p class="text-sm text-text-secondary">
+            No findings have been recorded for this run.
+          </p>
         </div>
       </section>
     </template>

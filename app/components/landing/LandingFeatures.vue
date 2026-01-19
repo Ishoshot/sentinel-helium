@@ -61,9 +61,13 @@ const simpleFeatures = [
                 class="w-5 h-5 text-blue-600"
               />
             </div>
-            <h3 class="text-lg font-semibold text-slate-900">{{ feature.title }}</h3>
+            <h3 class="text-lg font-semibold text-slate-900">
+              {{ feature.title }}
+            </h3>
           </div>
-          <p class="text-slate-600 leading-relaxed">{{ feature.description }}</p>
+          <p class="text-slate-600 leading-relaxed">
+            {{ feature.description }}
+          </p>
         </div>
       </div>
 
@@ -79,8 +83,12 @@ const simpleFeatures = [
             class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
           />
           <div>
-            <h4 class="text-base font-semibold text-slate-900">{{ feature.title }}</h4>
-            <p class="text-sm text-slate-600 my-2">{{ feature.description }}</p>
+            <h4 class="text-base font-semibold text-slate-900">
+              {{ feature.title }}
+            </h4>
+            <p class="text-sm text-slate-600 my-2">
+              {{ feature.description }}
+            </p>
           </div>
         </div>
       </div>
@@ -108,8 +116,12 @@ const simpleFeatures = [
                 class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">Security scanning</div>
-                <div class="text-sm text-slate-500 mt-0.5">Vulnerabilities detected automatically</div>
+                <div class="text-base font-medium text-slate-900">
+                  Security scanning
+                </div>
+                <div class="text-sm text-slate-500 mt-0.5">
+                  Vulnerabilities detected automatically
+                </div>
               </div>
             </div>
             <div class="flex items-start gap-3">
@@ -118,8 +130,12 @@ const simpleFeatures = [
                 class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">Code quality</div>
-                <div class="text-sm text-slate-500 mt-0.5">Best practices enforced consistently</div>
+                <div class="text-base font-medium text-slate-900">
+                  Code quality
+                </div>
+                <div class="text-sm text-slate-500 mt-0.5">
+                  Best practices enforced consistently
+                </div>
               </div>
             </div>
             <div class="flex items-start gap-3">
@@ -128,8 +144,12 @@ const simpleFeatures = [
                 class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">Policy compliance</div>
-                <div class="text-sm text-slate-500 mt-0.5">Custom rules for your team</div>
+                <div class="text-base font-medium text-slate-900">
+                  Policy compliance
+                </div>
+                <div class="text-sm text-slate-500 mt-0.5">
+                  Custom rules for your team
+                </div>
               </div>
             </div>
             <div class="flex items-start gap-3">
@@ -138,8 +158,12 @@ const simpleFeatures = [
                 class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">Fast reviews</div>
-                <div class="text-sm text-slate-500 mt-0.5">Results in seconds, not minutes</div>
+                <div class="text-base font-medium text-slate-900">
+                  Fast reviews
+                </div>
+                <div class="text-sm text-slate-500 mt-0.5">
+                  Results in seconds, not minutes
+                </div>
               </div>
             </div>
           </div>
@@ -228,7 +252,7 @@ const simpleFeatures = [
                   <div class="flex bg-[#3d1c20]">
                     <span class="w-8 text-center text-[#f85149] select-none py-0.5 border-r border-[#30363d]">45</span>
                     <span class="w-8 text-center text-[#8b949e] select-none py-0.5 border-r border-[#30363d]">-</span>
-                    <span class="flex-1 text-[#f85149] py-0.5 px-2 whitespace-pre"></span>
+                    <span class="flex-1 text-[#f85149] py-0.5 px-2 whitespace-pre" />
                   </div>
                   <div class="flex bg-[#3d1c20]">
                     <span class="w-8 text-center text-[#f85149] select-none py-0.5 border-r border-[#30363d]">46</span>
@@ -244,7 +268,7 @@ const simpleFeatures = [
                   <div class="flex bg-[#1a3d24]">
                     <span class="w-8 text-center text-[#8b949e] select-none py-0.5 border-r border-[#30363d]">45</span>
                     <span class="w-8 text-center text-[#3fb950] select-none py-0.5 border-r border-[#30363d]">+</span>
-                    <span class="flex-1 text-[#3fb950] py-0.5 px-2 whitespace-pre"></span>
+                    <span class="flex-1 text-[#3fb950] py-0.5 px-2 whitespace-pre" />
                   </div>
                   <div class="flex bg-[#1a3d24]">
                     <span class="w-8 text-center text-[#8b949e] select-none py-0.5 border-r border-[#30363d]">46</span>

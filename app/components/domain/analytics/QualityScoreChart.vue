@@ -51,12 +51,18 @@ const chartOptions: ChartOptions = {
     description="Quality score based on finding severity (100 = perfect)"
     height="400px"
   />
-  <BaseCard v-else-if="isLoading" padding="lg">
+  <BaseCard
+    v-else-if="isLoading"
+    padding="lg"
+  >
     <div class="flex items-center justify-center h-64">
       <BaseSpinner size="lg" />
     </div>
   </BaseCard>
-  <BaseCard v-else padding="lg">
+  <BaseCard
+    v-else
+    padding="lg"
+  >
     <BaseEmptyState
       icon="lucide:shield-check"
       title="No quality data"
