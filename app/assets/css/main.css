@@ -71,7 +71,7 @@
   }
 }
 
-/* Landing page v2 - Light Theme */
+/* Landing page theme */
 @layer base {
   .landing-light {
     /* Light backgrounds */
@@ -79,7 +79,6 @@
     --landing-bg-surface: #f8fafc;
     --landing-bg-elevated: #ffffff;
     --landing-bg-card: #f1f5f9;
-    --landing-bg-dark: #0f172a;
 
     /* Border colors */
     --landing-border-subtle: #e2e8f0;
@@ -112,114 +111,25 @@
 
     /* Shadows */
     --landing-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --landing-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    --landing-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    --landing-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --landing-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --landing-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --landing-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1);
   }
 
-  /* Keep dark theme for sections that need it */
-  .landing-dark {
-    /* Deep charcoal backgrounds */
-    --landing-bg-base: #0a0a1a;
-    --landing-bg-surface: #0f0f1a;
-    --landing-bg-elevated: #151520;
-    --landing-bg-card: #1a1a25;
-    --landing-bg-light: #f8fafc;
-
-    /* Border colors */
-    --landing-border-subtle: rgba(255, 255, 255, 0.06);
-    --landing-border-muted: rgba(255, 255, 255, 0.1);
-    --landing-border-accent: rgba(59, 130, 246, 0.3);
-    --landing-border-light: #e2e8f0;
-
-    /* Text colors */
-    --landing-text-primary: #fafafa;
-    --landing-text-secondary: #a1a1aa;
-    --landing-text-muted: #71717a;
-    --landing-text-faint: #52525b;
-    --landing-text-dark: #0f172a;
-    --landing-text-dark-secondary: #475569;
-
-    /* Accent - Electric Blue */
-    --landing-accent: #3b82f6;
-    --landing-accent-bright: #60a5fa;
-    --landing-accent-glow: rgba(59, 130, 246, 0.15);
-    --landing-accent-hover: #2563eb;
-
-    /* Success - Emerald */
-    --landing-success: #10b981;
-    --landing-success-glow: rgba(16, 185, 129, 0.15);
-
-    /* Warning - Amber */
-    --landing-warning: #f59e0b;
-    --landing-warning-glow: rgba(245, 158, 11, 0.15);
-
-    /* Error - Rose */
-    --landing-error: #f43f5e;
-    --landing-error-glow: rgba(244, 63, 94, 0.15);
-
-    /* Glow effects */
-    --landing-glow-blue: 0 0 80px -20px rgba(59, 130, 246, 0.4);
-    --landing-glow-subtle: 0 0 60px -15px rgba(255, 255, 255, 0.05);
-  }
 }
 
-/* Landing light theme component styles */
+/* Landing component styles */
 @layer components {
+  /* Theme wrapper */
   .landing-light {
     background-color: var(--landing-bg-base);
     color: var(--landing-text-primary);
   }
 
-  /* Light theme button secondary */
-  .landing-light .landing-btn-secondary {
-    background: var(--landing-bg-surface);
-    color: var(--landing-text-primary);
-    border: 1px solid var(--landing-border-subtle);
-  }
-
-  .landing-light .landing-btn-secondary:hover {
-    background: var(--landing-bg-card);
-    border-color: var(--landing-border-muted);
-  }
-}
-
-/* Landing dark theme component styles */
-@layer components {
-  .landing-dark {
-    background-color: var(--landing-bg-base);
-    color: var(--landing-text-primary);
-  }
-
-  /* Landing card styles */
-  .landing-card {
-    background: linear-gradient(
-      180deg,
-      var(--landing-bg-elevated) 0%,
-      var(--landing-bg-card) 100%
-    );
-    border: 1px solid var(--landing-border-subtle);
-    border-radius: 1rem;
-  }
-
-  .landing-card-glow {
-    box-shadow: var(--landing-glow-subtle);
-  }
-
-  /* Landing gradient text */
-  .landing-gradient-text {
-    background: linear-gradient(
-      135deg,
-      var(--landing-text-primary) 0%,
-      var(--landing-accent-bright) 50%,
-      var(--landing-text-primary) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Landing button primary */
+  /* Button primary */
   .landing-btn-primary {
     background: linear-gradient(
       180deg,
@@ -237,7 +147,7 @@
     transform: translateY(-1px);
   }
 
-  /* Landing button secondary */
+  /* Button secondary */
   .landing-btn-secondary {
     background: var(--landing-bg-elevated);
     color: var(--landing-text-primary);
@@ -250,80 +160,6 @@
     border-color: var(--landing-border-accent);
   }
 
-  /* Code block styling for landing */
-  .landing-code-block {
-    background: var(--landing-bg-surface);
-    border: 1px solid var(--landing-border-subtle);
-    font-family: "JetBrains Mono", "Fira Code", monospace;
-  }
-
-  /* Animated grid background */
-  .landing-grid-bg {
-    background-image: linear-gradient(
-        var(--landing-border-subtle) 1px,
-        transparent 1px
-      ),
-      linear-gradient(90deg, var(--landing-border-subtle) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-  }
-
-  /* Radial gradient overlay */
-  .landing-radial-glow {
-    background: radial-gradient(
-      ellipse at 50% 0%,
-      var(--landing-accent-glow) 0%,
-      transparent 60%
-    );
-  }
-
-  /* Aurora gradient background  */
-  .landing-aurora-bg {
-    background: linear-gradient(
-      135deg,
-      #0a0a1a 0%,
-      #0f0f23 25%,
-      #1a0a1f 50%,
-      #0a1a2a 75%,
-      #0a0a1a 100%
-    );
-    position: relative;
-  }
-
-  .landing-aurora-bg::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-        ellipse 80% 50% at 20% 40%,
-        rgba(255, 100, 50, 0.12) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse 60% 40% at 80% 20%,
-        rgba(100, 50, 255, 0.1) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse 50% 30% at 50% 80%,
-        rgba(50, 100, 255, 0.08) 0%,
-        transparent 50%
-      );
-    pointer-events: none;
-  }
-
-  /* CTA gradient section */
-  .landing-cta-gradient {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
-  }
-
-  /* Light section background */
-  .landing-section-light {
-    background-color: var(--landing-bg-light);
-  }
 
   /* Feature card with hover effect */
   .landing-feature-card {
@@ -380,12 +216,5 @@
   .landing-mockup-shadow {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
       0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
-
-  /* Glass morphism effect */
-  .landing-glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
