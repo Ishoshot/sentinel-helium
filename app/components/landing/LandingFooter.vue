@@ -7,25 +7,25 @@
 const currentYear = new Date().getFullYear()
 
 const productLinks = [
-  { label: 'Features', href: '#product' },
-  { label: 'Pricing', href: '#plans' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Features', href: '/#product' },
+  { label: 'Pricing', href: '/#plans' },
+  { label: 'FAQ', href: '/#faq' },
 ]
 
 const companyLinks = [
-  { label: 'About', href: '#' },
-  { label: 'Blog', href: '#' },
+  { label: 'About', href: '/#about' },
   { label: 'Contact', href: 'mailto:hello@usesentinel.ai' },
+  { label: 'Developers', href: '/#developers' },
 ]
 
 const legalLinks = [
-  { label: 'Privacy', href: '#' },
-  { label: 'Terms', href: '#' },
+  { label: 'Privacy', href: '/#privacy' },
+  { label: 'Terms', href: '/#terms' },
 ]
 
 const socialLinks = [
-  { label: 'X / Twitter', href: '#', icon: 'ph:x-logo-bold' },
-  { label: 'GitHub', href: '#', icon: 'ph:github-logo-bold' },
+  { label: 'X / Twitter', href: 'https://x.com/SentinelAIHQ', icon: 'ph:x-logo-bold' },
+  { label: 'GitHub', href: 'https://github.com/ishoshot', icon: 'ph:github-logo-bold' },
 ]
 </script>
 
@@ -107,10 +107,12 @@ const socialLinks = [
                 v-for="link in legalLinks"
                 :key="link.label"
               >
-                <a
-                  :href="link.href"
+                <NuxtLink
+                  :to="link.href"
                   class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
-                >{{ link.label }}</a>
+                >
+                  {{ link.label }}
+                </NuxtLink>
               </li>
             </ul>
           </div>

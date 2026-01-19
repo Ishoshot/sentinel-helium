@@ -16,10 +16,10 @@ const workspaceStore = useWorkspaceStore()
 const isMenuOpen = ref(false)
 
 const navLinks = [
-  { label: 'Product', href: '#product' },
-  { label: 'Workflow', href: '#workflow' },
-  { label: 'Plans', href: '#plans' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Product', href: '/#product' },
+  { label: 'Workflow', href: '/#workflow' },
+  { label: 'Plans', href: '/#plans' },
+  { label: 'FAQ', href: '/#faq' },
 ] satisfies ReadonlyArray<{ label: string; href: string }>
 
 function toggleMenu() {
