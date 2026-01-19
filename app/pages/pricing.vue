@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { hasToken } from '~/services/core/api'
+import { planConfigs, comparisonFeatures } from '~/config/plans'
 
 /**
  * Full pricing comparison with all features
+ * Uses shared plan configs as single source of truth
  */
 
 definePageMeta({
@@ -15,7 +17,7 @@ useHead({
     class: 'scroll-smooth',
   },
   bodyAttrs: {
-    class: 'bg-[#0a0a1a]',
+    class: 'bg-white',
   },
 })
 
@@ -40,88 +42,17 @@ function handleScroll() {
   scrolled.value = window.scrollY > 20
 }
 
-const tiers = [
-  {
-    name: 'Foundation',
-    price: '$0',
-    period: 'Free forever',
-    description: 'Everything you need for prototypes and personal projects.',
-    features: [
-      '20 reviews per month',
-      'GitHub integration',
-      'Basic findings',
-      '2 team members',
-      'Community support',
-    ],
-    cta: 'Start free',
-    highlighted: false,
-    href: '/login',
-  },
-  {
-    name: 'Illuminate',
-    price: '$20',
-    period: 'per month',
-    description: 'For growing teams wanting deeper insight and consistent quality.',
-    features: [
-      '500 reviews per month',
-      'Custom guidelines',
-      'Priority processing',
-      '5 team members',
-      'Email support',
-    ],
-    cta: 'Get started',
-    highlighted: true,
-    href: '/login',
-  },
-  {
-    name: 'Orchestrate',
-    price: '$50',
-    period: 'per month',
-    description: 'For professional teams coordinating quality at scale.',
-    features: [
-      '2,000 reviews per month',
-      'API access',
-      'Advanced analytics',
-      'Unlimited members',
-      'Priority support',
-    ],
-    cta: 'Get started',
-    highlighted: false,
-    href: '/login',
-  },
-  {
-    name: 'Sanctum',
-    price: '$200',
-    period: 'per month',
-    description: 'For organizations requiring governance and security.',
-    features: [
-      'Unlimited reviews',
-      'SSO & SAML',
-      'Audit logs',
-      'Unlimited members',
-      'Dedicated support',
-    ],
-    cta: 'Contact sales',
-    highlighted: false,
-    href: 'mailto:hello@usesentinel.ai',
-  },
-]
-
-const comparisonFeatures = [
-  { name: 'Reviews per month', foundation: '20', illuminate: '500', orchestrate: '2,000', sanctum: 'Unlimited' },
-  { name: 'Team members', foundation: '2', illuminate: '5', orchestrate: 'Unlimited', sanctum: 'Unlimited' },
-  { name: 'GitHub integration', foundation: true, illuminate: true, orchestrate: true, sanctum: true },
-  { name: 'Custom guidelines', foundation: false, illuminate: true, orchestrate: true, sanctum: true },
-  { name: 'API access', foundation: false, illuminate: false, orchestrate: true, sanctum: true },
-  { name: 'Advanced analytics', foundation: false, illuminate: false, orchestrate: true, sanctum: true },
-  { name: 'SSO / SAML', foundation: false, illuminate: false, orchestrate: false, sanctum: true },
-  { name: 'Audit logs', foundation: false, illuminate: false, orchestrate: false, sanctum: true },
-  { name: 'Priority support', foundation: false, illuminate: false, orchestrate: true, sanctum: true },
-  { name: 'Dedicated support', foundation: false, illuminate: false, orchestrate: false, sanctum: true },
-  { name: 'BYOK (Bring Your Own Key)', foundation: true, illuminate: true, orchestrate: true, sanctum: true },
-  { name: 'Workspace-level controls', foundation: true, illuminate: true, orchestrate: true, sanctum: true },
-  { name: 'Review history', foundation: true, illuminate: true, orchestrate: true, sanctum: true },
-]
+// Transform plan configs to the format expected by the template
+const tiers = planConfigs.map(plan => ({
+  name: plan.name,
+  price: plan.priceLabel,
+  period: plan.period,
+  description: plan.description,
+  features: plan.features,
+  cta: plan.cta,
+  href: plan.ctaLink,
+  highlighted: plan.highlighted,
+}))
 
 const faqs = [
   {
@@ -147,7 +78,7 @@ const faqs = [
   <!-- Loading state -->
   <div
     v-if="isCheckingAuth"
-    class="landing-dark min-h-screen flex items-center justify-center"
+    class="landing-light min-h-screen flex items-center justify-center"
   >
     <div class="flex flex-col items-center gap-4">
       <div class="w-8 h-8 border-2 border-[var(--landing-border-subtle)] border-t-[var(--landing-accent)] rounded-full animate-spin" />
@@ -158,7 +89,7 @@ const faqs = [
   <!-- Pricing page -->
   <div
     v-else
-    class="landing-dark min-h-screen overflow-x-hidden antialiased"
+    class="landing-light min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -167,12 +98,12 @@ const faqs = [
     />
 
     <!-- Hero -->
-    <section class="pt-32 lg:pt-40 pb-16 lg:pb-20 landing-aurora-bg">
+    <section class="pt-32 lg:pt-40 pb-16 lg:pb-20 bg-slate-50">
       <div class="relative max-w-4xl mx-auto px-6 text-center">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-white">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-slate-900">
           Simple, transparent pricing
         </h1>
-        <p class="mt-6 text-lg lg:text-xl text-[var(--landing-text-secondary)] max-w-2xl mx-auto">
+        <p class="mt-6 text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto">
           Start free, scale as you grow. All plans include BYOK for AI providers.
         </p>
       </div>
@@ -187,7 +118,7 @@ const faqs = [
             :key="tier.name"
             class="relative rounded-2xl p-6 transition-all duration-300"
             :class="tier.highlighted
-              ? 'bg-gradient-to-b from-blue-600 to-blue-700 ring-1 ring-blue-500 shadow-xl shadow-blue-500/20 scale-[1.02]'
+              ? 'bg-blue-600 ring-1 ring-blue-500 shadow-xl shadow-blue-500/20 scale-[1.02]'
               : 'bg-white border border-slate-200 hover:border-slate-300 hover:shadow-lg'"
           >
             <!-- Popular badge -->
@@ -419,20 +350,17 @@ const faqs = [
     </section>
 
     <!-- CTA -->
-    <section class="py-16 lg:py-20 landing-cta-gradient relative overflow-hidden">
-      <div class="absolute top-0 left-1/4 w-[400px] h-[200px] bg-blue-400 rounded-full blur-[120px] opacity-20 pointer-events-none" />
-      <div class="absolute bottom-0 right-1/4 w-[300px] h-[200px] bg-purple-400 rounded-full blur-[100px] opacity-15 pointer-events-none" />
-
-      <div class="relative max-w-3xl mx-auto px-6 text-center">
+    <section class="py-16 lg:py-20 bg-blue-600">
+      <div class="max-w-3xl mx-auto px-6 text-center">
         <h2 class="text-3xl lg:text-4xl font-semibold text-white mb-4">
           Ready to get started?
         </h2>
-        <p class="text-lg text-white/70 mb-8">
+        <p class="text-lg text-white/90 mb-8">
           Start with 20 free reviews per month. No credit card required.
         </p>
         <NuxtLink
           to="/login"
-          class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold rounded-xl bg-white text-slate-900 hover:bg-white/90 transition-colors shadow-xl"
+          class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold rounded-xl bg-white text-slate-900 hover:bg-slate-50 transition-colors shadow-xl"
         >
           Get started free
           <Icon
