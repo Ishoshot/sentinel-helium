@@ -18,8 +18,9 @@ const isMenuOpen = ref(false)
 const navLinks = [
   { label: 'Product', href: '/#product' },
   { label: 'Workflow', href: '/#workflow' },
-  { label: 'Plans', href: '/#plans' },
-  { label: 'FAQ', href: '/#faq' },
+  { label: 'Pricing', href: '/#plans' },
+  { label: 'Privacy Policy', href: '/privacy' },
+  // { label: 'FAQ', href: '/#faq' },
 ] satisfies ReadonlyArray<{ label: string; href: string }>
 
 function toggleMenu() {
@@ -78,7 +79,7 @@ const ctaText = computed(() => {
         </NuxtLink>
 
         <!-- Nav Links (Desktop) -->
-        <nav class="hidden md:flex items-center gap-8">
+        <nav class="hidden md:flex items-center gap-10">
           <a
             v-for="link in navLinks"
             :key="link.href"
