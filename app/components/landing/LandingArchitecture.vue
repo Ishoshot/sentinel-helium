@@ -252,7 +252,7 @@ const columns = [1, 2, 3, 4].map(col => ({
 /* Card base styles */
 .architecture-card {
   position: relative;
-  width: 400px;
+  width: 350px;
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;

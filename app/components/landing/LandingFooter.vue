@@ -13,14 +13,14 @@ const productLinks = [
 ]
 
 const companyLinks = [
-  { label: 'About', href: '/#about' },
+  { label: 'Product', href: '/#product' },
   { label: 'Contact', href: 'mailto:hello@usesentinel.ai' },
   { label: 'Developers', href: '/#developers' },
 ]
 
 const legalLinks = [
-  { label: 'Privacy', href: '/#privacy' },
-  { label: 'Terms', href: '/#terms' },
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
 ]
 
 const socialLinks = [

@@ -6,14 +6,14 @@
 const testimonials = [
   {
     quote: 'Sentinel caught a critical SQL injection vulnerability in our authentication flow. The review was fast, clear, and immediately actionable.',
-    author: 'Oluwatobi Ishola Akinleye',
+    author: 'Oluwatobi Ishola',
     role: 'Engineering Lead',
     company: 'Blaaiz',
     initials: 'OI',
   },
   {
     quote: 'We deployed Sentinel across 12 repositories in under an hour. The consistency in review quality has been remarkable.',
-    author: 'Gbenga Onikade',
+    author: 'Gbenga Oni',
     role: 'Chief Technology Officer',
     company: 'Blaaiz',
     initials: 'GO',
