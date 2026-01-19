@@ -48,11 +48,8 @@ const providers = [
 
     <!-- Auth card -->
     <div class="relative">
-      <!-- Card shadow -->
-      <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-xl opacity-50" />
-
       <!-- Card -->
-      <div class="relative rounded-2xl border border-slate-200 bg-white shadow-xl p-8">
+      <div class="relative rounded-2xl border border-slate-200 bg-white shadow-md p-8">
         <!-- OAuth buttons -->
         <div class="space-y-3">
           <button
