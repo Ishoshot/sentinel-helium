@@ -19,7 +19,7 @@ const navLinks = [
   { label: 'Product', href: '/#product' },
   { label: 'Workflow', href: '/#workflow' },
   { label: 'Pricing', href: '/#plans' },
-  { label: 'Privacy Policy', href: '/privacy' },
+  // { label: 'Privacy Policy', href: '/privacy' },
   // { label: 'FAQ', href: '/#faq' },
 ] satisfies ReadonlyArray<{ label: string; href: string }>
 
@@ -89,6 +89,11 @@ const ctaText = computed(() => {
               ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
               : 'text-gray-600 hover:text-gray-900'"
           >{{ link.label }}</a>
+            <a 
+            class="text-sm transition-colors duration-200"
+            :class="props.scrolled
+              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
+              : 'text-gray-600 hover:text-gray-900'" href="https://dev.usesentinel.ai/privacy">Privacy Policy</a>
         </nav>
 
         <!-- CTA -->
