@@ -96,7 +96,7 @@ const limitItems = computed(() => [
   {
     label: "Commands / month",
     value:
-      props.plan.monthly_commands_limit === null
+      props.plan.monthly_commands_limit == null
         ? "Unlimited"
         : props.plan.monthly_commands_limit.toLocaleString(),
     icon: "lucide:terminal",

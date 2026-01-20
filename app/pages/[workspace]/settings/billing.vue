@@ -498,7 +498,7 @@ watch(showPromotionModal, (isOpen) => {
                     <span class="text-xs font-medium">Commands / month</span>
                   </div>
                   <p class="text-2xl font-bold text-text-primary">
-                    {{ currentPlan.monthly_commands_limit === null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
+                    {{ currentPlan.monthly_commands_limit == null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
                   </p>
                 </div>
                 <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
