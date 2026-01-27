@@ -4,6 +4,12 @@
  */
 
 import { ToastType } from "~/types";
+import {
+  TOAST_DURATION_SUCCESS,
+  TOAST_DURATION_ERROR,
+  TOAST_DURATION_WARNING,
+  TOAST_DURATION_INFO,
+} from "~/constants/animations";
 
 export interface Toast {
   id: string;
@@ -34,10 +40,10 @@ const toasts = ref<Toast[]>([]);
 
 // Default durations by type (in ms)
 const DEFAULT_DURATIONS: Record<ToastType, number> = {
-  [ToastType.Success]: 4000,
-  [ToastType.Error]: 6000,
-  [ToastType.Warning]: 5000,
-  [ToastType.Info]: 4000,
+  [ToastType.Success]: TOAST_DURATION_SUCCESS,
+  [ToastType.Error]: TOAST_DURATION_ERROR,
+  [ToastType.Warning]: TOAST_DURATION_WARNING,
+  [ToastType.Info]: TOAST_DURATION_INFO,
 };
 
 // Generate unique ID

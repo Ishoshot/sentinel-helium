@@ -4,6 +4,7 @@
 
 import { useUserStore } from "~/stores/useUserStore";
 import { useApiClient } from "~/services/core/api";
+import { GETTING_STARTED_AUTO_SHOW } from "~/constants/animations";
 
 const isGettingStartedOpen = ref(false);
 
@@ -57,7 +58,7 @@ export function useGettingStarted() {
       // Small delay for better UX
       setTimeout(() => {
         openGettingStarted();
-      }, 1000);
+      }, GETTING_STARTED_AUTO_SHOW);
     }
   }
 
