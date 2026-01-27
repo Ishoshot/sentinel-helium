@@ -115,7 +115,10 @@ const socialLinks = [
                 </NuxtLink>
               </li>
               <li> 
-                <a class="text-sm text-slate-600 hover:text-slate-900 transition-colors" href="https://dev.usesentinel.ai/privacy">Privacy Policy</a>
+                <a
+                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  href="https://dev.usesentinel.ai/privacy"
+                >Privacy Policy</a>
               </li>
             </ul>
           </div>

@@ -107,7 +107,7 @@ function handleCancel() {
       >
         <div
           v-if="isResending"
-          class="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-accent text-white text-[10px] font-medium rounded-full shadow-sm"
+          class="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-accent text-white text-[10px] font-medium rounded-full shadow-sm"
         >
           <Icon
             name="lucide:loader-2"

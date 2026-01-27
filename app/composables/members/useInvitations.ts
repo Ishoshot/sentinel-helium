@@ -144,7 +144,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
   async function resendInvitation(invitationId: number) {
     if (!workspaceId.value) return null;
 
-    isLoading.value = true;
+    // Don't set global isLoading for resend - the card has its own spinner
     error.value = null;
 
     try {
@@ -154,12 +154,11 @@ export function useInvitations(workspaceId: Ref<number | null>) {
       );
 
       // Update local state with refreshed invitation
-      // Use splice() to ensure Vue's reactivity system detects the change
-      const index = invitations.value.findIndex(
-        (i) => !!i && i.id === invitationId
-      );
-      if (index !== -1 && invitation) {
-        invitations.value.splice(index, 1, invitation);
+      // Replace entire array to guarantee Vue's reactivity system triggers
+      if (invitation) {
+        invitations.value = invitations.value.map((i) =>
+          i && i.id === invitationId ? invitation : i
+        );
       }
 
       return invitation;
@@ -171,8 +170,6 @@ export function useInvitations(workspaceId: Ref<number | null>) {
           e instanceof Error ? e.message : "Failed to resend invitation";
       }
       return null;
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -192,9 +189,12 @@ export function useInvitations(workspaceId: Ref<number | null>) {
     }
   });
 
+  // Expose invitations as computed to ensure reactivity propagates correctly
+  const invitationsComputed = computed(() => invitations.value);
+
   return {
     // State
-    invitations: readonly(invitations),
+    invitations: invitationsComputed,
     isLoading: readonly(isLoading),
     error: readonly(error),
 

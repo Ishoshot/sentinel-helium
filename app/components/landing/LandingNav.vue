@@ -89,11 +89,13 @@ const ctaText = computed(() => {
               ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
               : 'text-gray-600 hover:text-gray-900'"
           >{{ link.label }}</a>
-            <a 
+          <a 
             class="text-sm transition-colors duration-200"
             :class="props.scrolled
               ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
-              : 'text-gray-600 hover:text-gray-900'" href="https://dev.usesentinel.ai/privacy">Privacy Policy</a>
+              : 'text-gray-600 hover:text-gray-900'"
+            href="https://dev.usesentinel.ai/privacy"
+          >Privacy Policy</a>
         </nav>
 
         <!-- CTA -->
