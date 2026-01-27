@@ -9,6 +9,10 @@ import type {
 import { useBriefingsService } from "~/services/briefings/briefingsService";
 import { useWebSocket } from "~/composables/useWebSocket";
 import { useAppToast } from "~/composables/shared/useAppToast";
+import {
+  WEBSOCKET_CONNECTION_TIMEOUT,
+  BRIEFING_POLLING_INTERVAL,
+} from "~/constants/animations";
 
 /**
  * Composable for tracking a single briefing generation with real-time updates
@@ -215,7 +219,7 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
   /**
    * Start polling for updates
    */
-  function startPolling(id: number, intervalMs = 2000) {
+  function startPolling(id: number, intervalMs = BRIEFING_POLLING_INTERVAL) {
     if (pollingInterval.value) stopPolling();
     if (!workspaceId.value) {
       toast.error("No workspace selected");
@@ -280,7 +284,7 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
       startWebSocket();
 
       // Wait for WebSocket to connect (or fail) - give it more time for auth
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, WEBSOCKET_CONNECTION_TIMEOUT));
 
       if (!wsConnected.value || wsError.value) {
         // WebSocket failed, fall back to polling

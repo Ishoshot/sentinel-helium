@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 import type { BriefingGeneration } from "~/types";
-import { getAchievementIcon, getAchievementColor } from "~/types/briefings";
+import {
+  getAchievementIcon,
+  getAchievementColor,
+  EXCERPT_META,
+} from "~/utils/briefing-icons";
+import { CLIPBOARD_FEEDBACK_DEFAULT } from "~/constants/animations";
+import { useAppToast } from "~/composables/shared/useAppToast";
+
+const toast = useAppToast();
 
 interface Props {
   generation: BriefingGeneration;
@@ -14,13 +23,52 @@ const props = withDefaults(defineProps<Props>(), {
   showExcerpts: false,
 });
 
-// Parse markdown narrative to HTML
-const narrativeHtml = computed(() => {
-  if (!props.generation.narrative) return "";
-  return marked.parse(props.generation.narrative, {
-    breaks: true,
-    gfm: true,
-  });
+// Async markdown parsing state
+const narrativeHtml = ref<string>("");
+const isParsingNarrative = ref(false);
+let narrativeParseRequestId = 0;
+
+/**
+ * Parse markdown narrative asynchronously to prevent UI blocking on large documents.
+ */
+async function parseNarrative(content: string | null): Promise<void> {
+  if (!content) {
+    narrativeHtml.value = "";
+    return;
+  }
+
+  const requestId = ++narrativeParseRequestId;
+  isParsingNarrative.value = true;
+
+  try {
+    const rawHtml = await marked.parse(content, {
+      breaks: true,
+      gfm: true,
+      async: true,
+    });
+
+    if (requestId === narrativeParseRequestId) {
+      narrativeHtml.value = DOMPurify.sanitize(rawHtml as string);
+    }
+  } catch (error) {
+    console.error("Narrative parsing error:", error);
+    if (requestId === narrativeParseRequestId) {
+      narrativeHtml.value = DOMPurify.sanitize(content);
+    }
+  } finally {
+    if (requestId === narrativeParseRequestId) {
+      isParsingNarrative.value = false;
+    }
+  }
+}
+
+// Parse on mount and when narrative changes
+onMounted(() => {
+  void parseNarrative(props.generation.narrative);
+});
+
+watch(() => props.generation.narrative, (newNarrative) => {
+  void parseNarrative(newNarrative);
 });
 
 // Format achievements nicely
@@ -42,20 +90,14 @@ async function copyExcerpt(key: string | number, value: string | undefined) {
     copiedExcerpt.value = String(key);
     setTimeout(() => {
       copiedExcerpt.value = null;
-    }, 2000);
+    }, CLIPBOARD_FEEDBACK_DEFAULT);
   } catch (e) {
     console.error("Failed to copy:", e);
+    toast.error("Failed to copy to clipboard");
   }
 }
 
-// Excerpt labels and icons
-const excerptMeta: Record<string, { label: string; icon: string }> = {
-  short: { label: "Short", icon: "lucide:align-left" },
-  slack: { label: "Slack", icon: "lucide:hash" },
-  email: { label: "Email", icon: "lucide:mail" },
-  linkedin: { label: "LinkedIn", icon: "lucide:linkedin" },
-  twitter: { label: "X (Twitter)", icon: "lucide:twitter" },
-};
+// Excerpt labels and icons (from shared utility)
 
 // Generation metadata
 const metadata = computed(() => props.generation.metadata);
@@ -120,6 +162,17 @@ const completedAt = computed(() => {
 
       <!-- Main narrative -->
       <div
+        v-if="isParsingNarrative && !narrativeHtml"
+        class="flex items-center gap-2 text-text-muted py-4"
+      >
+        <Icon
+          name="lucide:loader-2"
+          class="w-4 h-4 animate-spin"
+        />
+        <span class="text-sm">Rendering narrative...</span>
+      </div>
+      <div
+        v-else
         class="narrative-content"
         v-html="narrativeHtml"
       />
@@ -210,10 +263,10 @@ const completedAt = computed(() => {
           <div class="flex items-center justify-between px-4 py-2 bg-bg-elevated border-b border-border-subtle">
             <div class="flex items-center gap-2 text-sm font-medium text-text-secondary">
               <Icon
-                :name="excerptMeta[key]?.icon ?? 'lucide:file-text'"
+                :name="EXCERPT_META[key]?.icon ?? 'lucide:file-text'"
                 class="w-4 h-4"
               />
-              {{ excerptMeta[key]?.label ?? key }}
+              {{ EXCERPT_META[key]?.label ?? key }}
             </div>
             <button
               type="button"
