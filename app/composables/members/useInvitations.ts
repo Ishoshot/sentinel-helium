@@ -154,11 +154,12 @@ export function useInvitations(workspaceId: Ref<number | null>) {
       );
 
       // Update local state with refreshed invitation
+      // Use splice() to ensure Vue's reactivity system detects the change
       const index = invitations.value.findIndex(
         (i) => !!i && i.id === invitationId
       );
       if (index !== -1 && invitation) {
-        invitations.value[index] = invitation;
+        invitations.value.splice(index, 1, invitation);
       }
 
       return invitation;

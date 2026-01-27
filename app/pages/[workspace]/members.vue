@@ -54,6 +54,7 @@ const showRemoveMemberModal = ref(false)
 const showCancelInvitationModal = ref(false)
 const pendingMemberId = ref<number | null>(null)
 const pendingInvitationId = ref<number | null>(null)
+const resendingInvitationId = ref<number | null>(null)
 const isProcessing = ref(false)
 const inviteError = ref('')
 
@@ -221,11 +222,16 @@ async function confirmCancelInvitation() {
 
 // Handle resend invitation
 async function handleResendInvitation(invitationId: number) {
-  const result = await resendInvitation(invitationId)
-  if (result) {
-    toast.success('Invitation resent')
-  } else if (invitationsError.value) {
-    toast.error(invitationsError.value)
+  resendingInvitationId.value = invitationId
+  try {
+    const result = await resendInvitation(invitationId)
+    if (result) {
+      toast.success('Invitation resent')
+    } else if (invitationsError.value) {
+      toast.error(invitationsError.value)
+    }
+  } finally {
+    resendingInvitationId.value = null
   }
 }
 </script>
@@ -480,6 +486,7 @@ async function handleResendInvitation(invitationId: number) {
               :key="invitation.id"
               :invitation="invitation"
               :can-manage="canManage"
+              :is-resending="resendingInvitationId === invitation.id"
               @cancel="handleCancelInvitation"
               @resend="handleResendInvitation"
             />

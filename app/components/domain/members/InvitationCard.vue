@@ -10,9 +10,12 @@ import { MemberRole } from '~/types'
 interface Props {
   invitation: Invitation
   canManage: boolean
+  isResending?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isResending: false,
+})
 
 const emit = defineEmits<{
   cancel: [invitationId: number]
@@ -21,7 +24,6 @@ const emit = defineEmits<{
 
 // State
 const isHovered = ref(false)
-const isResending = ref(false)
 
 // Role configuration
 const roleConfig = computed(() => {
@@ -69,13 +71,8 @@ const sentDate = computed(() => {
   })
 })
 
-async function handleResend() {
-  isResending.value = true
+function handleResend() {
   emit('resend', props.invitation.id)
-  // Reset after a delay to show feedback
-  setTimeout(() => {
-    isResending.value = false
-  }, 1000)
 }
 
 function handleCancel() {
@@ -99,6 +96,27 @@ function handleCancel() {
             : 'bg-bg-elevated border-border-subtle',
       ]"
     >
+      <!-- Resending spinner -->
+      <Transition
+        enter-active-class="transition duration-150 ease-out"
+        enter-from-class="opacity-0 scale-90"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-100 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-90"
+      >
+        <div
+          v-if="isResending"
+          class="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-accent text-white text-[10px] font-medium rounded-full shadow-sm"
+        >
+          <Icon
+            name="lucide:loader-2"
+            class="w-3 h-3 animate-spin"
+          />
+          <span>Resending</span>
+        </div>
+      </Transition>
+
       <!-- Pending badge -->
       <div class="absolute -top-2 left-4">
         <div
@@ -201,8 +219,8 @@ function handleCancel() {
         >
           <!-- Resend button -->
           <button
-            class="p-2 text-text-muted hover:text-accent hover:bg-accent-light rounded-lg transition-default"
-            :class="{ 'animate-pulse': isResending }"
+            class="p-2 text-text-muted hover:text-accent hover:bg-accent-light rounded-lg transition-default disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isResending"
             :title="invitation.is_expired ? 'Resend invitation' : 'Resend'"
             @click="handleResend"
           >
