@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import type { ThemeRegistrationRaw } from 'shiki'
+import { CLIPBOARD_FEEDBACK_CODE } from '~/constants/animations'
+import { useAppToast } from '~/composables/shared/useAppToast'
+
+const toast = useAppToast()
 
 interface Props {
   code: string
@@ -137,27 +141,39 @@ watch([displayedCode, shikiLanguage], ([code, lang]: [string, string]) => {
 async function handleCopy(_: MouseEvent) {
   if (!import.meta.client) return
 
+  let copySucceeded = false
+
   try {
     await navigator.clipboard.writeText(normalizedCode.value)
+    copySucceeded = true
   } catch {
-    const textarea = document.createElement('textarea')
-    textarea.value = normalizedCode.value
-    textarea.setAttribute('readonly', '')
-    textarea.style.position = 'fixed'
-    textarea.style.top = '0'
-    textarea.style.left = '0'
-    textarea.style.opacity = '0'
+    // Fallback to textarea method for older browsers
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = normalizedCode.value
+      textarea.setAttribute('readonly', '')
+      textarea.style.position = 'fixed'
+      textarea.style.top = '0'
+      textarea.style.left = '0'
+      textarea.style.opacity = '0'
 
-    document.body.appendChild(textarea)
-    textarea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textarea)
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      copySucceeded = true
+    } catch (fallbackError) {
+      console.error('Failed to copy code:', fallbackError)
+      toast.error('Failed to copy to clipboard')
+    }
   }
 
-  isCopied.value = true
-  window.setTimeout(() => {
-    isCopied.value = false
-  }, 1500)
+  if (copySucceeded) {
+    isCopied.value = true
+    window.setTimeout(() => {
+      isCopied.value = false
+    }, CLIPBOARD_FEEDBACK_CODE)
+  }
 }
 
 function toggleExpanded(_: MouseEvent) {

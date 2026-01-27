@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { marked } from 'marked'
-import { computed } from 'vue'
+import DOMPurify from 'dompurify'
 
 interface Props {
   /**
@@ -19,24 +19,74 @@ const props = defineProps<Props>()
 marked.setOptions({
   breaks: true, // Enable GFM line breaks
   gfm: true, // Enable GitHub Flavored Markdown
+  async: true, // Enable async mode for better performance with large documents
 })
 
-// Parse markdown to HTML
-const html = computed(() => {
+// Reactive state for async parsing
+const html = ref<string>('')
+const isLoading = ref(true)
+
+// Track parsing requests to handle race conditions
+let parseRequestId = 0
+
+/**
+ * Parse markdown content asynchronously and sanitize the output.
+ * Uses request ID tracking to handle rapid content changes.
+ */
+async function parseMarkdown(content: string): Promise<void> {
+  const requestId = ++parseRequestId
+  isLoading.value = true
+
   try {
-    return marked.parse(props.content)
+    const rawHtml = await marked.parse(content)
+
+    // Only update if this is still the most recent request
+    if (requestId === parseRequestId) {
+      html.value = DOMPurify.sanitize(rawHtml as string)
+    }
   } catch (error) {
     console.error('Markdown parsing error:', error)
-    return props.content
+    if (requestId === parseRequestId) {
+      html.value = DOMPurify.sanitize(content)
+    }
+  } finally {
+    if (requestId === parseRequestId) {
+      isLoading.value = false
+    }
   }
+}
+
+// Parse on mount
+onMounted(() => {
+  void parseMarkdown(props.content)
+})
+
+// Re-parse when content changes
+watch(() => props.content, (newContent) => {
+  void parseMarkdown(newContent)
 })
 </script>
 
 <template>
-  <div
-    :class="['markdown-content', props.class]"
-    v-html="html"
-  />
+  <div :class="['markdown-content', props.class]">
+    <!-- Loading indicator for large documents -->
+    <div
+      v-if="isLoading && !html"
+      class="flex items-center gap-2 text-text-muted py-4"
+    >
+      <Icon
+        name="lucide:loader-2"
+        class="w-4 h-4 animate-spin"
+      />
+      <span class="text-sm">Rendering content...</span>
+    </div>
+
+    <!-- Rendered markdown content -->
+    <div
+      v-else
+      v-html="html"
+    />
+  </div>
 </template>
 
 <style scoped lang="postcss">
