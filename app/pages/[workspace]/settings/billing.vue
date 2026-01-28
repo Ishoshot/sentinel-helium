@@ -282,7 +282,7 @@ async function handlePlanAction(plan: Plan) {
 
 function handlePromotionCheckout() {
   if (!pendingCheckoutUrl.value) return;
-  window.location.href = pendingCheckoutUrl.value;
+  window.open(pendingCheckoutUrl.value, '_blank');
 }
 
 function handlePromotionDismiss() {
