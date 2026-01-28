@@ -39,6 +39,9 @@ const {
   openBillingPortal,
 } = useBilling(workspaceId);
 
+const route = useRoute();
+const router = useRouter();
+
 const showCancelModal = ref(false);
 const pendingPlanId = ref<number | null>(null);
 const isPortalLoading = ref(false);
@@ -49,6 +52,7 @@ const promotionNotice = ref<Promotion | null>(null);
 const pendingCheckoutUrl = ref<string | null>(null);
 const showPromotionModal = ref(false);
 const billingInterval = ref<BillingInterval>("monthly");
+const showPaymentProcessingAlert = ref(false);
 
 const currentMember = computed(() =>
   members.value.find((m) => m.user_id === userStore.user?.id)
@@ -67,26 +71,26 @@ const planOrder: Record<PlanTier, number> = {
   sanctum: 3,
 };
 
-const tierConfig: Record<PlanTier, { icon: string; gradient: string; bgGradient: string }> = {
+const tierConfig: Record<PlanTier, { icon: string; iconBg: string; iconColor: string }> = {
   foundation: {
     icon: "lucide:layers",
-    gradient: "from-slate-500 to-slate-600",
-    bgGradient: "from-slate-500/10 via-slate-500/5 to-transparent",
+    iconBg: "bg-slate-100 dark:bg-slate-800",
+    iconColor: "text-slate-600 dark:text-slate-400",
   },
   illuminate: {
     icon: "lucide:sparkles",
-    gradient: "from-accent to-blue-500",
-    bgGradient: "from-accent/10 via-accent/5 to-transparent",
+    iconBg: "bg-accent/10",
+    iconColor: "text-accent",
   },
   orchestrate: {
     icon: "lucide:zap",
-    gradient: "from-violet-500 to-purple-600",
-    bgGradient: "from-violet-500/10 via-violet-500/5 to-transparent",
+    iconBg: "bg-violet-100 dark:bg-violet-900/30",
+    iconColor: "text-violet-600 dark:text-violet-400",
   },
   sanctum: {
     icon: "lucide:shield-check",
-    gradient: "from-amber-500 to-orange-600",
-    bgGradient: "from-amber-500/10 via-amber-500/5 to-transparent",
+    iconBg: "bg-amber-100 dark:bg-amber-900/30",
+    iconColor: "text-amber-600 dark:text-amber-400",
   },
 };
 
@@ -331,6 +335,17 @@ async function handleCancelSubscription() {
 }
 
 onMounted(async () => {
+  // Check for checkout success params
+  const checkoutId = route.query.checkout_id as string | undefined;
+  if (checkoutId) {
+    // Show toast and alert for payment processing
+    toast.success("Payment received! Your subscription is being processed.");
+    showPaymentProcessingAlert.value = true;
+
+    // Remove query param from URL without page reload
+    router.replace({ query: {} });
+  }
+
   await Promise.all([fetchMembers(), fetchPlans(), fetchSubscription(), fetchUsage()]);
 });
 
@@ -392,35 +407,51 @@ watch(showPromotionModal, (isOpen) => {
 
           <div
             v-else
-            class="relative overflow-hidden rounded-2xl border border-border-subtle bg-bg-elevated"
+            class="rounded-2xl border border-border-subtle bg-bg-elevated"
           >
-            <!-- Background gradient -->
-            <div
-              class="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-60"
-              :class="currentTierConfig.bgGradient"
-            />
+            <div class="p-8">
+              <!-- Payment Processing Alert -->
+              <div
+                v-if="showPaymentProcessingAlert"
+                class="mb-6 flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4"
+              >
+                <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                  <Icon
+                    name="lucide:clock"
+                    class="size-4 text-accent"
+                  />
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-text-primary">
+                    Payment received
+                  </p>
+                  <p class="mt-0.5 text-xs text-text-muted">
+                    Your subscription is being processed. This usually takes up to 2 minutes.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="shrink-0 rounded-lg p-1 text-text-muted transition-colors hover:bg-bg-surface hover:text-text-secondary"
+                  @click="showPaymentProcessingAlert = false"
+                >
+                  <Icon
+                    name="lucide:x"
+                    class="size-4"
+                  />
+                </button>
+              </div>
 
-            <!-- Decorative elements -->
-            <div
-              class="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-gradient-to-br opacity-20 blur-3xl"
-              :class="currentTierConfig.gradient"
-            />
-            <div
-              class="pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-gradient-to-br opacity-10 blur-2xl"
-              :class="currentTierConfig.gradient"
-            />
-
-            <div class="relative p-8">
               <!-- Header -->
               <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div class="flex items-start gap-4">
                   <div
-                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg"
-                    :class="currentTierConfig.gradient"
+                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl"
+                    :class="currentTierConfig.iconBg"
                   >
                     <Icon
                       :name="currentTierConfig.icon"
-                      class="size-7 text-white"
+                      class="size-7"
+                      :class="currentTierConfig.iconColor"
                     />
                   </div>
                   <div>
@@ -483,8 +514,8 @@ watch(showPromotionModal, (isOpen) => {
               </div>
 
               <!-- Stats Grid -->
-              <div class="mb-8 grid gap-4 sm:grid-cols-3">
-                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+              <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-xl bg-bg-surface p-4">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
                     <Icon
                       name="lucide:git-pull-request"
@@ -496,7 +527,7 @@ watch(showPromotionModal, (isOpen) => {
                     {{ currentPlan.monthly_runs_limit === null ? "Unlimited" : currentPlan.monthly_runs_limit.toLocaleString() }}
                   </p>
                 </div>
-                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+                <div class="rounded-xl bg-bg-surface p-4">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
                     <Icon
                       name="lucide:users"
@@ -508,7 +539,7 @@ watch(showPromotionModal, (isOpen) => {
                     {{ currentPlan.team_size_limit === null ? "Unlimited" : currentPlan.team_size_limit.toLocaleString() }}
                   </p>
                 </div>
-                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+                <div class="rounded-xl bg-bg-surface p-4">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
                     <Icon
                       name="lucide:terminal"
@@ -520,7 +551,7 @@ watch(showPromotionModal, (isOpen) => {
                     {{ currentPlan.monthly_commands_limit == null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
                   </p>
                 </div>
-                <div class="rounded-xl border border-border-subtle/50 bg-bg-elevated/80 p-4 backdrop-blur-sm">
+                <div class="rounded-xl bg-bg-surface p-4">
                   <div class="mb-2 flex items-center gap-2 text-text-muted">
                     <Icon
                       name="lucide:calendar"
