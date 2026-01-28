@@ -417,7 +417,7 @@ watch(showPromotionModal, (isOpen) => {
             <!-- Payment Processing Alert (outside main padding for consistent height) -->
             <div
               v-if="showPaymentProcessingAlert"
-              class="border-b border-border-subtle px-8 pt-6"
+              class="px-8 pt-6"
             >
               <div class="flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">
                 <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
