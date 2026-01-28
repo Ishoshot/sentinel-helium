@@ -853,7 +853,7 @@ watch(showPromotionModal, (isOpen) => {
                 v-model="promoCode"
                 type="text"
                 placeholder="Promo code"
-                class="w-full rounded-xl border bg-bg-elevated py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                class="w-full rounded-xl border bg-bg-elevated py-3 pl-10 pr-4 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 :class="promoCodeError ? 'border-error' : 'border-border-subtle'"
                 :disabled="!canManage || isProcessing"
               >
