@@ -276,7 +276,7 @@ async function handlePlanAction(plan: Plan) {
       showPromotionModal.value = true;
       return;
     }
-    window.location.href = result.checkoutUrl;
+    window.open(result.checkoutUrl, '_blank');
   }
 }
 
