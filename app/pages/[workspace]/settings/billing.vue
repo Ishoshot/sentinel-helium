@@ -53,6 +53,7 @@ const pendingCheckoutUrl = ref<string | null>(null);
 const showPromotionModal = ref(false);
 const billingInterval = ref<BillingInterval>("monthly");
 const showPaymentProcessingAlert = ref(false);
+const isInitializing = ref(true);
 
 const currentMember = computed(() =>
   members.value.find((m) => m.user_id === userStore.user?.id)
@@ -346,7 +347,11 @@ onMounted(async () => {
     router.replace({ query: {} });
   }
 
-  await Promise.all([fetchMembers(), fetchPlans(), fetchSubscription(), fetchUsage()]);
+  try {
+    await Promise.all([fetchMembers(), fetchPlans(), fetchSubscription(), fetchUsage()]);
+  } finally {
+    isInitializing.value = false;
+  }
 });
 
 watch(error, (newError) => {
@@ -375,14 +380,14 @@ watch(showPromotionModal, (isOpen) => {
     <section>
       <!-- Loading State -->
       <div
-        v-if="isLoading && !subscription"
+        v-if="isInitializing"
         class="grid gap-6 lg:grid-cols-5"
       >
         <div class="lg:col-span-3">
-          <BaseSkeleton class="h-72 w-full rounded-2xl" />
+          <BaseSkeleton class="h-80 w-full rounded-2xl" />
         </div>
         <div class="lg:col-span-2">
-          <BaseSkeleton class="h-72 w-full rounded-2xl" />
+          <BaseSkeleton class="h-80 w-full rounded-2xl" />
         </div>
       </div>
 
@@ -793,7 +798,10 @@ watch(showPromotionModal, (isOpen) => {
     <!-- Plans Section -->
     <section>
       <!-- Section Header -->
-      <div class="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div
+        v-if="!isInitializing"
+        class="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
+      >
         <div>
           <h2 class="text-2xl font-bold text-text-primary">
             Choose your plan
@@ -860,9 +868,20 @@ watch(showPromotionModal, (isOpen) => {
         </div>
       </div>
 
-      <!-- Plans Grid -->
+      <!-- Plans Grid Loading -->
       <div
-        v-if="sortedPlans.length === 0 && !isLoadingPlans"
+        v-if="isInitializing || isLoadingPlans"
+        class="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
+      >
+        <BaseSkeleton class="h-96 w-full rounded-2xl" />
+        <BaseSkeleton class="h-96 w-full rounded-2xl" />
+        <BaseSkeleton class="h-96 w-full rounded-2xl" />
+        <BaseSkeleton class="h-96 w-full rounded-2xl" />
+      </div>
+
+      <!-- Plans Grid Empty -->
+      <div
+        v-else-if="sortedPlans.length === 0"
         class="rounded-2xl border border-border-subtle bg-bg-elevated p-12"
       >
         <BaseEmptyState
@@ -872,6 +891,7 @@ watch(showPromotionModal, (isOpen) => {
         />
       </div>
 
+      <!-- Plans Grid Content -->
       <div
         v-else
         class="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
