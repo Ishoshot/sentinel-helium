@@ -1,11 +1,11 @@
 import type {
   ApiListResponse,
   ApiResponse,
-  CheckoutResponse,
+  ChangeRequest,
+  ChangeResponse,
   Plan,
   PortalResponse,
   Subscription,
-  UpgradeRequest,
   Usage,
 } from "~/types";
 import { useApiClient } from "../core/api";
@@ -49,28 +49,20 @@ export function useBillingService() {
   }
 
   /**
-   * Upgrade or change subscription plan
+   * Change subscription plan (subscribe, upgrade, downgrade, or cancel)
    */
-  async function upgradeSubscription(
+  async function changeSubscription(
     workspaceId: number,
-    data: UpgradeRequest
-  ): Promise<CheckoutResponse> {
-    const response = await $api<
-      ApiResponse<CheckoutResponse> | CheckoutResponse
-    >(`/workspaces/${workspaceId}/subscription/upgrade`, {
-      method: "POST",
-      body: data,
-    });
+    data: ChangeRequest
+  ): Promise<ChangeResponse> {
+    const response = await $api<ApiResponse<ChangeResponse> | ChangeResponse>(
+      `/workspaces/${workspaceId}/subscription/change`,
+      {
+        method: "POST",
+        body: data,
+      }
+    );
     return "data" in response ? response.data : response;
-  }
-
-  /**
-   * Cancel the current subscription
-   */
-  async function cancelSubscription(workspaceId: number): Promise<void> {
-    await $api(`/workspaces/${workspaceId}/subscription/cancel`, {
-      method: "POST",
-    });
   }
 
   /**
@@ -92,8 +84,7 @@ export function useBillingService() {
     listPlans,
     getSubscription,
     getUsage,
-    upgradeSubscription,
-    cancelSubscription,
+    changeSubscription,
     createBillingPortal,
   };
 }
