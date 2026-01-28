@@ -1,11 +1,12 @@
 import type {
   BillingInterval,
-  PaidPlanTier,
+  PlanTier,
   Plan,
   Promotion,
   Subscription,
   Usage,
 } from "~/types";
+import { isCheckoutResponse } from "~/types";
 import { useBillingService } from "~/services/billing/billingService";
 import { ApiError } from "~/services/core/api";
 
@@ -24,11 +25,13 @@ export function useBilling(workspaceId: Ref<number | null>) {
   const isProcessing = ref(false);
   const error = ref<string | null>(null);
 
-  interface UpgradePlanResult {
+  interface ChangePlanResult {
     checkoutUrl: string | null;
     billingInterval: BillingInterval | null;
     promotion: Promotion | null;
     promoCodeError: string | null;
+    directChange: boolean;
+    newPlan: Plan | null;
   }
 
   async function fetchPlans() {
@@ -86,17 +89,19 @@ export function useBilling(workspaceId: Ref<number | null>) {
     }
   }
 
-  async function upgradePlan(
-    planTier: PaidPlanTier,
+  async function changePlan(
+    planTier: PlanTier,
     billingInterval: BillingInterval,
     promoCode?: string | null
-  ): Promise<UpgradePlanResult> {
+  ): Promise<ChangePlanResult> {
     if (!workspaceId.value) {
       return {
         checkoutUrl: null,
         billingInterval: null,
         promotion: null,
         promoCodeError: null,
+        directChange: false,
+        newPlan: null,
       };
     }
     isProcessing.value = true;
@@ -104,16 +109,31 @@ export function useBilling(workspaceId: Ref<number | null>) {
 
     try {
       const trimmedPromoCode = promoCode?.trim() ?? "";
-      const data = await billingService.upgradeSubscription(workspaceId.value, {
+      const data = await billingService.changeSubscription(workspaceId.value, {
         plan_tier: planTier,
         billing_interval: billingInterval,
         promo_code: trimmedPromoCode.length > 0 ? trimmedPromoCode : null,
       });
+
+      if (isCheckoutResponse(data)) {
+        return {
+          checkoutUrl: data.checkout_url,
+          billingInterval: data.billing_interval,
+          promotion: data.promotion ?? null,
+          promoCodeError: null,
+          directChange: false,
+          newPlan: null,
+        };
+      }
+
+      // Direct change (upgrade/downgrade/cancel applied locally)
       return {
-        checkoutUrl: data.checkout_url,
-        billingInterval: data.billing_interval,
-        promotion: data.promotion ?? null,
+        checkoutUrl: null,
+        billingInterval: data.billing_interval ?? null,
+        promotion: null,
         promoCodeError: null,
+        directChange: true,
+        newPlan: data.plan,
       };
     } catch (e) {
       let promoCodeError: string | null = null;
@@ -133,35 +153,16 @@ export function useBilling(workspaceId: Ref<number | null>) {
         error.value = "Only workspace owners can manage subscriptions";
       } else {
         error.value =
-          e instanceof Error ? e.message : "Failed to update subscription";
+          e instanceof Error ? e.message : "Failed to change subscription";
       }
       return {
         checkoutUrl: null,
         billingInterval: null,
         promotion: null,
         promoCodeError,
+        directChange: false,
+        newPlan: null,
       };
-    } finally {
-      isProcessing.value = false;
-    }
-  }
-
-  async function cancelSubscription() {
-    if (!workspaceId.value) return false;
-    isProcessing.value = true;
-    error.value = null;
-
-    try {
-      await billingService.cancelSubscription(workspaceId.value);
-      return true;
-    } catch (e) {
-      if (e instanceof ApiError && e.status === 403) {
-        error.value = "Only workspace owners can manage subscriptions";
-      } else {
-        error.value =
-          e instanceof Error ? e.message : "Failed to cancel subscription";
-      }
-      return false;
     } finally {
       isProcessing.value = false;
     }
@@ -203,8 +204,7 @@ export function useBilling(workspaceId: Ref<number | null>) {
     fetchPlans,
     fetchSubscription,
     fetchUsage,
-    upgradePlan,
-    cancelSubscription,
+    changePlan,
     openBillingPortal,
   };
 }
