@@ -161,7 +161,7 @@ const billingContent = planConfigs.map(plan => ({
 
 <template>
   <BaseContainer>
-    <div class="min-h-screen bg-slate-50">
+    <div class="min-h-screen bg-slate-50 -m-4 sm:-m-6 lg:-m-8">
       <!-- Hero section -->
       <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
         <div class="max-w-6xl mx-auto px-6 py-16">
