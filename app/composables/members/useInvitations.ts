@@ -46,7 +46,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
     try {
       const invitation = await invitationsService.create(
         workspaceId.value,
-        data
+        data,
       );
 
       // Add to local state
@@ -84,7 +84,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
 
       // Update local state
       invitations.value = invitations.value.filter(
-        (i) => !!i && i.id !== invitationId
+        (i) => !!i && i.id !== invitationId,
       );
 
       return true;
@@ -142,26 +142,19 @@ export function useInvitations(workspaceId: Ref<number | null>) {
    * Resend an invitation email
    */
   async function resendInvitation(invitationId: number) {
-    if (!workspaceId.value) return null;
+    if (!workspaceId.value) return false;
 
     // Don't set global isLoading for resend - the card has its own spinner
     error.value = null;
 
     try {
-      const invitation = await invitationsService.resend(
-        workspaceId.value,
-        invitationId
-      );
+      await invitationsService.resend(workspaceId.value, invitationId);
 
-      // Update local state with refreshed invitation
-      // Replace entire array to guarantee Vue's reactivity system triggers
-      if (invitation) {
-        invitations.value = invitations.value.map((i) =>
-          i && i.id === invitationId ? invitation : i
-        );
-      }
+      // Refetch invitations to get updated state from backend
+      // The resend endpoint returns a message, not the invitation object
+      await fetchInvitations();
 
-      return invitation;
+      return true;
     } catch (e) {
       if (e instanceof ApiError && e.status === 403) {
         error.value = "You do not have permission to resend invitations";
@@ -169,7 +162,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
         error.value =
           e instanceof Error ? e.message : "Failed to resend invitation";
       }
-      return null;
+      return false;
     }
   }
 
@@ -177,7 +170,7 @@ export function useInvitations(workspaceId: Ref<number | null>) {
    * Get pending invitations count
    */
   const pendingCount = computed(
-    () => invitations.value.filter((i) => !!i && i.is_pending).length
+    () => invitations.value.filter((i) => !!i && i.is_pending).length,
   );
 
   // Watch for workspace changes and refetch

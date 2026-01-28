@@ -17,13 +17,13 @@ export function useInvitationsService() {
    */
   async function list(workspaceId: number): Promise<Invitation[]> {
     const response = await $api<ApiListResponse<Invitation> | Invitation[]>(
-      `/workspaces/${workspaceId}/invitations`
+      `/workspaces/${workspaceId}/invitations`,
     );
     return "data" in response && Array.isArray(response.data)
       ? response.data
       : Array.isArray(response)
-      ? response
-      : [];
+        ? response
+        : [];
   }
 
   /**
@@ -31,14 +31,14 @@ export function useInvitationsService() {
    */
   async function create(
     workspaceId: number,
-    data: CreateInvitationData
+    data: CreateInvitationData,
   ): Promise<Invitation> {
     const response = await $api<ApiResponse<Invitation> | Invitation>(
       `/workspaces/${workspaceId}/invitations`,
       {
         method: "POST",
         body: data,
-      }
+      },
     );
     return "data" in response ? response.data : response;
   }
@@ -48,7 +48,7 @@ export function useInvitationsService() {
    */
   async function cancel(
     workspaceId: number,
-    invitationId: number
+    invitationId: number,
   ): Promise<void> {
     await $api(`/workspaces/${workspaceId}/invitations/${invitationId}`, {
       method: "DELETE",
@@ -62,23 +62,23 @@ export function useInvitationsService() {
   async function accept(token: string): Promise<Invitation> {
     const response = await $api<ApiResponse<Invitation> | Invitation>(
       `/invitations/${token}/accept`,
-      { method: "POST" }
+      { method: "POST" },
     );
     return "data" in response ? response.data : response;
   }
 
   /**
    * Resend an invitation email
+   * Returns a success message, not the invitation object
    */
   async function resend(
     workspaceId: number,
-    invitationId: number
-  ): Promise<Invitation> {
-    const response = await $api<ApiResponse<Invitation> | Invitation>(
+    invitationId: number,
+  ): Promise<void> {
+    await $api<{ message: string }>(
       `/workspaces/${workspaceId}/invitations/${invitationId}/resend`,
-      { method: "POST" }
+      { method: "POST" },
     );
-    return "data" in response ? response.data : response;
   }
 
   return {
