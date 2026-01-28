@@ -123,7 +123,7 @@ const entryLayer: ArchitectureLayer = {
         {
           icon: "ph:file-code",
           label: "Config",
-          value: "sentinel.json",
+          value: "sentinel.yaml",
           status: "active",
         },
       ],

@@ -400,7 +400,7 @@ watch(showPromotionModal, (isOpen) => {
         <div class="lg:col-span-3">
           <div
             v-if="!currentPlan"
-            class="rounded-2xl border border-border-subtle bg-bg-elevated p-8"
+            class="h-full rounded-2xl border border-border-subtle bg-bg-elevated p-8"
           >
             <BaseEmptyState
               icon="lucide:credit-card"
@@ -412,14 +412,14 @@ watch(showPromotionModal, (isOpen) => {
 
           <div
             v-else
-            class="rounded-2xl border border-border-subtle bg-bg-elevated"
+            class="flex h-full flex-col rounded-2xl border border-border-subtle bg-bg-elevated"
           >
-            <div class="p-8">
-              <!-- Payment Processing Alert -->
-              <div
-                v-if="showPaymentProcessingAlert"
-                class="mb-6 flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4"
-              >
+            <!-- Payment Processing Alert (outside main padding for consistent height) -->
+            <div
+              v-if="showPaymentProcessingAlert"
+              class="border-b border-border-subtle px-8 pt-6"
+            >
+              <div class="flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">
                 <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
                   <Icon
                     name="lucide:clock"
@@ -445,7 +445,9 @@ watch(showPromotionModal, (isOpen) => {
                   />
                 </button>
               </div>
+            </div>
 
+            <div class="flex flex-1 flex-col p-8">
               <!-- Header -->
               <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div class="flex items-start gap-4">

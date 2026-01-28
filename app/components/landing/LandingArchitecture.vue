@@ -226,12 +226,12 @@ const columns = [1, 2, 3, 4].map(col => ({
   gap: 1.5rem;
   padding: 2rem;
   transform-style: preserve-3d;
-  transform: rotateX(22deg) rotateZ(-12deg) scale(0.9);
+  transform: rotateX(17deg) rotateZ(-8deg) scale(0.9);
   transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .architecture-stage:hover {
-  transform: rotateX(17deg) rotateZ(-8deg) scale(0.95);
+  transform: rotateX(16deg) rotateZ(-7deg) scale(0.92);
 }
 
 /* Columns */

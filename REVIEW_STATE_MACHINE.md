@@ -5,6 +5,7 @@ This document defines the complete state machine for the code review system in S
 ## Overview
 
 The review system is event-driven and follows a clear state machine pattern:
+
 - **Entry Point**: GitHub webhook events (pull_request)
 - **Core Entity**: Run (represents a single review execution)
 - **State Storage**: `runs.status` enum field
@@ -16,9 +17,11 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Run States
 
 ### 1. `queued` (Initial State)
+
 **Description**: Run has been created and is waiting in the queue for execution
 
 **Entry Conditions**:
+
 - PR webhook received (`opened`, `synchronize`, `reopened`)
 - Repository has auto-review enabled
 - No config errors detected
@@ -26,6 +29,7 @@ The review system is event-driven and follows a clear state machine pattern:
 - Provider keys available (BYOK)
 
 **Properties**:
+
 - `status`: `queued`
 - `started_at`: `null`
 - `completed_at`: `null`
@@ -37,13 +41,16 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 2. `in_progress` (Active State)
+
 **Description**: Review is currently being executed by the review engine
 
 **Entry Conditions**:
+
 - `ExecuteReviewRun` job dequeued and started
 - Previous state was `queued`
 
 **Properties**:
+
 - `status`: `in_progress`
 - `started_at`: Timestamp when execution began
 - `completed_at`: `null`
@@ -51,6 +58,7 @@ The review system is event-driven and follows a clear state machine pattern:
 - `metadata`: PR details
 
 **Active Processes**:
+
 - Context building via `ContextEngine`
   - Diff collection
   - File context extraction
@@ -68,18 +76,21 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 3. `completed` (Terminal State)
+
 **Description**: Review executed successfully with findings generated
 
 **Entry Conditions**:
+
 - Review engine completed without exceptions
 - Findings stored in database
 - Summary generated
 
 **Properties**:
+
 - `status`: `completed`
 - `started_at`: Timestamp
 - `completed_at`: Timestamp
-- `metrics`: 
+- `metrics`:
   ```json
   {
     "duration_ms": 15234,
@@ -103,6 +114,7 @@ The review system is event-driven and follows a clear state machine pattern:
   ```
 
 **Related Records**:
+
 - `findings` (0 to N): Issue found during review
   - Severity: critical, high, medium, low, info
   - Category: security, performance, maintainability, etc.
@@ -111,6 +123,7 @@ The review system is event-driven and follows a clear state machine pattern:
 - `annotations` (0 to N): GitHub PR comments created from findings
 
 **Triggered Actions**:
+
 - Activity log created (`RunCompleted`)
 - `PostRunAnnotations` job dispatched (delayed 5s)
 
@@ -119,13 +132,16 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 4. `failed` (Terminal State)
+
 **Description**: Review execution failed due to an error
 
 **Entry Conditions**:
+
 - Exception thrown during review execution (excluding `NoProviderKeyException`)
 - Examples: Timeout, API errors, validation failures
 
 **Properties**:
+
 - `status`: `failed`
 - `started_at`: Timestamp
 - `completed_at`: Timestamp
@@ -138,6 +154,7 @@ The review system is event-driven and follows a clear state machine pattern:
   ```
 
 **Triggered Actions**:
+
 - Activity log created (`RunFailed`)
 - Skip reason comment posted to GitHub PR
 - Error type simplified for user display
@@ -147,14 +164,16 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 5. `skipped` (Terminal State)
+
 **Description**: Review was not executed due to a valid skip reason
 
 **Entry Conditions**:
+
 1. **No Provider Keys** (`NoProviderKeyException` thrown)
    - Repository has no BYOK keys configured
    - Most common skip reason
 2. **Config Error** (detected before job dispatch)
-   - Invalid sentinel.json syntax
+   - Invalid sentinel.yaml syntax
    - Config validation failure
 3. **Trigger Rules** (evaluated before job dispatch)
    - Branch patterns don't match
@@ -162,15 +181,17 @@ The review system is event-driven and follows a clear state machine pattern:
    - Label requirements not met
 
 **Properties**:
+
 - `status`: `skipped`
 - `completed_at`: Timestamp
-- `metadata.skip_reason`: 
+- `metadata.skip_reason`:
   - `"no_provider_keys"`
   - `"config_error"`
   - `"trigger_rule_<condition>"`
 - `metadata.skip_message`: Human-readable explanation
 
 **Triggered Actions**:
+
 - Activity log created (`RunSkipped`)
 - Skip reason comment posted (only for provider key issues)
 - Config error comment posted (only for config errors)
@@ -256,13 +277,16 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Components & Modules
 
 ### 1. **Entry Layer**
+
 **Controller**: `GitHubWebhookController`
+
 - Receives webhook POST
 - Verifies signature
 - Parses event type
 - Dispatches to queue
 
 **Service**: `GitHubWebhookService`
+
 - Signature verification
 - Event parsing
 - Action determination (trigger review vs metadata sync)
@@ -270,7 +294,9 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 2. **Orchestration Layer**
+
 **Job**: `ProcessPullRequestWebhook`
+
 - Finds Installation & Repository records
 - Checks configuration
 - Evaluates trigger rules
@@ -279,23 +305,28 @@ The review system is event-driven and follows a clear state machine pattern:
 - Dispatches review job
 
 **Action**: `CreatePullRequestRun`
+
 - Creates Run with status `queued`
 - Stores PR metadata
 - Associates greeting comment
 
 **Action**: `SyncPullRequestRunMetadata`
+
 - Updates existing run metadata
 - Handles: labels, assignees, reviewers, draft status, title, branch changes
 
 ---
 
 ### 3. **Review Execution Layer**
+
 **Job**: `ExecuteReviewRun`
+
 - Dequeues run
 - Delegates to action
 - Handles queue priority
 
 **Action**: `ExecuteReviewRun`
+
 - **State Management**: Updates status through lifecycle
 - **Context Building**: Uses `ContextEngine` to gather:
   - Diff (changed files)
@@ -310,12 +341,14 @@ The review system is event-driven and follows a clear state machine pattern:
 - **Activity Logging**: Records completion/failure/skip
 
 **Service**: `ReviewEngine` (Interface: `Contracts\ReviewEngine`)
+
 - Implementation: `PrismReviewEngine`
 - Uses Prism SDK for AI review
 - Provider key resolution (BYOK)
 - Token usage tracking
 
 **Service**: `ContextEngine` (Interface: `Contracts\ContextEngineContract`)
+
 - Orchestrates collectors and filters
 - Builds `ContextBag` with all review data
 - Collectors run in priority order (100 → 0)
@@ -324,27 +357,33 @@ The review system is event-driven and follows a clear state machine pattern:
 ---
 
 ### 4. **Output Layer**
+
 **Job**: `PostRunAnnotations`
+
 - Dispatched after completed review
 - Delayed 5 seconds
 - Posts findings as PR comments
 
 **Action**: `PostRunAnnotations`
+
 - Creates GitHub review comments
 - Links comments to findings (annotations)
 - Handles GitHub API rate limits
 
 **Action**: `PostsGreetingComment`
+
 - Posts immediate feedback
 - "⏳ Review in progress..."
 - Returns comment ID
 
 **Action**: `PostsSkipReasonComment`
+
 - Posts skip reason explanation
 - Different messages per skip reason
 - Links to settings when applicable
 
 **Action**: `PostsConfigErrorComment`
+
 - Posts config error details
 - Helps user fix configuration
 
@@ -353,6 +392,7 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Queue Architecture
 
 ### Queue Names
+
 1. **`webhooks`** (High Priority)
    - ProcessPullRequestWebhook
    - Fast validation and dispatching
@@ -374,7 +414,9 @@ The review system is event-driven and follows a clear state machine pattern:
    - Target: < 10s
 
 ### Priority Routing
+
 **Service**: `QueueResolver`
+
 - Determines queue based on workspace tier
 - Uses `JobContext` for routing decisions
 
@@ -383,6 +425,7 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Data Flow
 
 ### Run Creation
+
 ```php
 [
     'workspace_id' => int,
@@ -412,6 +455,7 @@ The review system is event-driven and follows a clear state machine pattern:
 ```
 
 ### Context Bag Structure
+
 ```php
 [
     'files' => [
@@ -448,6 +492,7 @@ The review system is event-driven and follows a clear state machine pattern:
 ```
 
 ### Review Result Structure
+
 ```php
 [
     'summary' => [
@@ -494,6 +539,7 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Events & Webhooks
 
 ### Received Webhook Events
+
 - `pull_request.opened`
 - `pull_request.synchronize`
 - `pull_request.reopened`
@@ -505,6 +551,7 @@ The review system is event-driven and follows a clear state machine pattern:
 - `pull_request.ready_for_review`
 
 ### Internal Events
+
 - `run.created`
 - `run.started`
 - `run.completed`
@@ -517,19 +564,24 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Real-Time Updates (For Frontend UI)
 
 ### Polling Strategy
+
 **Endpoint**: `GET /api/workspaces/{workspace}/runs/{run}`
 
 **Polling Intervals**:
+
 - `queued`: Poll every 2s
 - `in_progress`: Poll every 3s
 - Terminal states: Stop polling
 
 ### WebSocket/Broadcasting (Future)
+
 **Channels**:
+
 - `workspace.{id}.runs` - Broadcast run state changes
 - `run.{id}` - Broadcast run-specific updates
 
 **Events**:
+
 - `RunStatusChanged`
 - `FindingsGenerated`
 - `AnnotationsPosted`
@@ -539,16 +591,20 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Error Handling & Retries
 
 ### Retry Strategies
+
 **ExecuteReviewRun**:
+
 - No automatic retries (one-shot)
 - User can trigger manual re-review
 
 **PostRunAnnotations**:
+
 - 3 attempts: 0s, 30s, 60s, 120s
 - Exponential backoff
 - Handles GitHub rate limits
 
 ### Error Types
+
 1. **Config Errors** → Skipped (with comment)
 2. **No Provider Keys** → Skipped (with comment)
 3. **Trigger Rules** → Skipped (silent)
@@ -561,7 +617,9 @@ The review system is event-driven and follows a clear state machine pattern:
 ## Frontend UI Recommendations
 
 ### Run List View
+
 Show runs in cards with:
+
 - Status badge (with color coding)
 - PR title & number
 - Repository name
@@ -570,7 +628,9 @@ Show runs in cards with:
 - Progress indicator (for in_progress)
 
 ### Run Detail View
+
 Real-time sections:
+
 1. **Header Card**
    - Status with live updates
    - PR metadata
@@ -599,6 +659,7 @@ Real-time sections:
    - Retry button (if applicable)
 
 ### Real-Time Features
+
 - **Status transitions**: Smooth animations
 - **Progress updates**: Phase indicators
 - **Findings appear**: Animate in as generated
@@ -606,6 +667,7 @@ Real-time sections:
 - **Optimistic updates**: Instant feedback
 
 ### Design Patterns (Like Image)
+
 - **Card-based layout**: Each component in a card
 - **Contextual menus**: Three-dot menus for actions
 - **Status indicators**: Colored dots for enabled/active/verified
@@ -618,6 +680,7 @@ Real-time sections:
 ## Activity Logging
 
 All state transitions log activities:
+
 - `RunCompleted` - Success with findings count
 - `RunFailed` - Error with exception details
 - `RunSkipped` - Skip reason
