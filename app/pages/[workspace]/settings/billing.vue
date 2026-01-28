@@ -300,7 +300,7 @@ async function handlePlanAction(plan: Plan) {
 
 function handlePromotionCheckout() {
   if (!pendingCheckoutUrl.value) return;
-  window.open(pendingCheckoutUrl.value, '_blank');
+  window.location.href = pendingCheckoutUrl.value;
 }
 
 function handlePromotionDismiss() {
