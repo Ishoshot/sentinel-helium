@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MemberRole } from "~/types";
-import type { BillingInterval, PaidPlanTier, Plan, PlanTier, Promotion } from "~/types";
+import type { BillingInterval, Plan, PlanTier, Promotion } from "~/types";
 import { useUserStore } from "~/stores/useUserStore";
 import { useWorkspaceStore } from "~/stores/useWorkspaceStore";
 import { useAppToast } from "~/composables/shared/useAppToast";
@@ -35,8 +35,7 @@ const {
   fetchPlans,
   fetchSubscription,
   fetchUsage,
-  upgradePlan,
-  cancelSubscription,
+  changePlan,
   openBillingPortal,
 } = useBilling(workspaceId);
 
@@ -198,9 +197,13 @@ const planActionLabel = (plan: Plan) => {
 
 const planActionDisabled = (plan: Plan) => {
   if (currentPlan.value?.id === plan.id) return true;
-  if (!hasPricingForInterval(plan, billingInterval.value)) return true;
   if (!canManage.value) return true;
-  if (plan.tier === "foundation") return true;
+  // Foundation is free, no pricing check needed
+  if (plan.tier === "foundation") {
+    // Only enable downgrade to foundation if currently on a paid plan
+    return currentPlan.value?.tier === "foundation";
+  }
+  if (!hasPricingForInterval(plan, billingInterval.value)) return true;
   return false;
 };
 
@@ -216,10 +219,6 @@ function formatDate(value: string) {
 function formatTierLabel(tier: string) {
   if (!tier) return "Plan";
   return tier.charAt(0).toUpperCase() + tier.slice(1);
-}
-
-function isPaidPlanTier(tier: PlanTier): tier is PaidPlanTier {
-  return tier !== "foundation";
 }
 
 function hasPricingForInterval(plan: Plan, interval: BillingInterval) {
@@ -255,20 +254,39 @@ async function handlePlanAction(plan: Plan) {
   if (planActionDisabled(plan)) return;
   promoCodeError.value = null;
   pendingPlanId.value = plan.id;
-  if (!isPaidPlanTier(plan.tier)) {
-    pendingPlanId.value = null;
-    return;
-  }
-  const result = await upgradePlan(
+
+  // Capture original plan tier before change for toast message
+  const originalTier = currentPlan.value?.tier;
+
+  // For foundation (cancel/downgrade), no promo code
+  const promoCodeToSend = plan.tier === "foundation" ? null : promoCode.value;
+
+  const result = await changePlan(
     plan.tier,
     billingInterval.value,
-    promoCode.value
+    promoCodeToSend
   );
   pendingPlanId.value = null;
+
   if (result.promoCodeError) {
     promoCodeError.value = result.promoCodeError;
     return;
   }
+
+  // Direct change (no checkout needed)
+  if (result.directChange) {
+    await fetchSubscription();
+    if (plan.tier === "foundation") {
+      toast.success("Subscription cancelled");
+    } else if (originalTier && planOrder[plan.tier] < planOrder[originalTier]) {
+      toast.success("Subscription downgraded");
+    } else {
+      toast.success("Subscription upgraded");
+    }
+    return;
+  }
+
+  // Checkout flow
   if (result.checkoutUrl) {
     if (result.promotion) {
       promotionNotice.value = result.promotion;
@@ -302,9 +320,10 @@ async function handleOpenPortal() {
 async function handleCancelSubscription() {
   if (!canManage.value) return;
   isCanceling.value = true;
-  const success = await cancelSubscription();
+  const result = await changePlan("foundation", "monthly", null);
   isCanceling.value = false;
-  if (success) {
+  // Foundation is free, so it's always a direct change (no checkout)
+  if (result.directChange) {
     showCancelModal.value = false;
     await fetchSubscription();
     toast.success("Subscription cancelled");
