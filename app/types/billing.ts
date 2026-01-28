@@ -62,8 +62,8 @@ export interface Usage {
   annotations_count: number;
 }
 
-export interface UpgradeRequest {
-  plan_tier: PaidPlanTier;
+export interface ChangeRequest {
+  plan_tier: PlanTier;
   billing_interval?: BillingInterval;
   promo_code?: string | null;
 }
@@ -77,6 +77,18 @@ export interface CheckoutResponse {
   checkout_url: string;
   billing_interval: BillingInterval;
   promotion?: Promotion | null;
+}
+
+export interface DirectChangeResponse {
+  plan: Plan;
+  status: SubscriptionStatus;
+  billing_interval?: BillingInterval;
+}
+
+export type ChangeResponse = CheckoutResponse | DirectChangeResponse;
+
+export function isCheckoutResponse(response: ChangeResponse): response is CheckoutResponse {
+  return "checkout_url" in response;
 }
 
 export interface PortalResponse {
