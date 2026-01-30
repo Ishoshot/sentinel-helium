@@ -101,3 +101,21 @@ export interface Repository {
 export interface UpdateRepositoryData {
   auto_review_enabled?: boolean;
 }
+
+/**
+ * Response from preparing a config branch
+ */
+export interface CreateConfigPrResponse {
+  status: 'ready' | 'skipped' | 'error';
+  compare_url?: string;
+  message?: string;
+}
+
+/**
+ * WebSocket event for config branch ready
+ */
+export interface ConfigPrCreatedEvent {
+  repository_id: number;
+  repository_name: string;
+  pr_url: string; // This is actually the compare_url
+}

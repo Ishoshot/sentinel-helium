@@ -2,8 +2,8 @@
 import type { BillingInterval, Plan, PlanFeatureKey } from "~/types";
 
 /**
- * PlanCard - Premium plan display card
- * State-of-the-art design with gradients and refined visual hierarchy
+ * PlanCard - Sleek plan display card
+ * Refined design with clean hierarchy and elegant interactions
  */
 
 interface Props {
@@ -35,12 +35,12 @@ const tierConfig: Record<Plan["tier"], { label: string; icon: string; gradient: 
   foundation: {
     label: "Foundation",
     icon: "lucide:layers",
-    gradient: "from-slate-500 to-slate-600",
+    gradient: "from-slate-600 to-slate-700",
   },
   illuminate: {
     label: "Illuminate",
     icon: "lucide:sparkles",
-    gradient: "from-accent to-blue-500",
+    gradient: "from-blue-500 to-indigo-600",
   },
   orchestrate: {
     label: "Orchestrate",
@@ -54,13 +54,13 @@ const tierConfig: Record<Plan["tier"], { label: string; icon: string; gradient: 
   },
 };
 
-const featureLabels: Record<PlanFeatureKey, { label: string; icon: string }> = {
-  byok_enabled: { label: "Provider keys (BYOK)", icon: "lucide:key" },
-  custom_guidelines: { label: "Custom guidelines", icon: "lucide:file-text" },
-  priority_queue: { label: "Priority queue", icon: "lucide:rocket" },
-  api_access: { label: "API access", icon: "lucide:code" },
-  sso_enabled: { label: "Single sign-on", icon: "lucide:fingerprint" },
-  audit_logs: { label: "Audit logs", icon: "lucide:scroll-text" },
+const featureLabels: Record<PlanFeatureKey, string> = {
+  byok_enabled: "BYOK",
+  custom_guidelines: "Custom guidelines",
+  priority_queue: "Priority queue",
+  api_access: "API access",
+  sso_enabled: "SSO",
+  audit_logs: "Audit logs",
 };
 
 const tierInfo = computed(() => tierConfig[props.plan.tier]);
@@ -75,8 +75,8 @@ const selectedPriceLabel = computed(() => {
 });
 
 const currencyCaption = computed(() => {
-  if (!props.plan.currency) return "Contact sales";
-  return isMonthly.value ? "per month" : "per year";
+  if (!props.plan.currency) return "Contact us";
+  return isMonthly.value ? "/mo" : "/year";
 });
 
 const yearlySavingsLabel = computed(() => {
@@ -86,35 +86,32 @@ const yearlySavingsLabel = computed(() => {
 
 const limitItems = computed(() => [
   {
-    label: "Reviews / month",
+    label: "Reviews",
     value:
       props.plan.monthly_runs_limit === null
         ? "Unlimited"
         : props.plan.monthly_runs_limit.toLocaleString(),
-    icon: "lucide:git-pull-request",
   },
   {
-    label: "Commands / month",
+    label: "Commands",
     value:
       props.plan.monthly_commands_limit == null
         ? "Unlimited"
         : props.plan.monthly_commands_limit.toLocaleString(),
-    icon: "lucide:terminal",
   },
   {
-    label: "Team members",
+    label: "Team size",
     value:
       props.plan.team_size_limit === null
         ? "Unlimited"
         : props.plan.team_size_limit.toLocaleString(),
-    icon: "lucide:users",
   },
 ]);
 
 const featureItems = computed(() =>
   (Object.keys(featureLabels) as PlanFeatureKey[]).map((key) => ({
     key,
-    ...featureLabels[key],
+    label: featureLabels[key],
     enabled: props.plan.features[key],
   }))
 );
@@ -127,168 +124,140 @@ function handleAction() {
 
 <template>
   <div
-    class="group relative flex h-full flex-col overflow-hidden rounded-2xl border transition-all duration-300"
+    class="group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all duration-300"
     :class="[
       highlight
-        ? 'border-accent/40 bg-gradient-to-b from-accent/[0.03] to-transparent shadow-[0_0_0_1px_rgba(37,99,235,0.1),0_8px_40px_-12px_rgba(37,99,235,0.25)]'
-        : 'border-border-subtle bg-bg-elevated hover:border-border-muted hover:shadow-elevated',
-      isCurrent && !highlight ? 'ring-2 ring-accent/20 ring-offset-2 ring-offset-bg-app' : '',
+        ? 'border-accent shadow-lg shadow-accent/10 ring-1 ring-accent/20'
+        : 'border-border-subtle hover:border-border-muted hover:shadow-md',
+      isCurrent ? 'ring-2 ring-accent/30' : '',
     ]"
   >
     <!-- Popular Badge -->
     <div
       v-if="highlight"
-      class="absolute -right-12 top-6 z-10 rotate-45 bg-gradient-to-r from-accent to-blue-500 px-12 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg"
+      class="absolute -top-3 left-6"
     >
-      Popular
+      <span class="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white shadow-sm">
+        Most popular
+      </span>
     </div>
 
-    <!-- Card Content -->
-    <div class="flex flex-1 flex-col p-6">
-      <!-- Header -->
-      <div class="mb-6">
-        <div class="mb-4 flex items-center gap-3">
-          <div
-            class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br shadow-sm"
-            :class="tierInfo.gradient"
-          >
-            <Icon
-              :name="tierInfo.icon"
-              class="size-5 text-white"
-            />
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-text-primary">
-              {{ tierInfo.label }}
-            </h3>
-            <BaseBadge
-              v-if="isCurrent"
-              variant="primary"
-              size="sm"
-            >
-              Current plan
-            </BaseBadge>
-          </div>
-        </div>
-
-        <p
-          v-if="plan.description"
-          class="text-sm leading-relaxed text-text-muted"
-        >
-          {{ plan.description }}
-        </p>
-      </div>
-
-      <!-- Pricing -->
-      <div class="mb-6">
-        <div class="flex items-baseline gap-1">
-          <span class="text-4xl font-bold tracking-tight text-text-primary">
-            {{ selectedPriceLabel }}
-          </span>
-          <span class="text-sm text-text-muted">
-            {{ currencyCaption }}
-          </span>
-        </div>
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="mb-4 flex items-center gap-3">
         <div
-          v-if="yearlySavingsLabel && !isMonthly"
-          class="mt-2"
+          class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br"
+          :class="tierInfo.gradient"
         >
-          <span class="inline-flex items-center gap-1 rounded-full bg-success-light px-2.5 py-1 text-xs font-medium text-success">
-            <Icon
-              name="lucide:badge-percent"
-              class="size-3"
-            />
-            {{ yearlySavingsLabel }}
-          </span>
+          <Icon
+            :name="tierInfo.icon"
+            class="size-5 text-white"
+          />
         </div>
-      </div>
-
-      <!-- Limits -->
-      <div class="mb-6 space-y-3 rounded-xl bg-bg-surface/50 p-4">
-        <div
-          v-for="item in limitItems"
-          :key="item.label"
-          class="flex items-center justify-between"
-        >
-          <div class="flex items-center gap-2 text-sm text-text-muted">
-            <Icon
-              :name="item.icon"
-              class="size-4"
-            />
-            <span>{{ item.label }}</span>
-          </div>
-          <span class="text-sm font-semibold text-text-primary">
-            {{ item.value }}
-          </span>
-        </div>
-      </div>
-
-      <!-- Features -->
-      <div class="flex-1 space-y-2.5">
-        <p class="mb-3 text-xs font-medium uppercase tracking-wider text-text-muted">
-          Features
-        </p>
-        <div
-          v-for="feature in featureItems"
-          :key="feature.key"
-          class="flex items-center gap-2.5"
-        >
-          <div
-            class="flex size-5 items-center justify-center rounded-full"
-            :class="feature.enabled ? 'bg-success-light' : 'bg-bg-surface'"
-          >
-            <Icon
-              :name="feature.enabled ? 'lucide:check' : 'lucide:minus'"
-              class="size-3"
-              :class="feature.enabled ? 'text-success' : 'text-text-muted/50'"
-            />
-          </div>
+        <div>
+          <h3 class="font-semibold text-text-primary">
+            {{ tierInfo.label }}
+          </h3>
           <span
-            class="text-sm"
-            :class="feature.enabled ? 'text-text-secondary' : 'text-text-muted/60'"
+            v-if="isCurrent"
+            class="text-xs text-accent"
           >
-            {{ feature.label }}
+            Current plan
           </span>
         </div>
       </div>
 
-      <!-- CTA -->
-      <div class="mt-6 pt-4">
-        <button
-          type="button"
-          class="w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200"
-          :class="[
-            isCurrent
-              ? 'cursor-default bg-bg-surface text-text-muted'
-              : highlight
-                ? 'bg-gradient-to-r from-accent to-blue-500 text-white shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 active:scale-[0.98]'
-                : 'bg-text-primary text-white hover:bg-text-secondary active:scale-[0.98]',
-            (!canManage || actionDisabled) && !isCurrent ? 'cursor-not-allowed opacity-50' : '',
-          ]"
-          :disabled="!canManage || actionDisabled || isCurrent || actionLoading"
-          @click="handleAction"
-        >
-          <span
-            v-if="actionLoading"
-            class="flex items-center justify-center gap-2"
-          >
-            <Icon
-              name="lucide:loader-2"
-              class="size-4 animate-spin"
-            />
-            Processing...
-          </span>
-          <span v-else>
-            {{ canManage ? actionLabel : "Contact owner" }}
-          </span>
-        </button>
+      <p
+        v-if="plan.description"
+        class="text-sm leading-relaxed text-text-muted"
+      >
+        {{ plan.description }}
+      </p>
+    </div>
+
+    <!-- Price -->
+    <div class="mb-6">
+      <div class="flex items-baseline gap-1">
+        <span class="text-4xl font-bold tracking-tight text-text-primary">
+          {{ selectedPriceLabel }}
+        </span>
+        <span class="text-sm text-text-muted">
+          {{ currencyCaption }}
+        </span>
+      </div>
+      <div
+        v-if="yearlySavingsLabel && !isMonthly"
+        class="mt-2"
+      >
+        <span class="text-xs font-medium text-emerald-600">
+          {{ yearlySavingsLabel }} annually
+        </span>
       </div>
     </div>
 
-    <!-- Highlight glow effect -->
-    <div
-      v-if="highlight"
-      class="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-accent to-transparent"
-    />
+    <!-- Limits -->
+    <div class="mb-6 space-y-3 border-t border-border-subtle pt-6">
+      <div
+        v-for="item in limitItems"
+        :key="item.label"
+        class="flex items-center justify-between text-sm"
+      >
+        <span class="text-text-muted">{{ item.label }}</span>
+        <span class="font-medium text-text-primary">
+          {{ item.value }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="mb-6 flex-1 space-y-2">
+      <div
+        v-for="feature in featureItems"
+        :key="feature.key"
+        class="flex items-center gap-2"
+      >
+        <Icon
+          :name="feature.enabled ? 'lucide:check' : 'lucide:minus'"
+          class="size-4"
+          :class="feature.enabled ? 'text-emerald-500' : 'text-text-muted/30'"
+        />
+        <span
+          class="text-sm"
+          :class="feature.enabled ? 'text-text-secondary' : 'text-text-muted/50'"
+        >
+          {{ feature.label }}
+        </span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button
+      type="button"
+      class="w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200"
+      :class="[
+        isCurrent
+          ? 'cursor-default bg-bg-surface text-text-muted'
+          : highlight
+            ? 'bg-accent text-white shadow-md shadow-accent/25 hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/30 active:scale-[0.98]'
+            : 'bg-text-primary text-white hover:bg-text-secondary active:scale-[0.98]',
+        (!canManage || actionDisabled) && !isCurrent ? 'cursor-not-allowed opacity-50' : '',
+      ]"
+      :disabled="!canManage || actionDisabled || isCurrent || actionLoading"
+      @click="handleAction"
+    >
+      <span
+        v-if="actionLoading"
+        class="flex items-center justify-center gap-2"
+      >
+        <Icon
+          name="lucide:loader-2"
+          class="size-4 animate-spin"
+        />
+        Processing
+      </span>
+      <span v-else>
+        {{ canManage ? actionLabel : "Contact owner" }}
+      </span>
+    </button>
   </div>
 </template>

@@ -30,15 +30,15 @@ const emit = defineEmits<{
 // Generate unique ID if not provided
 const inputId = computed(() => props.id || `input-${Math.random().toString(36).slice(2, 9)}`)
 
-// Input classes
+// Input classes - modern subtle focus style
 const inputClasses = computed(() => {
-  const base = 'w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border rounded-lg transition-default placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed'
+  const base = 'w-full px-4 py-2.5 text-sm text-text-primary bg-bg-elevated border rounded-xl transition-all duration-200 placeholder:text-text-muted focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
 
-  const borderColor = props.error
-    ? 'border-error'
-    : 'border-border-muted hover:border-border-subtle'
+  const stateClasses = props.error
+    ? 'border-error focus:border-error focus:shadow-[0_0_0_3px_rgba(220,38,38,0.08)]'
+    : 'border-border-subtle hover:border-border-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]'
 
-  return [base, borderColor]
+  return [base, stateClasses]
 })
 
 function handleInput(event: Event) {

@@ -80,11 +80,15 @@ const chartOptions = computed(() => ({
         </p>
       </div>
 
-      <div :style="{ height }">
+      <div
+        class="relative"
+        :style="{ height }"
+      >
         <Chart
           :type="type"
           :data="data"
           :options="chartOptions"
+          class="!absolute inset-0 !h-full !w-full"
         />
       </div>
     </div>

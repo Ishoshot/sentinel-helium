@@ -98,18 +98,18 @@ function getNotificationIcon(type: string): string {
     <!-- Trigger Button -->
     <button
       type="button"
-      class="relative p-2 text-text-muted hover:text-text-secondary transition-colors rounded-lg hover:bg-bg-surface"
+      class="relative flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
       aria-label="Notifications"
       @click="isOpen = !isOpen"
     >
       <Icon
         name="lucide:bell"
-        class="w-5 h-5"
+        class="size-[18px]"
       />
       <!-- Unread Badge -->
       <span
         v-if="unreadCount > 0"
-        class="absolute top-1 right-1 w-2 h-2 bg-accent-primary rounded-full"
+        class="absolute right-1.5 top-1.5 size-2 rounded-full bg-accent"
       />
     </button>
 
