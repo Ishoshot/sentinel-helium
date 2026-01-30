@@ -188,7 +188,7 @@ const isExpanded = ref(true)
   <div class="bg-bg-elevated border border-border-subtle rounded-2xl hover:border-border-muted hover:shadow-md transition-all duration-200 overflow-hidden">
     <!-- Header - Always Visible -->
     <button
-      class="w-full p-6 flex items-start gap-5 hover:bg-bg-surface/50 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-inset"
+      class="w-full p-6 flex items-start gap-5 hover:bg-bg-surface/50 transition-colors focus:outline-none focus:border-accent focus:shadow-[inset_0_0_0_3px_rgba(37,99,235,0.08)]"
       @click="isExpanded = !isExpanded"
     >
       <!-- Severity Icon -->
@@ -362,7 +362,7 @@ const isExpanded = ref(true)
             :href="reference.url || undefined"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 rounded-lg bg-bg-surface border border-border-subtle px-3.5 py-2 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="inline-flex items-center gap-2 rounded-lg bg-bg-surface border border-border-subtle px-3.5 py-2 text-sm font-medium transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
             :class="reference.url ? 'text-accent hover:text-accent-hover hover:border-accent/30 hover:bg-accent/5 hover:shadow-sm cursor-pointer' : 'text-text-secondary cursor-default'"
           >
             {{ reference.text }}

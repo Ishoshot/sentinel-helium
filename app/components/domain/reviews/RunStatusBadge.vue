@@ -18,58 +18,52 @@ const config = computed(() => {
   switch (props.status) {
     case RunStatus.Completed:
       return {
-        bg: 'bg-success/10',
-        text: 'text-success',
-        icon: 'lucide:check-circle-2', // Minimal variant might ignore this or use a simple dot
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        icon: 'lucide:check-circle-2',
         label: 'Completed',
-        ring: 'ring-success/20',
-        dot: 'bg-success',
+        dot: 'bg-emerald-500',
       }
     case RunStatus.Failed:
       return {
-        bg: 'bg-error/10',
-        text: 'text-error',
+        bg: 'bg-red-50',
+        text: 'text-red-700',
         icon: 'lucide:x-circle',
         label: 'Failed',
-        ring: 'ring-error/20',
-        dot: 'bg-error',
+        dot: 'bg-red-500',
       }
     case RunStatus.InProgress:
       return {
-        bg: 'bg-accent/10',
-        text: 'text-accent',
+        bg: 'bg-blue-50',
+        text: 'text-blue-700',
         icon: 'lucide:loader-2',
-        label: 'Running', // "Building" in concept, "Running" or "In Progress" in app
-        ring: 'ring-accent/20',
+        label: 'Running',
         spin: true,
-        dot: 'bg-accent',
+        dot: 'bg-blue-500',
       }
     case RunStatus.Queued:
       return {
-        bg: 'bg-warning/10',
-        text: 'text-warning',
+        bg: 'bg-amber-50',
+        text: 'text-amber-700',
         icon: 'lucide:clock',
         label: 'Queued',
-        ring: 'ring-warning/20',
-        dot: 'bg-warning',
+        dot: 'bg-amber-500',
       }
     case RunStatus.Skipped:
       return {
-        bg: 'bg-bg-surface',
-        text: 'text-text-muted',
+        bg: 'bg-gray-100',
+        text: 'text-gray-600',
         icon: 'lucide:slash',
         label: 'Skipped',
-        ring: 'ring-border-subtle',
-        dot: 'bg-text-muted',
+        dot: 'bg-gray-400',
       }
     default:
       return {
-        bg: 'bg-bg-surface',
-        text: 'text-text-muted',
+        bg: 'bg-gray-100',
+        text: 'text-gray-600',
         icon: 'lucide:help-circle',
         label: props.status,
-        ring: 'ring-border-subtle',
-        dot: 'bg-text-muted',
+        dot: 'bg-gray-400',
       }
   }
 })
@@ -84,20 +78,20 @@ const config = computed(() => {
   >
     <div
       v-if="config.spin"
-      class="relative flex h-2 w-2"
+      class="relative flex size-2"
     >
       <span
-        class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+        class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
         :class="config.dot"
       />
       <span
-        class="relative inline-flex rounded-full h-2 w-2"
+        class="relative inline-flex size-2 rounded-full"
         :class="config.dot"
       />
     </div>
     <div
       v-else
-      class="w-2 h-2 rounded-full"
+      class="size-2 rounded-full"
       :class="config.dot"
     />
     <span>{{ config.label }}</span>
@@ -106,12 +100,12 @@ const config = computed(() => {
   <!-- Standard Badge Variant -->
   <div
     v-else
-    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-inset"
-    :class="[config.bg, config.text, config.ring]"
+    class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium"
+    :class="[config.bg, config.text]"
   >
     <Icon
       :name="config.icon"
-      class="w-3.5 h-3.5"
+      class="size-3"
       :class="{ 'animate-spin': config.spin }"
     />
     <span>{{ config.label }}</span>

@@ -1,124 +1,113 @@
 <script setup lang="ts">
-type EmptyStateType = 'no-data' | 'no-matches' | 'error';
+type EmptyStateType = 'no-data' | 'no-matches' | 'error'
 
 interface Props {
-  type: EmptyStateType;
-  viewMode?: 'all' | 'pr' | 'repository';
-  errorMessage?: string;
-  workspaceSlug?: string;
+  type: EmptyStateType
+  viewMode?: 'all' | 'pr' | 'repository'
+  errorMessage?: string
+  workspaceSlug?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   viewMode: 'all',
-});
+})
 
 const emit = defineEmits<{
-  clearFilters: [];
-  retry: [];
-}>();
+  clearFilters: []
+  retry: []
+}>()
 
 const config = computed(() => {
   switch (props.type) {
     case 'error':
       return {
         icon: 'lucide:alert-circle',
-        iconClass: 'w-16 h-16 rounded-2xl bg-error/10 text-error flex items-center justify-center mb-6 shadow-sm',
-        iconSize: 'w-8 h-8',
+        iconClass: 'flex size-16 items-center justify-center rounded-2xl bg-red-50',
+        iconColor: 'text-red-500',
         title: 'Failed to load reviews',
         description: props.errorMessage || 'An error occurred while loading the data.',
-        showAction: true,
-        actionLabel: 'Try Again',
-        actionIcon: 'lucide:refresh-cw',
-        actionVariant: 'secondary' as const,
-        containerClass: 'bg-error/5 border border-error/20 rounded-2xl p-8',
-        contentClass: 'flex flex-col items-center justify-center py-12 text-center',
-      };
+      }
     case 'no-matches':
       return {
         icon: 'lucide:search-x',
-        iconClass: 'w-16 h-16 rounded-2xl bg-bg-elevated border border-border-subtle flex items-center justify-center mx-auto mb-6',
-        iconSize: 'w-8 h-8',
+        iconClass: 'flex size-16 items-center justify-center rounded-2xl bg-gray-100',
+        iconColor: 'text-gray-400',
         title: `No matching ${props.viewMode === 'all' ? 'reviews' : props.viewMode === 'pr' ? 'pull requests' : 'repositories'}`,
         description: "Try adjusting your search or filters to find what you're looking for.",
-        showAction: true,
-        actionLabel: 'Clear all filters',
-        actionIcon: 'lucide:x-circle',
-        actionVariant: 'secondary' as const,
-        containerClass: 'flex items-center justify-center py-16',
-        contentClass: 'text-center max-w-md',
-      };
+      }
     case 'no-data':
     default:
       return {
         icon: 'lucide:git-pull-request',
-        iconClass: 'w-20 h-20 rounded-2xl bg-bg-elevated border border-border-subtle flex items-center justify-center mx-auto mb-6 shadow-sm',
-        iconSize: 'w-10 h-10',
+        iconClass: 'flex size-16 items-center justify-center rounded-2xl bg-gray-100',
+        iconColor: 'text-gray-400',
         title: 'No reviews yet',
         description: 'Code reviews will appear here when pull requests are opened in your connected repositories.',
-        showAction: !!props.workspaceSlug,
-        actionLabel: 'View Repositories',
-        actionIcon: 'lucide:folder-git-2',
-        actionVariant: 'primary' as const,
-        containerClass: 'h-full flex flex-col items-center justify-center',
-        contentClass: 'text-center max-w-md',
-      };
+      }
   }
-});
-
-const handleAction = () => {
-  if (props.type === 'error') {
-    emit('retry');
-  } else if (props.type === 'no-matches') {
-    emit('clearFilters');
-  }
-};
+})
 </script>
 
 <template>
-  <div :class="config.containerClass">
-    <div :class="config.contentClass">
-      <div :class="config.iconClass">
-        <Icon
-          :name="config.icon"
-          :class="[config.iconSize, type !== 'error' && 'text-text-muted']"
-        />
-      </div>
-      <h3
-        class="font-bold text-text-primary mb-2"
-        :class="type === 'no-data' ? 'text-2xl mb-3' : 'text-xl'"
-      >
-        {{ config.title }}
-      </h3>
-      <p
-        class="text-sm text-text-secondary leading-relaxed"
-        :class="type === 'no-data' ? 'mb-8' : 'mb-6'"
-      >
-        {{ config.description }}
-      </p>
+  <div class="py-16 text-center">
+    <div
+      class="mx-auto mb-6"
+      :class="config.iconClass"
+    >
+      <Icon
+        :name="config.icon"
+        class="size-8"
+        :class="config.iconColor"
+      />
+    </div>
+
+    <h3 class="text-lg font-semibold text-gray-900">
+      {{ config.title }}
+    </h3>
+
+    <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500">
+      {{ config.description }}
+    </p>
+
+    <!-- Actions -->
+    <div class="mt-6">
       <NuxtLink
         v-if="type === 'no-data' && workspaceSlug"
         :to="`/${workspaceSlug}/repositories`"
-      >
-        <BaseButton :variant="config.actionVariant">
-          <Icon
-            :name="config.actionIcon"
-            class="w-4 h-4 mr-2"
-          />
-          {{ config.actionLabel }}
-        </BaseButton>
-      </NuxtLink>
-      <BaseButton
-        v-else-if="config.showAction"
-        :variant="config.actionVariant"
-        :size="type === 'no-matches' ? 'sm' : undefined"
-        @click="handleAction"
+        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
       >
         <Icon
-          :name="config.actionIcon"
-          class="w-4 h-4 mr-2"
+          name="lucide:folder-git-2"
+          class="size-4"
         />
-        {{ config.actionLabel }}
-      </BaseButton>
+        View Repositories
+      </NuxtLink>
+
+      <button
+        v-else-if="type === 'no-matches'"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        @click="emit('clearFilters')"
+      >
+        <Icon
+          name="lucide:x-circle"
+          class="size-4"
+        />
+        Clear all filters
+      </button>
+
+      <button
+        v-else-if="type === 'error'"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        @click="emit('retry')"
+      >
+        <Icon
+          name="lucide:refresh-cw"
+          class="size-4"
+        />
+        Try Again
+      </button>
     </div>
   </div>
 </template>
