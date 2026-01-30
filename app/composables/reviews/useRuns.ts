@@ -47,7 +47,7 @@ export function useRuns(workspaceId: Ref<number | null>) {
         workspaceId.value,
         repositoryId,
         page,
-        pagination.value.perPage
+        pagination.value.perPage,
       );
 
       runs.value = response.data;

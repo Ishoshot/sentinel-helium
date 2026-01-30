@@ -83,6 +83,42 @@ const duration = computed(() => {
 
 const reviewSummary = computed(() => run.value?.summary ?? run.value?.metadata?.review_summary)
 const metrics = computed(() => run.value?.metrics)
+const policySnapshot = computed(() => run.value?.policy_snapshot)
+
+const policySource = computed(() => {
+  const source = policySnapshot.value?.config_source
+
+  if (source === 'branch') {
+    return {
+      label: 'Repository config',
+      detail: policySnapshot.value?.config_branch ? `Branch: ${policySnapshot.value.config_branch}` : null,
+    }
+  }
+
+  if (source === 'settings') {
+    return { label: 'Workspace settings', detail: null }
+  }
+
+  return { label: 'Default policy', detail: null }
+})
+
+const confidenceThreshold = computed(() => {
+  const value = policySnapshot.value?.confidence_thresholds?.finding
+  return typeof value === 'number' ? value : null
+})
+
+const confidenceLabel = computed(() => {
+  if (confidenceThreshold.value === null) return 'Not set'
+  const percent = Math.round(confidenceThreshold.value * 100)
+  return `${confidenceThreshold.value.toFixed(2)} (${percent}%)`
+})
+
+const enabledRules = computed(() => policySnapshot.value?.enabled_rules ?? [])
+const ignoredPaths = computed(() => policySnapshot.value?.ignored_paths ?? [])
+
+const formatRuleLabel = (rule: string) => rule
+  .replace(/_/g, ' ')
+  .replace(/\b\w/g, (match) => match.toUpperCase())
 
 const verdictBadge = computed(() => {
   const verdict = reviewSummary.value?.verdict as RunVerdict | undefined
@@ -569,6 +605,121 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
               />
               <span class="font-mono text-2xl font-bold text-text-primary">{{ duration || '-' }}</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Policy Snapshot -->
+      <section
+        v-if="policySnapshot"
+        class="mb-8 overflow-hidden rounded-2xl border border-border-subtle bg-bg-elevated shadow-sm"
+      >
+        <div class="border-b border-border-subtle bg-bg-surface/50 p-6">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-xl bg-bg-elevated">
+              <Icon
+                name="lucide:sliders-horizontal"
+                class="size-5 text-text-muted"
+              />
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-text-primary">
+                Policy
+              </h2>
+              <p class="text-xs text-text-muted">
+                Snapshot of the review policy used for this run
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid gap-6 p-6 lg:grid-cols-2">
+          <div class="flex items-start gap-3">
+            <div class="flex size-9 items-center justify-center rounded-lg border border-border-subtle bg-bg-surface">
+              <Icon
+                name="lucide:folder-check"
+                class="size-4 text-text-muted"
+              />
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                Policy Source
+              </p>
+              <p class="text-sm font-semibold text-text-primary">
+                {{ policySource.label }}
+              </p>
+              <p
+                v-if="policySource.detail"
+                class="text-xs text-text-muted"
+              >
+                {{ policySource.detail }}
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="flex size-9 items-center justify-center rounded-lg border border-border-subtle bg-bg-surface">
+              <Icon
+                name="lucide:target"
+                class="size-4 text-text-muted"
+              />
+            </div>
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-wider text-text-muted">
+                Confidence Threshold
+              </p>
+              <p class="text-sm font-semibold text-text-primary">
+                {{ confidenceLabel }}
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Enabled Rules
+            </p>
+            <div
+              v-if="enabledRules.length > 0"
+              class="flex flex-wrap gap-2"
+            >
+              <span
+                v-for="rule in enabledRules"
+                :key="rule"
+                class="inline-flex items-center rounded-full border border-border-subtle bg-bg-surface px-3 py-1 text-xs font-semibold text-text-secondary"
+              >
+                {{ formatRuleLabel(rule) }}
+              </span>
+            </div>
+            <p
+              v-else
+              class="text-sm text-text-muted"
+            >
+              No enabled rules configured
+            </p>
+          </div>
+
+          <div class="lg:col-span-2">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+              Ignored Paths
+            </p>
+            <div
+              v-if="ignoredPaths.length > 0"
+              class="flex flex-wrap gap-2"
+            >
+              <span
+                v-for="path in ignoredPaths"
+                :key="path"
+                class="inline-flex items-center rounded-full border border-border-subtle bg-bg-elevated px-3 py-1 text-xs font-mono text-text-secondary"
+              >
+                {{ path }}
+              </span>
+            </div>
+            <p
+              v-else
+              class="text-sm text-text-muted"
+            >
+              No ignored paths configured
+            </p>
           </div>
         </div>
       </section>

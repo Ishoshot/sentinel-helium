@@ -24,6 +24,7 @@ export interface FindingMetadata {
 export interface Finding {
   id: number;
   run_id: number;
+  finding_hash?: string | null;
   severity: FindingSeverity | string;
   category: string;
   title: string;
@@ -73,6 +74,18 @@ export interface RunSummary {
   recommendations?: readonly string[];
 }
 
+export interface PromptSnapshot {
+  system: {
+    version: string;
+    hash: string;
+  };
+  user: {
+    version: string;
+    hash: string;
+  };
+  hash_algorithm: string;
+}
+
 export interface Run {
   id: number;
   repository_id: number;
@@ -93,8 +106,25 @@ export interface Run {
     policy_version: number;
     enabled_rules: readonly string[];
     severity_thresholds: Record<string, string>;
+    confidence_thresholds?: Record<string, number>;
     comment_limits: Record<string, number>;
     ignored_paths: readonly string[];
+    tone?: string;
+    language?: string;
+    focus?: readonly string[];
+    annotations?: {
+      style: string;
+      post_threshold: string;
+      grouped: boolean;
+      include_suggestions: boolean;
+    };
+    provider?: {
+      preferred: string | null;
+      model: string | null;
+      fallback: boolean;
+    };
+    config_source?: string;
+    config_branch?: string;
   } | null;
   pull_request: PullRequest | null;
   summary: RunSummary | null;
@@ -110,6 +140,7 @@ export interface Run {
     skip_message?: string;
     /** @deprecated Use run.summary instead */
     review_summary?: RunSummary;
+    prompt_snapshot?: PromptSnapshot;
     [key: string]: unknown;
   } | null;
   repository?: Repository;

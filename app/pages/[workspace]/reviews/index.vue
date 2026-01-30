@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { useWorkspaceStore } from '~/stores/useWorkspaceStore';
-import { useGitHubService } from '~/services/integrations/githubService';
-import { useRuns, type WorkspaceRunsParams } from '~/composables/reviews/useRuns';
-import type { Repository } from '~/types';
-import { useAppToast } from '~/composables/shared/useAppToast';
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
+import { useGitHubService } from '~/services/integrations/githubService'
+import { useRuns, type WorkspaceRunsParams } from '~/composables/reviews/useRuns'
+import type { Repository } from '~/types'
+import { useAppToast } from '~/composables/shared/useAppToast'
+
+/**
+ * Code Reviews page
+ * Monitor and manage code reviews across repositories
+ */
 
 definePageMeta({
   middleware: ['auth', 'workspace'],
-});
+})
 
-const workspaceStore = useWorkspaceStore();
-const githubService = useGitHubService();
-const toast = useAppToast();
+const workspaceStore = useWorkspaceStore()
+const githubService = useGitHubService()
+const toast = useAppToast()
 
-const workspaceId = computed(() => workspaceStore.currentWorkspaceId);
-const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '');
+const workspaceId = computed(() => workspaceStore.currentWorkspaceId)
+const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? '')
 
 // Composables
 const {
@@ -25,27 +30,28 @@ const {
   error,
   fetchWorkspaceRuns,
   pagination,
-} = useRuns(workspaceId);
+} = useRuns(workspaceId)
 
 // State
-const repositories = ref<Repository[]>([]);
-const isLoadingRepos = ref(false);
-const isInitializing = ref(true);
+const repositories = ref<Repository[]>([])
+const isLoadingRepos = ref(false)
+const isInitializing = ref(true)
+
 // View mode
-const viewMode = ref<'all' | 'pr' | 'repository'>('all');
+const viewMode = ref<'all' | 'pr' | 'repository'>('all')
 
 // Filter state
-const search = ref('');
-const statusFilter = ref<string | null>(null);
-const riskFilter = ref<string | null>(null);
-const repositoryFilter = ref<number | null>(null);
-const authorFilter = ref<string | null>(null);
-const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, to: null });
-const sortOrder = ref<'asc' | 'desc'>('desc');
-const sortBy = ref<'created_at' | 'completed_at' | 'findings_count'>('created_at');
+const search = ref('')
+const statusFilter = ref<string | null>(null)
+const riskFilter = ref<string | null>(null)
+const repositoryFilter = ref<number | null>(null)
+const authorFilter = ref<string | null>(null)
+const dateRange = ref<{ from: string | null; to: string | null }>({ from: null, to: null })
+const sortOrder = ref<'asc' | 'desc'>('desc')
+const sortBy = ref<'created_at' | 'completed_at' | 'findings_count'>('created_at')
 
 // Debounced search
-const debouncedSearch = refDebounced(search, 300);
+const debouncedSearch = refDebounced(search, 300)
 
 // Check if any filters are active
 const hasActiveFilters = computed(() =>
@@ -58,7 +64,7 @@ const hasActiveFilters = computed(() =>
       dateRange.value.from ||
       dateRange.value.to
   )
-);
+)
 
 // Build query params
 const queryParams = computed<WorkspaceRunsParams>(() => ({
@@ -73,35 +79,36 @@ const queryParams = computed<WorkspaceRunsParams>(() => ({
   sortBy: sortBy.value,
   sortOrder: sortOrder.value,
   groupBy: viewMode.value === 'all' ? null : viewMode.value,
-}));
+}))
 
 // Load repositories for filter
 const fetchRepositories = async () => {
-  if (!workspaceId.value) return;
-  isLoadingRepos.value = true;
+  if (!workspaceId.value) return
+  isLoadingRepos.value = true
   try {
-    repositories.value = await githubService.listRepositories(workspaceId.value);
+    const response = await githubService.listRepositories(workspaceId.value)
+    repositories.value = response.data
   } catch (e) {
-    console.error('Failed to load repositories', e);
-    toast.error('Failed to load repositories');
+    console.error('Failed to load repositories', e)
+    toast.error('Failed to load repositories')
   } finally {
-    isLoadingRepos.value = false;
+    isLoadingRepos.value = false
   }
-};
+}
 
 // Unified fetch that handles all view modes
 const fetchData = async (params: WorkspaceRunsParams = {}, showToast = false) => {
-  await fetchWorkspaceRuns(params);
+  await fetchWorkspaceRuns(params)
 
   if (showToast && !error.value) {
-    toast.success('Reviews refreshed successfully');
+    toast.success('Reviews refreshed')
   }
-};
+}
 
 // Fetch runs when params change
 watch(queryParams, async (params) => {
-  await fetchData(params);
-}, { immediate: false });
+  await fetchData(params)
+}, { immediate: false })
 
 // Initial fetch
 onMounted(async () => {
@@ -110,191 +117,194 @@ onMounted(async () => {
       await Promise.all([
         fetchData(queryParams.value),
         fetchRepositories()
-      ]);
+      ])
     }
   } finally {
-    isInitializing.value = false;
+    isInitializing.value = false
   }
-});
+})
 
 // Filter handlers
 const clearFilters = () => {
-  search.value = '';
-  statusFilter.value = null;
-  riskFilter.value = null;
-  repositoryFilter.value = null;
-  authorFilter.value = null;
-  dateRange.value = { from: null, to: null };
-};
+  search.value = ''
+  statusFilter.value = null
+  riskFilter.value = null
+  repositoryFilter.value = null
+  authorFilter.value = null
+  dateRange.value = { from: null, to: null }
+}
 
 // Pagination
 const loadPage = async (page: number) => {
-  await fetchData({ ...queryParams.value, page });
-};
+  await fetchData({ ...queryParams.value, page })
+}
 
 // Current view item type for pagination
 const currentItemType = computed(() => {
-  if (viewMode.value === 'pr') return 'pull requests';
-  if (viewMode.value === 'repository') return 'repositories';
-  return 'reviews';
-});
+  if (viewMode.value === 'pr') return 'pull requests'
+  if (viewMode.value === 'repository') return 'repositories'
+  return 'reviews'
+})
 
 // Check if current view has data
 const hasData = computed(() => {
-  if (viewMode.value === 'all') return runs.value.length > 0;
-  if (viewMode.value === 'pr') return prGroups.value.length > 0;
-  return repositoryGroups.value.length > 0;
-});
+  if (viewMode.value === 'all') return runs.value.length > 0
+  if (viewMode.value === 'pr') return prGroups.value.length > 0
+  return repositoryGroups.value.length > 0
+})
 
 // Show no-data empty state (when no filters and no data)
 const showNoDataState = computed(() =>
   !hasData.value && !hasActiveFilters.value && !isLoading.value && !isInitializing.value
-);
+)
 
 // Show no-matches empty state (when filters applied but no results)
 const showNoMatchesState = computed(() =>
   !hasData.value && hasActiveFilters.value && !isLoading.value && !isInitializing.value
-);
+)
+
+// Stats
+const completedCount = computed(() => runs.value.filter(r => r.status === 'completed').length)
+const inProgressCount = computed(() => runs.value.filter(r => r.status === 'in_progress' || r.status === 'queued').length)
 </script>
 
 <template>
-  <BaseContainer>
-    <div class="min-h-[calc(100vh-64px)] lg:h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
-      <!-- Header -->
-      <div class="px-4 sm:px-6 lg:px-8 py-8 border-b border-border-subtle bg-bg-app shrink-0">
-        <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between mb-6">
-          <div class="flex-1">
-            <h1 class="text-3xl font-bold text-text-primary tracking-tight">
-              Code Reviews
-            </h1>
-            <p class="mt-2 text-sm text-text-secondary">
-              Monitor and manage all code reviews across your repositories
-            </p>
-          </div>
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              class="group relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed"
-              :class="isLoading
-                ? 'bg-bg-elevated border border-border-subtle text-text-secondary'
-                : 'bg-bg-elevated border border-border-subtle text-text-secondary hover:border-accent hover:text-accent hover:shadow-sm hover:scale-105'"
-              :disabled="isLoading"
-              @click="fetchData(queryParams, true)"
-            >
-              <Icon
-                name="lucide:refresh-cw"
-                class="w-4 h-4 transition-transform duration-300"
-                :class="{ 'animate-spin': isLoading, 'group-hover:rotate-180': !isLoading }"
-              />
-              <span>{{ isLoading ? 'Refreshing...' : 'Refresh' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- View Mode Toggle -->
-        <div class="mb-8">
-          <DomainReviewsRunsViewModeToggle v-model="viewMode" />
-        </div>
-
-        <!-- Filters -->
-        <DomainReviewsRunsFilterBar
-          v-model:search="search"
-          v-model:status-filter="statusFilter"
-          v-model:risk-filter="riskFilter"
-          v-model:repository-filter="repositoryFilter"
-          v-model:author-filter="authorFilter"
-          v-model:date-range="dateRange"
-          v-model:sort-by="sortBy"
-          v-model:sort-order="sortOrder"
-          :repositories="repositories"
-          :is-loading-repos="isLoadingRepos"
-          @clear-filters="clearFilters"
-        />
+  <BaseContainer class="space-y-8">
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-900">
+          Code Reviews
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+          {{ pagination.total }} {{ pagination.total === 1 ? 'review' : 'reviews' }}
+          <template v-if="completedCount > 0">
+            · {{ completedCount }} completed
+          </template>
+          <template v-if="inProgressCount > 0">
+            · {{ inProgressCount }} in progress
+          </template>
+        </p>
       </div>
 
-      <!-- Content Area -->
-      <div class="flex-1 overflow-auto bg-bg-app px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Loading State (Initial) -->
-        <div
-          v-if="(isLoading || isInitializing) && !hasData"
-          class="space-y-5"
-        >
-          <BaseSkeleton class="h-32 w-full rounded-2xl" />
-          <BaseSkeleton class="h-32 w-full rounded-2xl" />
-          <BaseSkeleton class="h-32 w-full rounded-2xl" />
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        :disabled="isLoading"
+        @click="fetchData(queryParams, true)"
+      >
+        <Icon
+          name="lucide:refresh-cw"
+          class="size-4"
+          :class="{ 'animate-spin': isLoading }"
+        />
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+
+    <!-- View Mode Toggle -->
+    <DomainReviewsRunsViewModeToggle v-model="viewMode" />
+
+    <!-- Filters -->
+    <DomainReviewsRunsFilterBar
+      v-model:search="search"
+      v-model:status-filter="statusFilter"
+      v-model:risk-filter="riskFilter"
+      v-model:repository-filter="repositoryFilter"
+      v-model:author-filter="authorFilter"
+      v-model:date-range="dateRange"
+      v-model:sort-by="sortBy"
+      v-model:sort-order="sortOrder"
+      :repositories="repositories"
+      :is-loading-repos="isLoadingRepos"
+      @clear-filters="clearFilters"
+    />
+
+    <!-- Loading State -->
+    <div
+      v-if="(isLoading || isInitializing) && !hasData"
+      class="space-y-3"
+    >
+      <div
+        v-for="i in 4"
+        :key="i"
+        class="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4"
+      >
+        <BaseSkeleton class="size-10 rounded-lg" />
+        <div class="flex-1 space-y-2">
+          <BaseSkeleton class="h-4 w-48" />
+          <BaseSkeleton class="h-3 w-72" />
         </div>
-
-        <!-- Error State -->
-        <DomainReviewsRunsEmptyState
-          v-else-if="error"
-          type="error"
-          :error-message="error"
-          @retry="fetchData(queryParams, true)"
-        />
-
-        <!-- Empty State (No Data) -->
-        <DomainReviewsRunsEmptyState
-          v-else-if="showNoDataState"
-          type="no-data"
-          :workspace-slug="workspaceSlug"
-        />
-
-        <!-- Empty State (No Matches) -->
-        <DomainReviewsRunsEmptyState
-          v-else-if="showNoMatchesState"
-          type="no-matches"
-          :view-mode="viewMode"
-          @clear-filters="clearFilters"
-        />
-
-        <!-- Content by View Mode -->
-        <div
-          v-else
-          class="space-y-8 pb-8"
-        >
-          <!-- All Runs View (Default) -->
-          <DomainReviewsRunsTable
-            v-if="viewMode === 'all'"
-            :runs="runs"
-            :workspace-slug="workspaceSlug"
-          />
-
-          <!-- By Pull Request View -->
-          <div
-            v-else-if="viewMode === 'pr'"
-            class="space-y-4"
-          >
-            <DomainReviewsPullRequestGroup
-              v-for="group in prGroups"
-              :key="`${group.repository.id}-${group.pull_request_number}`"
-              :group="group"
-            />
-          </div>
-
-          <!-- By Repository View -->
-          <div
-            v-else-if="viewMode === 'repository'"
-            class="space-y-4"
-          >
-            <DomainReviewsRepositoryGroup
-              v-for="group in repositoryGroups"
-              :key="group.repository.id"
-              :group="group"
-            />
-          </div>
-
-          <!-- Pagination -->
-          <DomainReviewsRunsPagination
-            :current-page="pagination.currentPage"
-            :last-page="pagination.lastPage"
-            :from="pagination.from"
-            :to="pagination.to"
-            :total="pagination.total"
-            :item-type="currentItemType"
-            @load-page="loadPage"
-          />
-        </div>
+        <BaseSkeleton class="h-6 w-20 rounded-full" />
       </div>
     </div>
+
+    <!-- Error State -->
+    <DomainReviewsRunsEmptyState
+      v-else-if="error"
+      type="error"
+      :error-message="error"
+      @retry="fetchData(queryParams, true)"
+    />
+
+    <!-- Empty State (No Data) -->
+    <DomainReviewsRunsEmptyState
+      v-else-if="showNoDataState"
+      type="no-data"
+      :workspace-slug="workspaceSlug"
+    />
+
+    <!-- Empty State (No Matches) -->
+    <DomainReviewsRunsEmptyState
+      v-else-if="showNoMatchesState"
+      type="no-matches"
+      :view-mode="viewMode"
+      @clear-filters="clearFilters"
+    />
+
+    <!-- Content -->
+    <template v-else>
+      <!-- All Runs View -->
+      <DomainReviewsRunsTable
+        v-if="viewMode === 'all'"
+        :runs="runs"
+        :workspace-slug="workspaceSlug"
+      />
+
+      <!-- By Pull Request View -->
+      <div
+        v-else-if="viewMode === 'pr'"
+        class="space-y-3"
+      >
+        <DomainReviewsPullRequestGroup
+          v-for="group in prGroups"
+          :key="`${group.repository.id}-${group.pull_request_number}`"
+          :group="group"
+        />
+      </div>
+
+      <!-- By Repository View -->
+      <div
+        v-else-if="viewMode === 'repository'"
+        class="space-y-3"
+      >
+        <DomainReviewsRepositoryGroup
+          v-for="group in repositoryGroups"
+          :key="group.repository.id"
+          :group="group"
+        />
+      </div>
+
+      <!-- Pagination -->
+      <DomainReviewsRunsPagination
+        :current-page="pagination.currentPage"
+        :last-page="pagination.lastPage"
+        :from="pagination.from"
+        :to="pagination.to"
+        :total="pagination.total"
+        :item-type="currentItemType"
+        @load-page="loadPage"
+      />
+    </template>
   </BaseContainer>
 </template>
