@@ -4,7 +4,7 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useSentinelConfig } from '~/composables/repositories/useSentinelConfig'
 
 /**
- * RepositoryCard - Grid view card for a repository
+ * RepositoryCard - Clean grid view card for a repository
  */
 
 interface Props {
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
   canManage: false,
 })
 
-const emit = defineEmits<{
+defineEmits<{
   toggleAutoReview: [repositoryId: number]
   openSettings: [repositoryId: number]
 }>()
@@ -59,142 +59,137 @@ const githubUrl = computed(
 </script>
 
 <template>
-  <div class="group bg-bg-elevated border border-border-subtle rounded-2xl p-6 hover:border-border-muted hover:shadow-lg transition-all duration-200 flex flex-col h-full">
+  <div class="group flex h-full flex-col rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300">
     <!-- Header -->
-    <div class="flex items-start justify-between gap-4 mb-5">
+    <div class="flex items-start justify-between gap-3 p-4">
       <div class="flex items-center gap-3 min-w-0 flex-1">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bg-surface to-bg-elevated border border-border-subtle flex items-center justify-center shrink-0 shadow-sm">
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
           <Icon
             :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
-            class="w-6 h-6 text-text-muted"
+            class="size-5 text-gray-500"
           />
         </div>
         <div class="min-w-0 flex-1">
-          <h3 class="text-base font-bold text-text-primary truncate leading-tight">
+          <h3 class="truncate text-sm font-semibold text-gray-900">
             {{ repository.name }}
           </h3>
-          <p class="text-sm text-text-muted truncate mt-1">
+          <p class="truncate text-xs text-gray-500">
             {{ repository.owner }}
           </p>
         </div>
       </div>
 
-      <!-- Auto-review indicator -->
-      <div class="flex flex-col items-end gap-2 shrink-0">
-        <div
-          v-if="configStatus !== 'default'"
-          class="px-3 py-1 rounded-lg text-xs font-semibold ring-1 ring-inset flex items-center gap-1.5"
-          :class="configStatus === 'error'
-            ? 'bg-warning/10 text-warning ring-warning/20'
-            : 'bg-accent/10 text-accent ring-accent/20'"
-          :title="configStatus === 'error' ? 'Configuration error' : 'Configuration active'"
-        >
-          <Icon
-            :name="configStatus === 'error' ? 'lucide:alert-triangle' : 'lucide:check-circle-2'"
-            class="w-3.5 h-3.5"
-          />
-          <span>{{ configStatus === 'error' ? 'Error' : 'Config' }}</span>
-        </div>
-
-        <div
-          class="px-3 py-1 rounded-lg text-xs font-semibold ring-1 ring-inset"
+      <!-- Status -->
+      <div class="flex flex-col items-end gap-1.5 shrink-0">
+        <span
+          class="rounded px-1.5 py-0.5 text-[10px] font-medium"
           :class="repository.auto_review_enabled
-            ? 'bg-success/10 text-success ring-success/20'
-            : 'bg-bg-surface text-text-muted ring-border-subtle'"
+            ? 'bg-emerald-50 text-emerald-700'
+            : 'bg-gray-100 text-gray-500'"
         >
           {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
-        </div>
+        </span>
+        <span
+          v-if="configStatus === 'active'"
+          class="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700"
+        >
+          Config
+        </span>
+        <span
+          v-else-if="configStatus === 'error'"
+          class="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
+        >
+          Error
+        </span>
       </div>
     </div>
 
     <!-- Description -->
-    <p
-      v-if="repository.description"
-      class="text-sm text-text-secondary mb-6 line-clamp-2 flex-1 leading-relaxed"
-    >
-      {{ repository.description }}
-    </p>
-    <div
-      v-else
-      class="flex-1 mb-6"
-    >
-      <span class="text-sm text-text-muted italic">No description provided</span>
+    <div class="flex-1 px-4">
+      <p
+        v-if="repository.description"
+        class="line-clamp-2 text-sm text-gray-500"
+      >
+        {{ repository.description }}
+      </p>
+      <p
+        v-else
+        class="text-sm italic text-gray-400"
+      >
+        No description
+      </p>
     </div>
 
     <!-- Meta -->
-    <div class="flex items-center gap-5 text-sm text-text-muted mb-6 font-semibold">
+    <div class="flex items-center gap-4 px-4 py-3 text-xs text-gray-400">
       <span
         v-if="repository.language"
-        class="flex items-center gap-2"
+        class="flex items-center gap-1.5"
       >
         <span
-          class="w-2.5 h-2.5 rounded-full ring-1 ring-inset ring-black/10"
+          class="size-2 rounded-full"
           :class="languageColor"
         />
         {{ repository.language }}
       </span>
-      <span class="flex items-center gap-2">
+      <span class="flex items-center gap-1.5">
         <Icon
           name="lucide:git-branch"
-          class="w-4 h-4"
+          class="size-3.5"
         />
         {{ repository.default_branch }}
       </span>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between pt-5 border-t border-border-subtle mt-auto">
-      <!-- Open in GitHub -->
+    <div class="flex items-center justify-between border-t border-gray-100 p-3">
       <a
         :href="githubUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-2 text-sm font-semibold text-text-muted hover:text-text-primary transition-colors"
+        class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600"
       >
         <Icon
           name="lucide:external-link"
-          class="w-4 h-4"
+          class="size-3.5"
         />
         GitHub
       </a>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
         <NuxtLink
           :to="runsUrl"
-          class="p-2.5 text-text-muted hover:text-text-primary rounded-xl hover:bg-bg-surface transition-all hover:shadow-sm"
-          title="View runs history"
+          class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          title="View runs"
         >
           <Icon
             name="lucide:history"
-            class="w-5 h-5"
+            class="size-4"
           />
         </NuxtLink>
 
         <template v-if="canManage">
           <button
-            class="p-2.5 rounded-xl transition-all hover:shadow-sm"
-            :class="[
-              repository.auto_review_enabled
-                ? 'text-success hover:bg-success/10'
-                : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
-            ]"
+            class="rounded p-1.5 transition-colors"
+            :class="repository.auto_review_enabled
+              ? 'text-emerald-500 hover:bg-emerald-50'
+              : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
             :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
             @click="$emit('toggleAutoReview', repository.id)"
           >
             <Icon
               :name="repository.auto_review_enabled ? 'lucide:toggle-right' : 'lucide:toggle-left'"
-              class="w-5 h-5"
+              class="size-4"
             />
           </button>
           <button
-            class="p-2.5 text-text-muted hover:text-text-primary rounded-xl hover:bg-bg-surface transition-all hover:shadow-sm"
-            title="Repository settings"
+            class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            title="Settings"
             @click="$emit('openSettings', repository.id)"
           >
             <Icon
               name="lucide:settings"
-              class="w-5 h-5"
+              class="size-4"
             />
           </button>
         </template>

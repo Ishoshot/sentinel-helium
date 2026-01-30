@@ -5,10 +5,11 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useAppToast } from '~/composables/shared/useAppToast'
 import { useProviderKeys } from '~/composables/integrations/useProviderKeys'
 import { useSentinelConfig } from '~/composables/repositories/useSentinelConfig'
+import { useGitHub } from '~/composables/integrations/useGitHub'
 
 /**
- * RepositorySettingsModal - Configure repository settings
- * Premium design with organized sections
+ * RepositorySettingsModal - Premium repository configuration
+ * Sleek, modern design with organized sections and smooth interactions
  */
 
 interface Props {
@@ -58,6 +59,8 @@ const hasSelectedProviderKey = computed((): boolean => {
 const { hasConfig, error: configError, hasError, syncedAtLabel, configJson, config } =
   useSentinelConfig(computed(() => props.repository?.settings))
 
+const { createConfigPr, isCreatingConfigPr } = useGitHub(workspaceId)
+
 const {
   providerKeys,
   aiOptions,
@@ -72,7 +75,6 @@ const {
   availableProviders,
 } = useProviderKeys(workspaceId, repositoryId)
 
-// Provider icons mapping
 const providerIcons: Record<string, string> = {
   anthropic: 'lucide:brain',
   openai: 'lucide:zap',
@@ -80,14 +82,19 @@ const providerIcons: Record<string, string> = {
   mistral: 'lucide:wind',
 }
 
-// Watch provider selection to fetch AI options
+const providerColors: Record<string, { bg: string; text: string; border: string }> = {
+  anthropic: { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-200' },
+  openai: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
+  google: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
+  mistral: { bg: 'bg-violet-50', text: 'text-violet-600', border: 'border-violet-200' },
+}
+
 watch(
   () => newKeyProvider.value,
   async (provider) => {
     newKeyModelId.value = null
     if (provider) {
       await fetchAiOptions(provider as AiProvider)
-      // Auto-select the default model
       const defaultOption = aiOptions.value.find((opt: AiOption) => opt.is_default)
       if (defaultOption) {
         newKeyModelId.value = defaultOption.id
@@ -96,36 +103,30 @@ watch(
   }
 )
 
-// Initialize form when repository changes
 watch(
   () => props.repository,
   (repo) => {
     if (repo) {
       autoReviewEnabled.value = repo.auto_review_enabled
-      // Reset API keys form
       showAddKeyForm.value = false
       newKeyProvider.value = ''
       newKeyValue.value = ''
       newKeyModelId.value = null
-      // Fetch keys
       fetchProviderKeys()
     }
   },
   { immediate: true }
 )
 
-// Reset form when modal closes
 watch(
   () => props.modelValue,
   (isOpen) => {
     if (!isOpen) {
-      // Reset on close
       autoReviewEnabled.value = props.repository?.auto_review_enabled ?? false
       showConfigViewer.value = false
       showAddKeyForm.value = false
       keyToDelete.value = null
     } else {
-      // Ensure keys are fresh when opening
       if (props.repository) {
         fetchProviderKeys()
       }
@@ -133,14 +134,11 @@ watch(
   }
 )
 
-// Check if form has changes
 const hasChanges = computed(() => {
   if (!props.repository) return false
-
   return autoReviewEnabled.value !== props.repository.auto_review_enabled
 })
 
-// Handle save
 function handleSave() {
   const data: UpdateRepositoryData = {
     auto_review_enabled: autoReviewEnabled.value,
@@ -148,7 +146,6 @@ function handleSave() {
   emit('save', data)
 }
 
-// Handle Add Key
 async function handleAddKey() {
   if (!newKeyProvider.value || !newKeyValue.value) return
 
@@ -159,41 +156,37 @@ async function handleAddKey() {
       newKeyValue.value,
       newKeyModelId.value ?? undefined
     )
-    toast.success('Provider key configured successfully')
+    toast.success('API key configured')
     showAddKeyForm.value = false
     newKeyProvider.value = ''
     newKeyValue.value = ''
     newKeyModelId.value = null
   } catch (e) {
-    toast.error(e instanceof Error ? e.message : 'Failed to save provider key')
+    toast.error(e instanceof Error ? e.message : 'Failed to save')
   } finally {
     isSubmittingKey.value = false
   }
 }
 
-// Handle Delete Key
 async function handleDeleteKey() {
   if (!keyToDelete.value) return
 
-  isSubmittingKey.value = true // Reuse submitting state for delete loading
+  isSubmittingKey.value = true
   try {
     await deleteProviderKey(keyToDelete.value)
-    toast.success('Provider key deleted successfully')
+    toast.success('API key deleted')
     keyToDelete.value = null
   } catch (e) {
-    toast.error(e instanceof Error ? e.message : 'Failed to delete provider key')
+    toast.error(e instanceof Error ? e.message : 'Failed to delete')
   } finally {
     isSubmittingKey.value = false
   }
 }
 
-// Handle Edit Key - Start editing
 async function handleStartEdit(key: ProviderKey) {
   keyToEdit.value = key
   editModelId.value = key.ai_model?.id ?? null
-  // Fetch options for this provider
   await fetchAiOptions(key.provider)
-  // If no model was selected, auto-select default
   if (editModelId.value === null) {
     const defaultOption = aiOptions.value.find((opt: AiOption) => opt.is_default)
     if (defaultOption) {
@@ -202,295 +195,708 @@ async function handleStartEdit(key: ProviderKey) {
   }
 }
 
-// Handle Save Edit
 async function handleSaveEdit() {
   if (!keyToEdit.value) return
 
   isSubmittingKey.value = true
   try {
     await updateProviderKeyModel(keyToEdit.value.id, editModelId.value)
-    toast.success('AI model updated successfully')
+    toast.success('Model updated')
     keyToEdit.value = null
     editModelId.value = null
   } catch (e) {
-    toast.error(e instanceof Error ? e.message : 'Failed to update AI model')
+    toast.error(e instanceof Error ? e.message : 'Failed to update')
   } finally {
     isSubmittingKey.value = false
   }
 }
 
-// Handle Cancel Edit
 function handleCancelEdit() {
   keyToEdit.value = null
   editModelId.value = null
 }
 
-// Close modal
 function close() {
   emit('update:modelValue', false)
+}
+
+function getProviderColor(provider: string) {
+  return providerColors[provider] || { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' }
+}
+
+async function handleCreateConfigPr() {
+  if (!props.repository) return
+
+  try {
+    const response = await createConfigPr(props.repository.id)
+    if (response?.status === 'ready' && response.compare_url) {
+      window.open(response.compare_url, '_blank', 'noopener,noreferrer')
+      toast.success('Config branch ready - create your PR on GitHub')
+    } else if (response?.status === 'skipped') {
+      toast.info(response.message ?? 'Skipped')
+    } else if (response?.status === 'error') {
+      toast.error(response.message ?? 'An error occurred')
+    }
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : 'Failed to prepare config branch')
+  }
 }
 </script>
 
 <template>
-  <BaseModal
-    :model-value="modelValue"
-    title="Repository Settings"
-    size="xl"
-    @update:model-value="$emit('update:modelValue', $event)"
-  >
-    <template #header>
-      <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-xl bg-accent/10">
-          <Icon
-            name="lucide:settings-2"
-            class="size-5 text-accent"
-          />
-        </div>
-        <div>
-          <h2 class="text-lg font-semibold text-text-primary">
-            Repository Settings
-          </h2>
-          <p
-            v-if="repository"
-            class="text-sm text-text-muted"
-          >
-            {{ repository.full_name }}
-          </p>
-        </div>
-      </div>
-    </template>
-
-    <div
-      v-if="repository"
-      class="max-h-[60vh] space-y-6 overflow-y-auto pr-2"
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <!-- Auto-review Section -->
-      <div class="rounded-xl border border-border-subtle bg-bg-surface/50 px-6 py-5">
-        <div class="flex items-start justify-between gap-6">
-          <div class="flex items-start gap-3">
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-              <Icon
-                name="lucide:bot"
-                class="size-5 text-accent"
-              />
-            </div>
-            <div>
-              <p class="font-medium text-text-primary">
-                Automatic Code Reviews
-              </p>
-              <p class="mt-0.5 text-sm text-text-muted">
-                Sentinel will automatically review pull requests when opened
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-            :class="autoReviewEnabled ? 'bg-accent' : 'bg-border-muted'"
-            role="switch"
-            :aria-checked="autoReviewEnabled"
-            @click="autoReviewEnabled = !autoReviewEnabled"
-          >
-            <span
-              class="pointer-events-none inline-block size-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-              :class="autoReviewEnabled ? 'translate-x-5' : 'translate-x-0'"
-            />
-          </button>
-        </div>
-      </div>
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      >
+        <!-- Backdrop -->
+        <div
+          class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+          @click="close"
+        />
 
-      <!-- API Keys Section -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between gap-6">
-          <div class="flex items-center gap-4">
-            <div class="flex size-10 items-center justify-center rounded-lg bg-amber-500/10">
-              <Icon
-                name="lucide:key"
-                class="size-5 text-amber-500"
-              />
-            </div>
-            <div>
-              <h4 class="font-medium text-text-primary">
-                API Keys
-              </h4>
-              <p class="text-xs text-text-muted">
-                Configure AI provider keys for this repository
-              </p>
-            </div>
-          </div>
-          <button
-            v-if="canManage && !showAddKeyForm"
-            type="button"
-            class="inline-flex items-center gap-1.5 rounded-lg bg-text-primary px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-text-secondary"
-            @click="showAddKeyForm = true"
-          >
-            <Icon
-              name="lucide:plus"
-              class="size-3.5"
-            />
-            Add Key
-          </button>
-        </div>
-
-        <!-- Add Key Form -->
+        <!-- Modal -->
         <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 -translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-2"
+          enter-active-class="transition ease-out duration-300"
+          enter-from-class="opacity-0 translate-y-4 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition ease-in duration-200"
+          leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 translate-y-4 scale-95"
         >
           <div
-            v-if="showAddKeyForm"
-            class="overflow-hidden rounded-xl border border-accent/20 bg-accent/5"
+            v-if="modelValue"
+            class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl"
           >
-            <div class="border-b border-accent/10 bg-accent/5 px-4 py-3">
-              <div class="flex items-center justify-between">
-                <h5 class="flex items-center gap-2 text-sm font-medium text-text-primary">
+            <!-- Header -->
+            <div class="relative border-b border-slate-100 px-6 py-5">
+              <div class="flex items-center gap-4">
+                <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 shadow-lg">
                   <Icon
-                    name="lucide:plus-circle"
-                    class="size-4 text-accent"
+                    name="lucide:folder-git-2"
+                    class="size-6 text-white"
                   />
-                  Add New API Key
-                </h5>
+                </div>
+                <div class="flex-1">
+                  <h2 class="text-lg font-semibold text-slate-900">
+                    Repository Settings
+                  </h2>
+                  <p
+                    v-if="repository"
+                    class="mt-0.5 text-sm text-slate-500"
+                  >
+                    {{ repository.full_name }}
+                  </p>
+                </div>
                 <button
-                  type="button"
-                  class="rounded-lg p-1 text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
-                  @click="showAddKeyForm = false"
+                  class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                  @click="close"
                 >
                   <Icon
                     name="lucide:x"
-                    class="size-4"
+                    class="size-5"
                   />
                 </button>
               </div>
             </div>
 
-            <div class="space-y-4 p-4">
-              <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium text-text-secondary">Provider</label>
-                  <div class="relative">
-                    <select
-                      v-model="newKeyProvider"
-                      class="h-10 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-8 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+            <!-- Body -->
+            <div
+              v-if="repository"
+              class="max-h-[65vh] space-y-6 overflow-y-auto p-6"
+            >
+              <!-- Auto-review Section -->
+              <div class="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-5">
+                <div class="flex items-center justify-between gap-4">
+                  <div class="flex items-center gap-4">
+                    <div
+                      class="flex size-11 items-center justify-center rounded-xl"
+                      :class="autoReviewEnabled ? 'bg-emerald-100' : 'bg-slate-100'"
                     >
-                      <option
-                        value=""
-                        disabled
-                      >
-                        Select provider...
-                      </option>
-                      <option
-                        v-for="provider in AI_PROVIDERS"
-                        :key="provider.value"
-                        :value="provider.value"
-                      >
-                        {{ provider.label }}
-                      </option>
-                    </select>
-                    <Icon
-                      name="lucide:chevron-down"
-                      class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
+                      <Icon
+                        :name="autoReviewEnabled ? 'lucide:zap' : 'lucide:zap-off'"
+                        class="size-5"
+                        :class="autoReviewEnabled ? 'text-emerald-600' : 'text-slate-400'"
+                      />
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-900">
+                        Automatic Reviews
+                      </p>
+                      <p class="mt-0.5 text-sm text-slate-500">
+                        Review PRs automatically when opened
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Toggle Switch -->
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="autoReviewEnabled"
+                    class="relative h-7 w-12 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    :class="autoReviewEnabled ? 'bg-emerald-500' : 'bg-slate-200'"
+                    @click="autoReviewEnabled = !autoReviewEnabled"
+                  >
+                    <span
+                      class="absolute left-0.5 top-0.5 size-6 rounded-full bg-white shadow-md transition-transform duration-200"
+                      :class="autoReviewEnabled ? 'translate-x-5' : 'translate-x-0'"
                     />
+                  </button>
+                </div>
+              </div>
+
+              <!-- API Keys Section -->
+              <div class="space-y-4 py-2">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="flex size-9 items-center justify-center rounded-lg bg-amber-100">
+                      <Icon
+                        name="lucide:key"
+                        class="size-4 text-amber-600"
+                      />
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-900">
+                        API Keys
+                      </p>
+                      <p class="text-xs text-slate-500">
+                        Bring your own provider keys
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    v-if="canManage && !showAddKeyForm"
+                    type="button"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
+                    @click="showAddKeyForm = true"
+                  >
+                    <Icon
+                      name="lucide:plus"
+                      class="size-3.5"
+                    />
+                    Add Key
+                  </button>
+                </div>
+
+                <!-- Add Key Form -->
+                <Transition
+                  enter-active-class="transition duration-200 ease-out"
+                  enter-from-class="opacity-0 -translate-y-2"
+                  enter-to-class="opacity-100 translate-y-0"
+                  leave-active-class="transition duration-150 ease-in"
+                  leave-from-class="opacity-100"
+                  leave-to-class="opacity-0 -translate-y-2"
+                >
+                  <div
+                    v-if="showAddKeyForm"
+                    class="overflow-hidden rounded-xl border border-slate-200 bg-white"
+                  >
+                    <div class="border-b border-slate-100 px-4 py-3">
+                      <div class="flex items-center justify-between">
+                        <h5 class="flex items-center gap-2 text-sm font-medium text-slate-900">
+                          <Icon
+                            name="lucide:plus-circle"
+                            class="size-4 text-slate-500"
+                          />
+                          New API Key
+                        </h5>
+                        <button
+                          type="button"
+                          class="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          @click="showAddKeyForm = false"
+                        >
+                          <Icon
+                            name="lucide:x"
+                            class="size-4"
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="space-y-4 bg-slate-50 p-4">
+                      <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label class="mb-1.5 block text-xs font-medium text-slate-700">Provider</label>
+                          <div class="relative">
+                            <select
+                              v-model="newKeyProvider"
+                              class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                            >
+                              <option
+                                value=""
+                                disabled
+                              >
+                                Select provider...
+                              </option>
+                              <option
+                                v-for="provider in AI_PROVIDERS"
+                                :key="provider.value"
+                                :value="provider.value"
+                              >
+                                {{ provider.label }}
+                              </option>
+                            </select>
+                            <Icon
+                              name="lucide:chevron-down"
+                              class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label class="mb-1.5 block text-xs font-medium text-slate-700">API Key</label>
+                          <div class="relative">
+                            <input
+                              v-model="newKeyValue"
+                              :type="showKeyInput ? 'text' : 'password'"
+                              class="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 font-mono text-sm text-slate-900 transition-all duration-200 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                              placeholder="sk-..."
+                            >
+                            <button
+                              type="button"
+                              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                              @click="showKeyInput = !showKeyInput"
+                            >
+                              <Icon
+                                :name="showKeyInput ? 'lucide:eye-off' : 'lucide:eye'"
+                                class="size-4"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Model Selection -->
+                      <div v-if="newKeyProvider && aiOptions.length > 0">
+                        <label class="mb-1.5 block text-xs font-medium text-slate-700">AI Model</label>
+                        <div class="relative">
+                          <select
+                            v-model="newKeyModelId"
+                            class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                            :disabled="isLoadingOptions"
+                          >
+                            <option
+                              v-for="option in aiOptions"
+                              :key="option.id"
+                              :value="option.id"
+                            >
+                              {{ option.name }}{{ option.is_default ? ' (Default)' : '' }}
+                            </option>
+                          </select>
+                          <Icon
+                            v-if="isLoadingOptions"
+                            name="lucide:loader-2"
+                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-slate-400"
+                          />
+                          <Icon
+                            v-else
+                            name="lucide:chevron-down"
+                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <Icon
+                          name="lucide:shield-check"
+                          class="size-3.5 text-emerald-500"
+                        />
+                        <span>Encrypted at rest. Never displayed again.</span>
+                      </div>
+
+                      <div
+                        v-if="hasSelectedProviderKey"
+                        class="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-700"
+                      >
+                        <Icon
+                          name="lucide:alert-triangle"
+                          class="mt-0.5 size-4 shrink-0"
+                        />
+                        <span>This will replace your existing {{ AI_PROVIDERS.find(p => p.value === newKeyProvider)?.label }} key.</span>
+                      </div>
+
+                      <div class="flex justify-end gap-2 border-t border-slate-200 pt-4">
+                        <button
+                          type="button"
+                          class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
+                          @click="showAddKeyForm = false"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                          :disabled="!newKeyProvider || !newKeyValue || isSubmittingKey"
+                          @click="handleAddKey"
+                        >
+                          <Icon
+                            v-if="isSubmittingKey"
+                            name="lucide:loader-2"
+                            class="size-4 animate-spin"
+                          />
+                          {{ isSubmittingKey ? 'Saving...' : 'Save Key' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Transition>
+
+                <!-- Keys List -->
+                <div
+                  v-if="isLoadingKeys"
+                  class="flex justify-center py-8"
+                >
+                  <Icon
+                    name="lucide:loader-2"
+                    class="size-6 animate-spin text-slate-400"
+                  />
+                </div>
+
+                <div
+                  v-else-if="providerKeys.length > 0"
+                  class="space-y-2"
+                >
+                  <div
+                    v-for="key in providerKeys"
+                    :key="key.id"
+                    class="group overflow-hidden rounded-xl border transition-all duration-200"
+                    :class="keyToEdit?.id === key.id ? 'border-slate-300 bg-slate-50' : 'border-slate-200 bg-white hover:border-slate-300'"
+                  >
+                    <!-- Edit Mode -->
+                    <div
+                      v-if="keyToEdit?.id === key.id"
+                      class="p-4"
+                    >
+                      <div class="mb-4 flex items-center gap-3">
+                        <div
+                          class="flex size-10 items-center justify-center rounded-lg border"
+                          :class="[getProviderColor(key.provider).bg, getProviderColor(key.provider).border]"
+                        >
+                          <Icon
+                            :name="providerIcons[key.provider] ?? 'lucide:key'"
+                            class="size-5"
+                            :class="getProviderColor(key.provider).text"
+                          />
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold text-slate-900">
+                            {{ key.provider_label }}
+                          </p>
+                          <p class="text-xs text-slate-500">
+                            Select AI model
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="relative mb-4">
+                        <select
+                          v-model="editModelId"
+                          class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                          :disabled="isLoadingOptions"
+                        >
+                          <option
+                            v-for="option in aiOptions"
+                            :key="option.id"
+                            :value="option.id"
+                          >
+                            {{ option.name }}{{ option.is_default ? ' (Default)' : '' }}
+                          </option>
+                        </select>
+                        <Icon
+                          v-if="isLoadingOptions"
+                          name="lucide:loader-2"
+                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-slate-400"
+                        />
+                        <Icon
+                          v-else
+                          name="lucide:chevron-down"
+                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                        />
+                      </div>
+
+                      <div class="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          class="rounded-lg px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                          @click="handleCancelEdit"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                          :disabled="isSubmittingKey"
+                          @click="handleSaveEdit"
+                        >
+                          <Icon
+                            v-if="isSubmittingKey"
+                            name="lucide:loader-2"
+                            class="size-3.5 animate-spin"
+                          />
+                          Save
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- View Mode -->
+                    <div
+                      v-else
+                      class="flex items-center justify-between p-4"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex size-10 items-center justify-center rounded-lg border"
+                          :class="[getProviderColor(key.provider).bg, getProviderColor(key.provider).border]"
+                        >
+                          <Icon
+                            :name="providerIcons[key.provider] ?? 'lucide:key'"
+                            class="size-5"
+                            :class="getProviderColor(key.provider).text"
+                          />
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold text-slate-900">
+                            {{ key.provider_label }}
+                          </p>
+                          <div class="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+                            <span class="flex size-1.5 rounded-full bg-emerald-500" />
+                            <span class="font-mono">{{ key.ai_model?.name || 'Default model' }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        v-if="canManage"
+                        class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                      >
+                        <button
+                          type="button"
+                          class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          title="Edit"
+                          @click="handleStartEdit(key)"
+                        >
+                          <Icon
+                            name="lucide:pencil"
+                            class="size-4"
+                          />
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                          title="Delete"
+                          @click="keyToDelete = key.id"
+                        >
+                          <Icon
+                            name="lucide:trash-2"
+                            class="size-4"
+                          />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium text-text-secondary">API Key</label>
-                  <div class="relative">
-                    <input
-                      v-model="newKeyValue"
-                      :type="showKeyInput ? 'text' : 'password'"
-                      class="h-10 w-full rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                      placeholder="sk-..."
-                    >
+                <!-- Empty State -->
+                <div
+                  v-else-if="!showAddKeyForm"
+                  class="rounded-xl border-2 border-dashed border-slate-200 p-8 text-center"
+                >
+                  <div class="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-slate-100">
+                    <Icon
+                      name="lucide:key"
+                      class="size-5 text-slate-400"
+                    />
+                  </div>
+                  <p class="text-sm font-medium text-slate-900">
+                    No API keys configured
+                  </p>
+                  <p class="mt-1 text-xs text-slate-500">
+                    Add your own key to enable reviews
+                  </p>
+                </div>
+              </div>
+
+              <!-- Configuration Section -->
+              <div class="space-y-4 py-2">
+                <div class="flex items-center gap-3">
+                  <div class="flex size-9 items-center justify-center rounded-lg bg-violet-100">
+                    <Icon
+                      name="lucide:file-code"
+                      class="size-4 text-violet-600"
+                    />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-900">
+                      Configuration
+                    </p>
+                    <p class="text-xs text-slate-500">
+                      .sentinel/config.yaml
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Config Error -->
+                <div
+                  v-if="hasError"
+                  class="rounded-xl border border-red-200 bg-red-50 p-4"
+                >
+                  <div class="flex items-start gap-3">
+                    <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-red-100">
+                      <Icon
+                        name="lucide:alert-circle"
+                        class="size-4 text-red-600"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-red-800">
+                        Configuration Error
+                      </p>
+                      <p class="mt-1 whitespace-pre-line text-xs text-red-600">
+                        {{ configError }}
+                      </p>
+                      <p class="mt-2 text-xs text-red-500">
+                        Last sync: {{ syncedAtLabel }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Config Active -->
+                <div
+                  v-else-if="hasConfig"
+                  class="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-4"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                        <Icon
+                          name="lucide:check"
+                          class="size-4 text-emerald-600"
+                        />
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-slate-900">
+                          Configuration Active
+                        </p>
+                        <p class="text-xs text-slate-500">
+                          Synced {{ syncedAtLabel }}
+                        </p>
+
+                        <div
+                          v-if="config?.provider"
+                          class="mt-3 flex flex-wrap gap-2"
+                        >
+                          <span
+                            v-if="config.provider.preferred"
+                            class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600"
+                          >
+                            <Icon
+                              name="lucide:bot"
+                              class="size-3"
+                            />
+                            {{ config.provider.preferred }}
+                          </span>
+                          <span
+                            v-if="config.provider.model"
+                            class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600"
+                          >
+                            {{ config.provider.model }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                     <button
                       type="button"
-                      class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-colors hover:text-text-primary"
-                      @click="showKeyInput = !showKeyInput"
+                      class="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                      @click="showConfigViewer = true"
+                    >
+                      View
+                    </button>
+                  </div>
+                </div>
+
+                <!-- No Config -->
+                <div
+                  v-else
+                  class="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-200">
+                        <Icon
+                          name="lucide:file-question"
+                          class="size-4 text-slate-500"
+                        />
+                      </div>
+                      <div>
+                        <p class="text-sm text-slate-600">
+                          Using default settings
+                        </p>
+                        <p class="mt-1 text-xs text-slate-500">
+                          Create <code class="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px]">.sentinel/config.yaml</code> to customize
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      v-if="canManage"
+                      type="button"
+                      class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-indigo-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      :disabled="isCreatingConfigPr"
+                      @click="handleCreateConfigPr"
                     >
                       <Icon
-                        :name="showKeyInput ? 'lucide:eye-off' : 'lucide:eye'"
-                        class="size-4"
+                        v-if="isCreatingConfigPr"
+                        name="lucide:loader-2"
+                        class="size-3.5 animate-spin"
                       />
+                      <Icon
+                        v-else
+                        name="lucide:git-pull-request"
+                        class="size-3.5"
+                      />
+                      Create Config PR
                     </button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- AI Model Selection -->
-              <div v-if="newKeyProvider && aiOptions.length > 0">
-                <label class="mb-1.5 block text-xs font-medium text-text-secondary">AI Model</label>
-                <div class="relative">
-                  <select
-                    v-model="newKeyModelId"
-                    class="h-10 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-8 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                    :disabled="isLoadingOptions"
-                  >
-                    <option
-                      v-for="option in aiOptions"
-                      :key="option.id"
-                      :value="option.id"
-                    >
-                      {{ option.name }}{{ option.is_default ? ' (Default)' : '' }}
-                    </option>
-                  </select>
-                  <Icon
-                    v-if="isLoadingOptions"
-                    name="lucide:loader-2"
-                    class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-text-muted"
-                  />
-                  <Icon
-                    v-else
-                    name="lucide:chevron-down"
-                    class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
-                  />
-                </div>
-                <p
-                  v-if="aiOptions.find(o => o.id === newKeyModelId)?.description"
-                  class="mt-1.5 text-xs text-text-muted"
-                >
-                  {{ aiOptions.find(o => o.id === newKeyModelId)?.description }}
-                </p>
-              </div>
-
-              <p class="flex items-start gap-2 text-xs text-text-muted">
-                <Icon
-                  name="lucide:lock"
-                  class="mt-0.5 size-3 shrink-0"
-                />
-                Your key is encrypted and will never be displayed again.
-              </p>
-
-              <div
-                v-if="hasSelectedProviderKey"
-                class="flex items-start gap-2 rounded-lg bg-warning/10 p-3 text-xs text-warning"
+            <!-- Footer -->
+            <div class="flex items-center justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-4">
+              <p
+                v-if="!canManage"
+                class="text-xs text-slate-500"
               >
-                <Icon
-                  name="lucide:alert-triangle"
-                  class="mt-0.5 size-4 shrink-0"
-                />
-                <span>A key for this provider already exists. Saving will replace it.</span>
-              </div>
-
-              <div class="flex justify-end gap-2 border-t border-border-subtle pt-4">
+                Admin permissions required
+              </p>
+              <div
+                v-else
+                class="flex-1"
+              />
+              <div class="flex items-center gap-3">
                 <button
                   type="button"
-                  class="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-surface"
-                  @click="showAddKeyForm = false"
+                  class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                  @click="close"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
-                  :disabled="!newKeyProvider || !newKeyValue || isSubmittingKey"
-                  @click="handleAddKey"
+                  class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  :disabled="!hasChanges || !canManage || isUpdating"
+                  @click="handleSave"
                 >
                   <Icon
-                    v-if="isSubmittingKey"
+                    v-if="isUpdating"
                     name="lucide:loader-2"
                     class="size-4 animate-spin"
                   />
@@ -499,383 +905,36 @@ function close() {
                     name="lucide:check"
                     class="size-4"
                   />
-                  {{ isSubmittingKey ? 'Saving...' : 'Save Key' }}
+                  Save Changes
                 </button>
               </div>
             </div>
           </div>
         </Transition>
-
-        <!-- Keys List -->
-        <div
-          v-if="isLoadingKeys"
-          class="flex justify-center py-8"
-        >
-          <Icon
-            name="lucide:loader-2"
-            class="size-6 animate-spin text-text-muted"
-          />
-        </div>
-
-        <div
-          v-else-if="providerKeys.length > 0"
-          class="space-y-2"
-        >
-          <div
-            v-for="key in providerKeys"
-            :key="key.id"
-            class="group rounded-xl border border-border-subtle bg-bg-elevated px-5 py-4 transition-colors hover:border-border-muted"
-          >
-            <!-- Edit Mode -->
-            <div
-              v-if="keyToEdit?.id === key.id"
-              class="space-y-4"
-            >
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-bg-surface">
-                  <Icon
-                    :name="providerIcons[key.provider] ?? 'lucide:key'"
-                    class="size-5 text-text-secondary"
-                  />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-text-primary">
-                    {{ key.provider_label }}
-                  </p>
-                  <p class="text-xs text-text-muted">
-                    Change AI model
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <label class="mb-1.5 block text-xs font-medium text-text-secondary">AI Model</label>
-                <div class="relative">
-                  <select
-                    v-model="editModelId"
-                    class="h-10 w-full appearance-none rounded-lg border border-border-subtle bg-bg-surface px-3 pr-8 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                    :disabled="isLoadingOptions"
-                  >
-                    <option
-                      v-for="option in aiOptions"
-                      :key="option.id"
-                      :value="option.id"
-                    >
-                      {{ option.name }}{{ option.is_default ? ' (Default)' : '' }}
-                    </option>
-                  </select>
-                  <Icon
-                    v-if="isLoadingOptions"
-                    name="lucide:loader-2"
-                    class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-text-muted"
-                  />
-                  <Icon
-                    v-else
-                    name="lucide:chevron-down"
-                    class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
-                  />
-                </div>
-                <p
-                  v-if="aiOptions.find(o => o.id === editModelId)?.description"
-                  class="mt-1.5 text-xs text-text-muted"
-                >
-                  {{ aiOptions.find(o => o.id === editModelId)?.description }}
-                </p>
-              </div>
-
-              <div class="flex justify-end gap-2">
-                <button
-                  type="button"
-                  class="rounded-lg px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-surface"
-                  @click="handleCancelEdit"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
-                  :disabled="isSubmittingKey"
-                  @click="handleSaveEdit"
-                >
-                  <Icon
-                    v-if="isSubmittingKey"
-                    name="lucide:loader-2"
-                    class="size-3.5 animate-spin"
-                  />
-                  <Icon
-                    v-else
-                    name="lucide:check"
-                    class="size-3.5"
-                  />
-                  Save
-                </button>
-              </div>
-            </div>
-
-            <!-- View Mode -->
-            <div
-              v-else
-              class="flex items-center justify-between gap-6"
-            >
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-bg-surface">
-                  <Icon
-                    :name="providerIcons[key.provider] ?? 'lucide:key'"
-                    class="size-5 text-text-secondary"
-                  />
-                </div>
-                <div>
-                  <p class="text-sm font-medium text-text-primary">
-                    {{ key.provider_label }}
-                  </p>
-                  <div class="mt-0.5 flex items-center gap-1.5 text-xs text-text-muted">
-                    <span class="flex size-1.5 rounded-full bg-success" />
-                    <span v-if="key.ai_model">{{ key.ai_model.name }}</span>
-                    <span v-else>Default model</span>
-                  </div>
-                </div>
-              </div>
-              <div
-                v-if="canManage"
-                class="flex items-center gap-2"
-              >
-                <button
-                  type="button"
-                  class="rounded-lg px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
-                  @click="handleStartEdit(key)"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  class="rounded-lg px-3 py-1.5 text-xs font-medium text-text-muted transition-colors hover:bg-error/10 hover:text-error"
-                  @click="keyToDelete = key.id"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          v-else-if="!showAddKeyForm"
-          class="flex flex-col items-center rounded-xl border border-dashed border-border-subtle p-8 text-center"
-        >
-          <div class="mb-3 flex size-12 items-center justify-center rounded-full bg-bg-surface">
-            <Icon
-              name="lucide:key"
-              class="size-6 text-text-muted"
-            />
-          </div>
-          <p class="text-sm font-medium text-text-primary">
-            No API keys configured
-          </p>
-          <p class="mt-1 text-xs text-text-muted">
-            Add an API key to enable reviews for this repository
-          </p>
-        </div>
       </div>
-
-      <!-- Sentinel Configuration Section -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-4">
-          <div class="flex size-10 items-center justify-center rounded-lg bg-violet-500/10">
-            <Icon
-              name="lucide:file-code"
-              class="size-5 text-violet-500"
-            />
-          </div>
-          <div>
-            <h4 class="font-medium text-text-primary">
-              Sentinel Configuration
-            </h4>
-            <p class="text-xs text-text-muted">
-              Repository-specific review settings
-            </p>
-          </div>
-        </div>
-
-        <!-- Config Error -->
-        <div
-          v-if="hasError"
-          class="rounded-xl border border-warning/20 bg-warning/5 px-5 py-4"
-        >
-          <div class="flex items-start gap-4">
-            <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/10">
-              <Icon
-                name="lucide:alert-triangle"
-                class="size-4 text-warning"
-              />
-            </div>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-text-primary">
-                Configuration Error
-              </p>
-              <p class="mt-1 whitespace-pre-line text-sm text-text-secondary">
-                {{ configError }}
-              </p>
-              <p class="mt-2 text-xs text-text-muted">
-                Reviews are skipped until this is fixed.
-              </p>
-              <p class="text-xs text-text-muted">
-                Last sync: {{ syncedAtLabel }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Config Active -->
-        <div
-          v-else-if="hasConfig"
-          class="rounded-xl border border-border-subtle bg-bg-surface/50 px-5 py-4"
-        >
-          <div class="flex items-start justify-between gap-6">
-            <div class="flex items-start gap-4">
-              <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-success/10">
-                <Icon
-                  name="lucide:check-circle"
-                  class="size-4 text-success"
-                />
-              </div>
-              <div>
-                <p class="text-sm font-medium text-text-primary">
-                  Configuration Active
-                </p>
-                <p class="text-xs text-text-muted">
-                  Last synced: {{ syncedAtLabel }}
-                </p>
-
-                <!-- AI Provider Info -->
-                <div
-                  v-if="config?.provider"
-                  class="mt-3 space-y-1.5 border-t border-border-subtle pt-3"
-                >
-                  <p class="text-xs font-medium text-text-secondary">
-                    AI Provider Settings
-                  </p>
-                  <div
-                    v-if="config.provider.preferred"
-                    class="flex items-center gap-2 text-xs text-text-muted"
-                  >
-                    <Icon
-                      name="lucide:bot"
-                      class="size-3.5"
-                    />
-                    Provider: <span class="font-medium text-text-primary">{{ config.provider.preferred }}</span>
-                  </div>
-                  <div
-                    v-if="config.provider.model"
-                    class="flex items-center gap-2 text-xs text-text-muted"
-                  >
-                    <Icon
-                      name="lucide:cpu"
-                      class="size-3.5"
-                    />
-                    Model: <span class="font-medium text-text-primary">{{ config.provider.model }}</span>
-                  </div>
-                  <div
-                    v-if="config.provider.fallback !== undefined"
-                    class="flex items-center gap-2 text-xs text-text-muted"
-                  >
-                    <Icon
-                      name="lucide:shield-check"
-                      class="size-3.5"
-                    />
-                    Fallback: <span class="font-medium text-text-primary">{{ config.provider.fallback ? 'Enabled' : 'Disabled' }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              class="shrink-0 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs font-medium text-text-primary transition-colors hover:bg-bg-surface"
-              @click="showConfigViewer = true"
-            >
-              View Config
-            </button>
-          </div>
-        </div>
-
-        <!-- No Config -->
-        <div
-          v-else
-          class="rounded-xl border border-border-subtle bg-bg-surface/50 px-5 py-4"
-        >
-          <div class="flex items-start gap-4">
-            <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-surface">
-              <Icon
-                name="lucide:file-question"
-                class="size-4 text-text-muted"
-              />
-            </div>
-            <div>
-              <p class="text-sm text-text-secondary">
-                Using Sentinel's default settings
-              </p>
-              <p class="mt-1 text-xs text-text-muted">
-                Create <code class="rounded bg-bg-surface px-1.5 py-0.5 font-mono text-[10px]">.sentinel/config.yaml</code> to customize.
-              </p>
-              <p class="mt-1 text-xs text-text-muted">
-                Last checked: {{ syncedAtLabel }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <template #footer>
-      <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-        <p
-          v-if="!canManage"
-          class="text-xs text-text-muted"
-        >
-          You need admin permissions to modify settings.
-        </p>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <BaseButton
-            variant="secondary"
-            @click="close"
-          >
-            Cancel
-          </BaseButton>
-          <BaseButton
-            :loading="isUpdating"
-            :disabled="!hasChanges || !canManage"
-            @click="handleSave"
-          >
-            <Icon
-              name="lucide:check"
-              class="size-4"
-            />
-            Save Changes
-          </BaseButton>
-        </div>
-      </div>
-    </template>
-  </BaseModal>
+    </Transition>
+  </Teleport>
 
   <!-- Config Viewer Modal -->
   <BaseModal
     :model-value="showConfigViewer"
-    title=".sentinel/config.yaml"
+    title="Configuration"
     size="lg"
     @update:model-value="showConfigViewer = $event"
   >
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-xl bg-violet-500/10">
+        <div class="flex size-10 items-center justify-center rounded-xl bg-violet-100">
           <Icon
             name="lucide:file-code"
-            class="size-5 text-violet-500"
+            class="size-5 text-violet-600"
           />
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-text-primary">
+          <h2 class="text-lg font-semibold text-slate-900">
             .sentinel/config.yaml
           </h2>
-          <p class="text-xs text-text-muted">
+          <p class="text-xs text-slate-500">
             Last synced: {{ syncedAtLabel }}
           </p>
         </div>
@@ -884,7 +943,7 @@ function close() {
 
     <div
       v-if="configJson"
-      class="max-h-[60vh] overflow-auto rounded-xl border border-border-subtle"
+      class="max-h-[60vh] overflow-auto rounded-xl border border-slate-200"
     >
       <BaseCodeBlock
         :code="configJson"
@@ -899,32 +958,33 @@ function close() {
     >
       <Icon
         name="lucide:file-x"
-        class="mb-3 size-8 text-text-muted"
+        class="mb-3 size-8 text-slate-400"
       />
-      <p class="text-sm text-text-muted">
-        No configuration found.
+      <p class="text-sm text-slate-500">
+        No configuration found
       </p>
     </div>
 
     <template #footer>
       <div class="flex justify-end">
-        <BaseButton
-          variant="secondary"
+        <button
+          type="button"
+          class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
           @click="showConfigViewer = false"
         >
           Close
-        </BaseButton>
+        </button>
       </div>
     </template>
   </BaseModal>
 
-  <!-- Delete Key Confirmation -->
+  <!-- Delete Confirmation -->
   <BaseConfirmModal
     :model-value="!!keyToDelete"
     title="Delete API Key?"
-    message="Are you sure you want to delete this API key? This will disable automated reviews until a new key is configured."
+    message="This will disable automated reviews until a new key is configured."
     variant="danger"
-    confirm-label="Delete Key"
+    confirm-label="Delete"
     :loading="isSubmittingKey"
     @update:model-value="!$event && (keyToDelete = null)"
     @confirm="handleDeleteKey"

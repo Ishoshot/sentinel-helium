@@ -4,7 +4,7 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useSentinelConfig } from '~/composables/repositories/useSentinelConfig'
 
 /**
- * RepositoryRow - Displays a single repository with its settings
+ * RepositoryRow - Clean, functional repository list item
  */
 
 interface Props {
@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
   canManage: false,
 })
 
-const emit = defineEmits<{
+defineEmits<{
   toggleAutoReview: [repositoryId: number]
   openSettings: [repositoryId: number]
 }>()
@@ -59,148 +59,136 @@ const githubUrl = computed(
 </script>
 
 <template>
-  <div class="group bg-bg-elevated border border-border-subtle rounded-2xl p-6 hover:border-border-muted hover:shadow-lg transition-all duration-200">
-    <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
-      <!-- Repository info -->
-      <div class="flex items-start gap-5 flex-1 min-w-0">
-        <!-- Icon -->
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-bg-surface to-bg-elevated border border-border-subtle flex items-center justify-center shrink-0 shadow-sm">
-          <Icon
-            :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
-            class="w-6 h-6 text-text-muted"
-          />
-        </div>
-
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-3 mb-3 min-w-0 flex-wrap">
-            <!-- Repository name -->
-            <h3 class="text-base font-bold text-text-primary truncate max-w-full sm:max-w-[50%] leading-tight">
-              {{ repository.full_name }}
-            </h3>
-
-            <!-- Language -->
-            <div
-              v-if="repository.language"
-              class="flex items-center gap-2 shrink-0"
-            >
-              <span
-                class="w-2.5 h-2.5 rounded-full ring-1 ring-inset ring-black/10"
-                :class="languageColor"
-              />
-              <span class="text-sm font-semibold text-text-muted">
-                {{ repository.language }}
-              </span>
-            </div>
-
-            <!-- Auto-review badge -->
-            <div
-              class="shrink-0 px-3 py-1 rounded-lg text-sm font-semibold ring-1 ring-inset"
-              :class="repository.auto_review_enabled
-                ? 'bg-success/10 text-success ring-success/20'
-                : 'bg-bg-surface text-text-muted ring-border-subtle'"
-            >
-              {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
-            </div>
-
-            <div
-              v-if="configStatus !== 'default'"
-              class="shrink-0 px-3 py-1 rounded-lg text-sm font-semibold ring-1 ring-inset flex items-center gap-2"
-              :class="configStatus === 'error'
-                ? 'bg-warning/10 text-warning ring-warning/20'
-                : 'bg-accent/10 text-accent ring-accent/20'"
-              :title="configStatus === 'error' ? 'Configuration error' : 'Configuration active'"
-            >
-              <Icon
-                :name="configStatus === 'error' ? 'lucide:alert-triangle' : 'lucide:check-circle-2'"
-                class="w-4 h-4"
-              />
-              <span>{{ configStatus === 'error' ? 'Error' : 'Config' }}</span>
-            </div>
-          </div>
-
-          <!-- Description -->
-          <p
-            v-if="repository.description"
-            class="text-sm text-text-secondary mb-3 line-clamp-2 leading-relaxed"
-          >
-            {{ repository.description }}
-          </p>
-          <p
-            v-else
-            class="text-sm text-text-muted italic mb-3"
-          >
-            No description provided
-          </p>
-
-          <!-- Meta info -->
-          <div class="flex items-center gap-6 text-sm font-semibold text-text-muted">
-            <!-- Default branch -->
-            <span class="flex items-center gap-2">
-              <Icon
-                name="lucide:git-branch"
-                class="w-4 h-4"
-              />
-              {{ repository.default_branch }}
-            </span>
-
-            <!-- Open in GitHub -->
-            <a
-              :href="githubUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center gap-2 hover:text-text-primary transition-colors"
-            >
-              <Icon
-                name="lucide:external-link"
-                class="w-4 h-4"
-              />
-              GitHub
-            </a>
-          </div>
-        </div>
+  <div class="group rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300">
+    <div class="flex items-center gap-4 p-4">
+      <!-- Icon -->
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+        <Icon
+          :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
+          class="size-5 text-gray-500"
+        />
       </div>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-2 shrink-0 self-center">
-        <!-- View Runs History -->
+      <!-- Info -->
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-3">
+          <h3 class="truncate text-sm font-semibold text-gray-900">
+            {{ repository.full_name }}
+          </h3>
+
+          <!-- Language -->
+          <div
+            v-if="repository.language"
+            class="hidden items-center gap-1.5 sm:flex"
+          >
+            <span
+              class="size-2 rounded-full"
+              :class="languageColor"
+            />
+            <span class="text-xs text-gray-500">
+              {{ repository.language }}
+            </span>
+          </div>
+
+          <!-- Status badges -->
+          <div class="flex items-center gap-2">
+            <span
+              class="rounded px-1.5 py-0.5 text-[10px] font-medium"
+              :class="repository.auto_review_enabled
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'bg-gray-100 text-gray-500'"
+            >
+              {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
+            </span>
+
+            <span
+              v-if="configStatus === 'active'"
+              class="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700"
+            >
+              Config
+            </span>
+            <span
+              v-else-if="configStatus === 'error'"
+              class="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
+            >
+              Error
+            </span>
+          </div>
+        </div>
+
+        <p
+          v-if="repository.description"
+          class="mt-1 truncate text-sm text-gray-500"
+        >
+          {{ repository.description }}
+        </p>
+        <p
+          v-else
+          class="mt-1 text-sm italic text-gray-400"
+        >
+          No description
+        </p>
+      </div>
+
+      <!-- Meta -->
+      <div class="hidden items-center gap-4 text-sm text-gray-400 lg:flex">
+        <span class="flex items-center gap-1.5">
+          <Icon
+            name="lucide:git-branch"
+            class="size-4"
+          />
+          {{ repository.default_branch }}
+        </span>
+        <a
+          :href="githubUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1.5 hover:text-gray-600"
+        >
+          <Icon
+            name="lucide:external-link"
+            class="size-4"
+          />
+          GitHub
+        </a>
+      </div>
+
+      <!-- Actions - always visible on mobile, hover on desktop -->
+      <div class="flex items-center gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
         <NuxtLink
           :to="runsUrl"
-          class="p-3 text-text-muted hover:text-text-primary rounded-xl hover:bg-bg-surface transition-all hover:shadow-sm"
-          title="View runs history"
+          class="rounded p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          title="View runs"
         >
           <Icon
             name="lucide:history"
-            class="w-5 h-5"
+            class="size-4"
           />
         </NuxtLink>
 
-        <!-- Quick toggle for auto-review -->
         <template v-if="canManage">
           <button
-            class="p-3 rounded-xl transition-all hover:shadow-sm"
-            :class="[
-              repository.auto_review_enabled
-                ? 'text-success hover:bg-success/10'
-                : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
-            ]"
+            class="rounded p-2 transition-colors"
+            :class="repository.auto_review_enabled
+              ? 'text-emerald-500 hover:bg-emerald-50'
+              : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
             :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
             @click="$emit('toggleAutoReview', repository.id)"
           >
             <Icon
               :name="repository.auto_review_enabled ? 'lucide:toggle-right' : 'lucide:toggle-left'"
-              class="w-5 h-5"
+              class="size-4"
             />
           </button>
 
-          <!-- Settings button -->
           <button
-            class="p-3 text-text-muted hover:text-text-primary rounded-xl hover:bg-bg-surface transition-all hover:shadow-sm"
-            title="Repository settings"
+            class="rounded p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            title="Settings"
             @click="$emit('openSettings', repository.id)"
           >
             <Icon
               name="lucide:settings"
-              class="w-5 h-5"
+              class="size-4"
             />
           </button>
         </template>

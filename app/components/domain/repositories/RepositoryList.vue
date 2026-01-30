@@ -22,7 +22,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="space-y-5">
+  <div class="space-y-3">
     <DomainRepositoryRow
       v-for="repo in repositories"
       :key="repo.id"
