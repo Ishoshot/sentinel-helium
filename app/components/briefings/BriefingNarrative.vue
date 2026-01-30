@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { marked } from "marked";
 import DOMPurify from "dompurify";
-import type { BriefingGeneration } from "~/types";
+import type { Achievement, BriefingGeneration } from "~/types";
 import {
   getAchievementIcon,
   getAchievementColor,
@@ -100,11 +100,15 @@ async function copyExcerpt(key: string | number, value: string | undefined) {
 // Excerpt labels and icons (from shared utility)
 
 // Generation metadata
-const metadata = computed(() => props.generation.metadata);
+const aiGeneration = computed(() => props.generation.ai_generation);
 const completedAt = computed(() => {
   if (!props.generation.completed_at) return null;
   return new Date(props.generation.completed_at);
 });
+
+function getAchievementKey(achievement: Achievement, index: number): string {
+  return achievement.id ?? `${achievement.type}-${achievement.title}-${index}`;
+}
 </script>
 
 <template>
@@ -158,6 +162,30 @@ const completedAt = computed(() => {
             AI Generated
           </div>
         </div>
+
+        <div
+          v-if="aiGeneration"
+          class="mt-4 flex flex-wrap items-center gap-4 text-xs text-text-muted"
+        >
+          <span class="inline-flex items-center gap-1.5">
+            <Icon
+              name="lucide:cpu"
+              class="w-3.5 h-3.5"
+            />
+            {{ aiGeneration.provider || 'AI Provider' }}
+            <span v-if="aiGeneration.model">· {{ aiGeneration.model }}</span>
+          </span>
+          <span
+            v-if="aiGeneration.duration_ms !== null"
+            class="inline-flex items-center gap-1.5"
+          >
+            <Icon
+              name="lucide:timer"
+              class="w-3.5 h-3.5"
+            />
+            {{ Math.round(aiGeneration.duration_ms / 1000) }}s
+          </span>
+        </div>
       </header>
 
       <!-- Main narrative -->
@@ -193,8 +221,8 @@ const completedAt = computed(() => {
 
       <div class="grid gap-3 sm:grid-cols-2">
         <div
-          v-for="achievement in achievements"
-          :key="achievement.id"
+          v-for="(achievement, index) in achievements"
+          :key="getAchievementKey(achievement, index)"
           class="group relative overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated p-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
         >
           <!-- Confetti background on hover -->

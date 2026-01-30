@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * BriefingCard - Clean, professional briefing card
- * Uses flexbox to ensure consistent height with actions pinned to bottom
+ * BriefingCard - Template card for briefing types
+ * Modern design with visual hierarchy and subtle interactions
  */
 
 import type { Briefing, BriefingSubscription } from "~/types";
@@ -26,7 +26,6 @@ const emit = defineEmits<{
   info: [briefing: Briefing];
 }>();
 
-// Icon mapping for briefing types
 const iconMap: Record<string, string> = {
   standup: "lucide:coffee",
   "standup-update": "lucide:coffee",
@@ -39,12 +38,26 @@ const iconMap: Record<string, string> = {
   default: "lucide:file-text",
 };
 
+const colorMap: Record<string, { bg: string; icon: string; accent: string }> = {
+  standup: { bg: "bg-amber-100", icon: "text-amber-600", accent: "from-amber-500/10" },
+  "standup-update": { bg: "bg-amber-100", icon: "text-amber-600", accent: "from-amber-500/10" },
+  "weekly-team-summary": { bg: "bg-blue-100", icon: "text-blue-600", accent: "from-blue-500/10" },
+  "delivery-velocity": { bg: "bg-rose-100", icon: "text-rose-600", accent: "from-rose-500/10" },
+  "engineer-spotlight": { bg: "bg-violet-100", icon: "text-violet-600", accent: "from-violet-500/10" },
+  "company-update": { bg: "bg-emerald-100", icon: "text-emerald-600", accent: "from-emerald-500/10" },
+  "sprint-retrospective": { bg: "bg-cyan-100", icon: "text-cyan-600", accent: "from-cyan-500/10" },
+  "code-health": { bg: "bg-pink-100", icon: "text-pink-600", accent: "from-pink-500/10" },
+  default: { bg: "bg-slate-100", icon: "text-slate-600", accent: "from-slate-500/10" },
+};
+
 const briefingIcon = computed(() => {
-  const icon = props.briefing.icon || iconMap[props.briefing.slug] || iconMap.default;
-  return icon as string;
+  return props.briefing.icon || iconMap[props.briefing.slug] || iconMap.default;
 });
 
-// Target audience display
+const briefingColors = computed(() => {
+  return colorMap[props.briefing.slug] || colorMap.default;
+});
+
 const audienceDisplay = computed(() => {
   const roles = props.briefing.target_roles;
   if (!roles || roles.length === 0) return "Everyone";
@@ -55,28 +68,20 @@ const audienceDisplay = computed(() => {
     manager: "Managers",
     executive: "Executives",
     developer: "Developers",
-    engineering_manager: "Engineering Managers",
+    engineering_manager: "Eng. Managers",
     tech_lead: "Tech Leads",
   };
 
   return roles
     .slice(0, 2)
     .map((r) => roleLabels[r] || r.charAt(0).toUpperCase() + r.slice(1))
-    .join(", ");
+    .join(" · ");
 });
 
-// Subscription status
 const hasSubscription = computed(() => !!props.subscription?.is_active);
 const nextDelivery = computed(() => {
   if (!props.subscription?.next_scheduled_at) return null;
   return new Date(props.subscription.next_scheduled_at);
-});
-
-// Output format display
-const formatDisplay = computed(() => {
-  const formats = props.briefing.output_formats;
-  if (!formats || formats.length === 0) return "";
-  return formats.slice(0, 2).join(", ").toUpperCase();
 });
 
 function handleTitleClick() {
@@ -99,160 +104,118 @@ function handleManage() {
 </script>
 
 <template>
-  <div
-    class="group relative h-full flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
-    :class="[!isEligible && 'opacity-60 pointer-events-none']"
+  <article
+    class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md"
+    :class="[!isEligible && 'opacity-60']"
   >
-    <!-- Card content - grows to fill space -->
-    <div class="flex-1 p-5 flex flex-col">
-      <!-- Header -->
-      <div class="flex items-start gap-4 mb-3">
-        <!-- Icon -->
-        <div class="shrink-0 w-11 h-11 rounded-lg flex items-center justify-center bg-gray-100">
-          <Icon
-            :name="briefingIcon"
-            class="w-5 h-5 text-gray-600"
-          />
-        </div>
+    <!-- Subtle gradient accent on hover -->
+    <div
+      class="pointer-events-none absolute -right-20 -top-20 size-40 rounded-full bg-gradient-to-br to-transparent opacity-0 blur-3xl transition-opacity duration-300 group-hover:opacity-100"
+      :class="briefingColors.accent"
+    />
 
-        <!-- Title & Meta -->
-        <div class="flex-1 min-w-0">
-          <button
-            type="button"
-            class="text-left w-full group/title"
-            @click="handleTitleClick"
-          >
-            <h3 class="font-semibold text-gray-900 text-base leading-tight mb-1 truncate group-hover/title:text-blue-600 transition-colors">
-              {{ briefing.title }}
-            </h3>
-          </button>
-          <p class="text-xs text-gray-500">
-            {{ audienceDisplay }}
-          </p>
-        </div>
-
-        <!-- Subscription badge -->
-        <div
-          v-if="hasSubscription"
-          class="shrink-0"
-        >
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-md">
-            <Icon
-              name="lucide:bell"
-              class="w-3 h-3"
-            />
-            Active
-          </span>
-        </div>
+    <!-- Header -->
+    <div class="relative flex items-start justify-between p-4 pb-0">
+      <!-- Icon -->
+      <div
+        class="flex size-11 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105"
+        :class="briefingColors.bg"
+      >
+        <Icon
+          :name="briefingIcon"
+          class="size-5"
+          :class="briefingColors.icon"
+        />
       </div>
 
-      <!-- Description - fixed height with 3 line clamp -->
-      <p class="text-sm text-gray-600 leading-relaxed line-clamp-3 mb-4">
+      <!-- Active indicator -->
+      <div v-if="hasSubscription" class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 ring-1 ring-emerald-100">
+        <span class="relative flex size-1.5">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+        </span>
+        <span class="text-[11px] font-medium text-emerald-700">Active</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative flex flex-1 flex-col p-4">
+      <!-- Title -->
+      <button
+        type="button"
+        class="text-left"
+        @click="handleTitleClick"
+      >
+        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-slate-700">
+          {{ briefing.title }}
+        </h3>
+      </button>
+
+      <!-- Audience -->
+      <p class="mt-1 text-xs text-slate-500">
+        {{ audienceDisplay }}
+      </p>
+
+      <!-- Description -->
+      <p class="mt-2.5 line-clamp-2 flex-1 text-[13px] leading-relaxed text-slate-600">
         {{ briefing.description }}
       </p>
 
-      <!-- Tags - grows to push actions down -->
-      <div class="flex-1 flex flex-wrap content-start items-start gap-2">
-        <!-- AI Badge -->
+      <!-- Tags -->
+      <div class="mt-3 flex flex-wrap items-center gap-1.5">
         <span
           v-if="briefing.requires_ai"
-          class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-md"
+          class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 ring-1 ring-indigo-100"
         >
-          <Icon
-            name="lucide:sparkles"
-            class="w-3 h-3"
-          />
-          AI-Powered
+          <Icon name="lucide:sparkles" class="size-3" />
+          AI
         </span>
-
-        <!-- Format badge -->
-        <span
-          v-if="formatDisplay"
-          class="inline-flex items-center px-2 py-0.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-md"
-        >
-          {{ formatDisplay }}
-        </span>
-
-        <!-- Schedulable badge -->
         <span
           v-if="briefing.is_schedulable"
-          class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-md"
+          class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200"
         >
-          <Icon
-            name="lucide:calendar"
-            class="w-3 h-3"
-          />
+          <Icon name="lucide:calendar" class="size-3" />
           Schedulable
         </span>
       </div>
 
-      <!-- Next delivery info -->
-      <div
+      <!-- Next delivery -->
+      <p
         v-if="hasSubscription && nextDelivery"
-        class="mt-4 flex items-center gap-2 text-xs text-gray-500"
+        class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500"
       >
-        <Icon
-          name="lucide:clock"
-          class="w-3.5 h-3.5"
-        />
-        <span>
-          Next:
-          <time
-            :datetime="nextDelivery.toISOString()"
-            class="font-medium text-gray-700"
-          >
-            {{ nextDelivery.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) }}
-          </time>
-        </span>
-      </div>
+        <Icon name="lucide:clock" class="size-3.5" />
+        Next: {{ nextDelivery.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }}
+      </p>
     </div>
 
-    <!-- Actions - always at bottom -->
+    <!-- Actions -->
     <div
       v-if="showActions"
-      class="shrink-0 px-5 pb-5"
+      class="relative flex items-center gap-2 border-t border-slate-100 p-3"
     >
-      <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-        <BaseButton
-          variant="primary"
-          size="sm"
-          @click="handleGenerate"
-        >
-          <Icon
-            name="lucide:play"
-            class="w-4 h-4 mr-1.5"
-          />
-          Generate
-        </BaseButton>
+      <button
+        type="button"
+        class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-[13px] font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-white/80"
+        :disabled="!isEligible"
+        @click="handleGenerate"
+      >
+        Generate
+      </button>
 
-        <BaseButton
-          v-if="briefing.is_schedulable"
-          variant="ghost"
-          size="sm"
-          @click="hasSubscription ? handleManage() : handleSubscribe()"
-        >
-          <Icon
-            :name="hasSubscription ? 'lucide:settings' : 'lucide:bell-plus'"
-            class="w-4 h-4"
-          />
-        </BaseButton>
-      </div>
-    </div>
-
-    <!-- Ineligible overlay -->
-    <div
-      v-if="!isEligible"
-      class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl"
-    >
-      <div class="text-center px-4">
+      <button
+        v-if="briefing.is_schedulable"
+        type="button"
+        class="flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-300"
+        :disabled="!isEligible"
+        :title="hasSubscription ? 'Manage subscription' : 'Subscribe'"
+        @click="hasSubscription ? handleManage() : handleSubscribe()"
+      >
         <Icon
-          name="lucide:lock"
-          class="w-6 h-6 text-gray-400 mx-auto mb-2"
+          :name="hasSubscription ? 'lucide:settings' : 'lucide:bell'"
+          class="size-4"
         />
-        <p class="text-sm font-medium text-gray-600">
-          Upgrade to access
-        </p>
-      </div>
+      </button>
     </div>
-  </div>
+  </article>
 </template>

@@ -17,6 +17,10 @@ withDefaults(defineProps<Props>(), {
 function getAnimationDelay(index: number): string {
   return `${index * 100}ms`;
 }
+
+function getAchievementKey(achievement: Achievement, index: number): string {
+  return achievement.id ?? `${achievement.type}-${achievement.title}-${index}`;
+}
 </script>
 
 <template>
@@ -28,7 +32,7 @@ function getAnimationDelay(index: number): string {
     >
       <div
         v-for="(achievement, index) in achievements"
-        :key="achievement.id"
+        :key="getAchievementKey(achievement, index)"
         class="group relative overflow-hidden rounded-2xl border bg-bg-elevated p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
         :class="[
           getAchievementStyle(achievement).border,
@@ -103,7 +107,7 @@ function getAnimationDelay(index: number): string {
     >
       <div
         v-for="(achievement, index) in achievements"
-        :key="achievement.id"
+        :key="getAchievementKey(achievement, index)"
         class="flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated transition-all duration-200 hover:shadow-md"
         :class="animated && 'animate-fade-in-up'"
         :style="animated ? { animationDelay: getAnimationDelay(index) } : undefined"
@@ -144,8 +148,8 @@ function getAnimationDelay(index: number): string {
       class="flex flex-wrap gap-2"
     >
       <div
-        v-for="achievement in achievements"
-        :key="achievement.id"
+        v-for="(achievement, index) in achievements"
+        :key="getAchievementKey(achievement, index)"
         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 hover:shadow-sm"
         :class="[
           getAchievementStyle(achievement).bg,

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { BriefingGeneration, BriefingOutputFormat } from "~/types";
-import { getBriefingStatusColor, getBriefingStatusLabel, BriefingGenerationStatus } from "~/types";
+import { getBriefingStatusLabel, BriefingGenerationStatus } from "~/types";
+
+/**
+ * BriefingGenerationCard - Generation history card
+ * Clean list item with status indicators and actions
+ */
 
 interface Props {
   generation: BriefingGeneration;
@@ -18,17 +23,14 @@ const emit = defineEmits<{
   share: [generation: BriefingGeneration];
 }>();
 
-// Status helpers
 const status = computed(() => props.generation.status as BriefingGenerationStatus);
 const isComplete = computed(() => status.value === BriefingGenerationStatus.Completed);
 const isProcessing = computed(() => status.value === BriefingGenerationStatus.Processing);
 const isPending = computed(() => status.value === BriefingGenerationStatus.Pending);
 const isFailed = computed(() => status.value === BriefingGenerationStatus.Failed);
 
-const statusColor = computed(() => getBriefingStatusColor(status.value));
 const statusLabel = computed(() => getBriefingStatusLabel(status.value));
 
-// Formatted dates
 const createdAt = computed(() => new Date(props.generation.created_at));
 const completedAt = computed(() => {
   if (!props.generation.completed_at) return null;
@@ -50,33 +52,47 @@ const timeAgo = computed(() => {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 });
 
-// Achievements count
 const achievementsCount = computed(() => props.generation.achievements?.length ?? 0);
-
-// Progress for in-progress generations
 const progress = computed(() => props.generation.progress ?? 0);
 
-// Available output formats
 const availableFormats = computed(() => {
   if (!isComplete.value) return [];
-  return props.generation.briefing?.output_formats ?? ["html", "pdf"];
+  return props.generation.output_formats ?? [];
 });
 
-// Status badge styling
-function getStatusBadgeClass() {
-  switch (statusColor.value) {
-    case "success":
-      return "text-success bg-success/10";
-    case "error":
-      return "text-error bg-error/10";
-    case "info":
-      return "text-accent bg-accent/10";
-    case "warning":
-      return "text-warning bg-warning/10";
-    default:
-      return "text-text-muted bg-bg-surface";
+const statusConfig = computed(() => {
+  if (isComplete.value) {
+    return {
+      bg: 'bg-emerald-100',
+      text: 'text-emerald-700',
+      ring: 'ring-emerald-200',
+      icon: 'lucide:check',
+    };
   }
-}
+  if (isProcessing.value || isPending.value) {
+    return {
+      bg: 'bg-blue-100',
+      text: 'text-blue-700',
+      ring: 'ring-blue-200',
+      icon: 'lucide:loader-2',
+      animate: true,
+    };
+  }
+  if (isFailed.value) {
+    return {
+      bg: 'bg-red-100',
+      text: 'text-red-700',
+      ring: 'ring-red-200',
+      icon: 'lucide:x',
+    };
+  }
+  return {
+    bg: 'bg-slate-100',
+    text: 'text-slate-600',
+    ring: 'ring-slate-200',
+    icon: 'lucide:help-circle',
+  };
+});
 
 function handleView() {
   emit("view", props.generation);
@@ -92,48 +108,38 @@ function handleShare() {
 </script>
 
 <template>
-  <!-- Compact variant for lists -->
+  <!-- Compact variant -->
   <div
     v-if="compact"
-    class="flex items-center gap-4 p-4 rounded-xl border border-border-subtle bg-bg-elevated transition-all duration-200 hover:shadow-md hover:border-border-muted cursor-pointer"
+    class="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
     @click="handleView"
   >
     <!-- Status indicator -->
     <div
-      class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-      :class="getStatusBadgeClass()"
+      class="flex size-10 shrink-0 items-center justify-center rounded-lg ring-1"
+      :class="[statusConfig.bg, statusConfig.ring]"
     >
       <Icon
-        v-if="isComplete"
-        name="lucide:file-text"
-        class="w-5 h-5"
-      />
-      <Icon
-        v-else-if="isFailed"
-        name="lucide:alert-circle"
-        class="w-5 h-5"
-      />
-      <Icon
-        v-else
-        name="lucide:loader-2"
-        class="w-5 h-5 animate-spin"
+        :name="statusConfig.icon"
+        class="size-4"
+        :class="[statusConfig.text, statusConfig.animate && 'animate-spin']"
       />
     </div>
 
     <!-- Content -->
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2 mb-1">
-        <h3 class="font-medium text-text-primary truncate">
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center gap-2">
+        <h3 class="truncate text-sm font-medium text-slate-900">
           {{ generation.briefing?.title ?? 'Briefing' }}
         </h3>
         <span
-          class="shrink-0 px-2 py-0.5 text-xs font-medium rounded-full"
-          :class="getStatusBadgeClass()"
+          class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium ring-1"
+          :class="[statusConfig.bg, statusConfig.text, statusConfig.ring]"
         >
           {{ statusLabel }}
         </span>
       </div>
-      <p class="text-sm text-text-muted">
+      <p class="mt-0.5 text-xs text-slate-500">
         {{ timeAgo }}
         <template v-if="achievementsCount > 0">
           · {{ achievementsCount }} achievement{{ achievementsCount !== 1 ? 's' : '' }}
@@ -141,21 +147,28 @@ function handleShare() {
       </p>
     </div>
 
-    <!-- Progress or Actions -->
+    <!-- Progress or arrow -->
     <div class="shrink-0">
       <template v-if="isProcessing || isPending">
-        <div class="w-20 h-2 bg-bg-surface rounded-full overflow-hidden">
-          <div
-            class="h-full bg-accent rounded-full transition-all duration-300"
-            :style="{ width: `${progress}%` }"
-          />
+        <div class="w-24">
+          <div class="mb-1.5 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-700">{{ Math.round(progress) }}%</span>
+          </div>
+          <div class="h-1.5 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+            <div
+              class="h-full rounded-full bg-blue-500 transition-all duration-500"
+              :style="{ width: `${progress}%` }"
+            />
+          </div>
         </div>
       </template>
-      <template v-else-if="isComplete">
-        <Icon
-          name="lucide:chevron-right"
-          class="w-5 h-5 text-text-muted"
-        />
+      <template v-else>
+        <div class="flex size-8 items-center justify-center rounded-lg transition-colors group-hover:bg-slate-100">
+          <Icon
+            name="lucide:chevron-right"
+            class="size-5 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-600"
+          />
+        </div>
       </template>
     </div>
   </div>
@@ -163,122 +176,92 @@ function handleShare() {
   <!-- Full card variant -->
   <div
     v-else
-    class="group rounded-2xl border border-border-subtle bg-bg-elevated overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-black/5"
+    class="overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm"
   >
-    <!-- Header with status -->
-    <div class="px-6 py-4 border-b border-border-subtle bg-bg-surface/50">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <!-- Briefing icon -->
-          <div
-            class="w-10 h-10 rounded-xl flex items-center justify-center"
-            :class="getStatusBadgeClass()"
-          >
-            <Icon
-              v-if="isComplete"
-              name="lucide:file-text"
-              class="w-5 h-5"
-            />
-            <Icon
-              v-else-if="isFailed"
-              name="lucide:alert-circle"
-              class="w-5 h-5"
-            />
-            <Icon
-              v-else
-              name="lucide:loader-2"
-              class="w-5 h-5 animate-spin"
-            />
-          </div>
-
-          <div>
-            <h3 class="font-semibold text-text-primary">
-              {{ generation.briefing?.title ?? 'Briefing Generation' }}
-            </h3>
-            <p class="text-sm text-text-muted">
-              {{ timeAgo }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Status badge -->
-        <span
-          class="px-3 py-1 text-sm font-medium rounded-full"
-          :class="getStatusBadgeClass()"
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-100 p-5">
+      <div class="flex items-center gap-3">
+        <div
+          class="flex size-11 items-center justify-center rounded-xl ring-1"
+          :class="[statusConfig.bg, statusConfig.ring]"
         >
-          {{ statusLabel }}
-        </span>
+          <Icon
+            :name="statusConfig.icon"
+            class="size-5"
+            :class="[statusConfig.text, statusConfig.animate && 'animate-spin']"
+          />
+        </div>
+        <div>
+          <h3 class="font-medium text-slate-900">
+            {{ generation.briefing?.title ?? 'Briefing' }}
+          </h3>
+          <p class="text-sm text-slate-500">{{ timeAgo }}</p>
+        </div>
       </div>
+
+      <span
+        class="rounded-md px-2.5 py-1 text-xs font-medium ring-1"
+        :class="[statusConfig.bg, statusConfig.text, statusConfig.ring]"
+      >
+        {{ statusLabel }}
+      </span>
     </div>
 
-    <!-- Progress bar for in-progress -->
+    <!-- Progress -->
     <div
       v-if="isProcessing || isPending"
-      class="px-6 py-4"
+      class="p-5"
     >
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-sm text-text-muted">
+      <div class="mb-2 flex items-center justify-between">
+        <span class="text-sm text-slate-600">
           {{ generation.progress_message ?? 'Generating...' }}
         </span>
-        <span class="text-sm font-medium text-text-primary tabular-nums">
-          {{ Math.round(progress) }}%
-        </span>
+        <span class="text-sm font-semibold tabular-nums text-slate-900">{{ Math.round(progress) }}%</span>
       </div>
-      <div class="h-2 bg-bg-surface rounded-full overflow-hidden">
+      <div class="h-2 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
         <div
-          class="h-full bg-accent rounded-full transition-all duration-300"
+          class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
           :style="{ width: `${progress}%` }"
         />
       </div>
     </div>
 
-    <!-- Content preview for completed -->
+    <!-- Content for completed -->
     <div
       v-else-if="isComplete"
-      class="px-6 py-4"
+      class="p-5"
     >
-      <!-- Narrative preview -->
       <p
         v-if="generation.narrative"
-        class="text-sm text-text-secondary line-clamp-3 mb-4"
+        class="line-clamp-3 text-sm leading-relaxed text-slate-600"
       >
         {{ generation.narrative.slice(0, 200) }}{{ generation.narrative.length > 200 ? '...' : '' }}
       </p>
 
-      <!-- Achievements preview -->
-      <div
+      <p
         v-if="achievementsCount > 0"
-        class="flex items-center gap-2 mb-4"
+        class="mt-4 flex items-center gap-2 text-sm text-slate-600"
       >
-        <Icon
-          name="lucide:trophy"
-          class="w-4 h-4 text-amber-500"
-        />
-        <span class="text-sm text-text-muted">
-          {{ achievementsCount }} achievement{{ achievementsCount !== 1 ? 's' : '' }} unlocked
+        <span class="flex size-6 items-center justify-center rounded-md bg-amber-100 ring-1 ring-amber-200">
+          <Icon name="lucide:trophy" class="size-3.5 text-amber-600" />
         </span>
-      </div>
+        <span class="font-medium text-slate-900">{{ achievementsCount }}</span>
+        achievement{{ achievementsCount !== 1 ? 's' : '' }}
+      </p>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-2">
+      <div class="mt-5 flex items-center gap-2">
         <NuxtLink
           :to="`/${workspaceSlug}/briefings/generations/${generation.id}`"
           class="flex-1"
         >
-          <BaseButton
-            variant="primary"
-            size="sm"
-            class="w-full"
+          <button
+            type="button"
+            class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
           >
-            <Icon
-              name="lucide:eye"
-              class="w-4 h-4 mr-1.5"
-            />
             View Briefing
-          </BaseButton>
+          </button>
         </NuxtLink>
 
-        <!-- Download dropdown -->
         <BaseDropdown
           v-if="availableFormats.length > 0"
           :options="availableFormats.map(f => ({ label: f.toUpperCase(), value: f }))"
@@ -287,49 +270,37 @@ function handleShare() {
           @update:model-value="(v: BriefingOutputFormat) => handleDownload(v)"
         >
           <template #trigger>
-            <BaseButton
-              variant="secondary"
-              size="sm"
+            <button
+              type="button"
+              class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
             >
-              <Icon
-                name="lucide:download"
-                class="w-4 h-4"
-              />
-            </BaseButton>
+              <Icon name="lucide:download" class="size-4" />
+            </button>
           </template>
         </BaseDropdown>
 
-        <!-- Share button -->
-        <BaseButton
-          variant="secondary"
-          size="sm"
+        <button
+          type="button"
+          class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
           @click="handleShare"
         >
-          <Icon
-            name="lucide:share-2"
-            class="w-4 h-4"
-          />
-        </BaseButton>
+          <Icon name="lucide:share" class="size-4" />
+        </button>
       </div>
     </div>
 
-    <!-- Error message for failed -->
+    <!-- Error state -->
     <div
       v-else-if="isFailed"
-      class="px-6 py-4"
+      class="p-5"
     >
-      <div class="flex items-start gap-3 p-3 rounded-lg bg-error/5 border border-error/10">
-        <Icon
-          name="lucide:alert-triangle"
-          class="w-5 h-5 text-error shrink-0 mt-0.5"
-        />
+      <div class="flex items-start gap-3 rounded-lg bg-red-50 p-4 ring-1 ring-red-100">
+        <Icon name="lucide:alert-circle" class="mt-0.5 size-5 shrink-0 text-red-500" />
         <div>
-          <p class="text-sm font-medium text-error">
-            Generation failed
-          </p>
+          <p class="font-medium text-red-800">Generation failed</p>
           <p
             v-if="generation.error_message"
-            class="text-sm text-text-muted mt-1"
+            class="mt-1 text-sm text-red-700"
           >
             {{ generation.error_message }}
           </p>
@@ -340,9 +311,9 @@ function handleShare() {
     <!-- Generator info -->
     <div
       v-if="generation.generated_by"
-      class="px-6 py-3 border-t border-border-subtle bg-bg-surface/30"
+      class="border-t border-slate-100 px-5 py-3"
     >
-      <div class="flex items-center gap-2 text-xs text-text-muted">
+      <div class="flex items-center gap-2 text-xs text-slate-500">
         <BaseAvatar
           :src="generation.generated_by.avatar_url"
           :name="generation.generated_by.name"
