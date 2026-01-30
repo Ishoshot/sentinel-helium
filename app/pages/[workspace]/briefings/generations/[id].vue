@@ -29,7 +29,8 @@ const generationId = computed(() => Number(route.params.id));
 const {
   fetchGeneration,
   downloadBriefing,
-  createShare,
+  submitFeedback,
+  isSubmittingFeedback,
 } = useBriefings(workspaceId);
 
 // State
@@ -37,9 +38,13 @@ const generation = ref<BriefingGeneration | null>(null);
 const isLoading = ref(true);
 const error = ref<string | null>(null);
 const isDownloading = ref(false);
-const isSharing = ref(false);
 const showShareModal = ref(false);
 const showExcerpts = ref(false);
+const rating = ref<number | null>(null);
+const comment = ref("");
+const tagsInput = ref("");
+const feedbackError = ref<string | null>(null);
+const feedbackSubmitted = ref(false);
 
 // Fetch generation data
 onMounted(async () => {
@@ -89,25 +94,14 @@ async function handleDownload(format: BriefingOutputFormat) {
   }
 }
 
-// Share handler
-async function handleShare() {
-  if (!generation.value) return;
+// Share handler - opens modal
+function handleShare() {
+  showShareModal.value = true;
+}
 
-  isSharing.value = true;
-
-  try {
-    const share = await createShare(generation.value.id);
-    if (share?.share_url) {
-      // Copy share URL to clipboard
-      await navigator.clipboard.writeText(share.share_url);
-      toast.success("Share link copied to clipboard!");
-    }
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : "Failed to create share link";
-    toast.error(message);
-  } finally {
-    isSharing.value = false;
-  }
+// Handle share created
+function handleShareCreated() {
+  toast.success("Share link created!");
 }
 
 // Print handler
@@ -122,10 +116,10 @@ function handleGoBack() {
 
 // Available output formats
 const availableFormats = computed(() => {
-  if (!generation.value?.briefing?.output_formats) {
-    return ["html", "pdf"] as BriefingOutputFormat[];
+  if (!generation.value) {
+    return [] as BriefingOutputFormat[];
   }
-  return generation.value.briefing.output_formats;
+  return generation.value.output_formats ?? [];
 });
 
 // Check if has excerpts
@@ -138,6 +132,36 @@ const completedDate = computed(() => {
   if (!generation.value?.completed_at) return null;
   return new Date(generation.value.completed_at);
 });
+
+const parsedTags = computed(() => {
+  if (!tagsInput.value.trim()) return [];
+  return tagsInput.value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0)
+    .slice(0, 10);
+});
+
+async function handleSubmitFeedback() {
+  if (!generation.value) return;
+
+  if (!rating.value) {
+    feedbackError.value = "Please select a rating.";
+    return;
+  }
+
+  feedbackError.value = null;
+
+  const success = await submitFeedback(generation.value.id, {
+    rating: rating.value,
+    comment: comment.value.trim() || undefined,
+    tags: parsedTags.value.length > 0 ? parsedTags.value : undefined,
+  });
+
+  if (success) {
+    feedbackSubmitted.value = true;
+  }
+}
 </script>
 
 <template>
@@ -236,16 +260,9 @@ const completedDate = computed(() => {
             <BaseButton
               variant="primary"
               size="sm"
-              :disabled="isSharing"
               @click="handleShare"
             >
               <Icon
-                v-if="isSharing"
-                name="lucide:loader-2"
-                class="w-4 h-4 mr-1.5 animate-spin"
-              />
-              <Icon
-                v-else
                 name="lucide:share"
                 class="w-4 h-4 mr-1.5"
               />
@@ -310,6 +327,94 @@ const completedDate = computed(() => {
           :show-achievements="true"
           :show-excerpts="showExcerpts"
         />
+
+        <!-- Feedback -->
+        <section class="mt-12 rounded-2xl border border-border-subtle bg-bg-elevated p-6">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 class="text-base font-semibold text-text-primary">
+                How was this briefing?
+              </h3>
+              <p class="text-sm text-text-muted">
+                Share quick feedback to help us improve.
+              </p>
+            </div>
+            <div
+              v-if="feedbackSubmitted"
+              class="inline-flex items-center gap-2 text-sm text-success"
+            >
+              <Icon
+                name="lucide:check-circle"
+                class="w-4 h-4"
+              />
+              Feedback received
+            </div>
+          </div>
+
+          <div
+            v-if="!feedbackSubmitted"
+            class="mt-4 space-y-4"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-text-muted">Rating</span>
+              <div class="flex items-center gap-2">
+                <button
+                  v-for="value in 5"
+                  :key="value"
+                  type="button"
+                  class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition-colors"
+                  :class="rating === value
+                    ? 'border-accent-primary/40 bg-accent-primary/10 text-accent-primary'
+                    : 'border-border-subtle bg-bg-surface text-text-secondary hover:border-border-muted'"
+                  @click="rating = value"
+                >
+                  {{ value }}
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-sm font-medium text-text-primary">
+                Comment (optional)
+              </label>
+              <textarea
+                v-model="comment"
+                rows="3"
+                class="w-full rounded-xl border border-border-subtle bg-bg-elevated px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
+                placeholder="Tell us what stood out or what we could improve."
+              />
+            </div>
+
+            <BaseInput
+              v-model="tagsInput"
+              label="Tags (optional)"
+              placeholder="e.g. clarity, accuracy, completeness"
+            />
+
+            <p
+              v-if="feedbackError"
+              class="text-sm text-error"
+            >
+              {{ feedbackError }}
+            </p>
+
+            <div>
+              <BaseButton
+                variant="primary"
+                size="sm"
+                :disabled="isSubmittingFeedback"
+                @click="handleSubmitFeedback"
+              >
+                <Icon
+                  v-if="isSubmittingFeedback"
+                  name="lucide:loader-2"
+                  class="w-4 h-4 mr-2 animate-spin"
+                />
+                Submit Feedback
+              </BaseButton>
+            </div>
+          </div>
+        </section>
 
         <!-- Actions Footer (No print) -->
         <div class="no-print mt-12 pt-8 border-t border-border-subtle">
@@ -399,6 +504,13 @@ const completedDate = computed(() => {
         </BaseButton>
       </div>
     </div>
+
+    <!-- Share Modal -->
+    <BriefingsBriefingShareModal
+      v-model="showShareModal"
+      :generation="generation"
+      @created="handleShareCreated"
+    />
   </div>
 </template>
 

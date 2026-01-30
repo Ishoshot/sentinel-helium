@@ -3,12 +3,12 @@ import { useWorkspaceStore } from "~/stores/useWorkspaceStore";
 import { useBriefings } from "~/composables/briefings/useBriefings";
 import { useAppToast } from "~/composables/shared/useAppToast";
 import type { Briefing, BriefingSubscription } from "~/types";
+import BaseContainer from "~/components/base/BaseContainer.vue";
 
 /**
- * Briefings Hub - Browse and generate AI-powered briefings
+ * Briefings Hub - AI-powered narrative intelligence
  *
- * This is designed to be "the talk of the town" - a premium,
- * polished experience that showcases narrative intelligence.
+ * Flagship feature page with immersive design
  */
 
 definePageMeta({
@@ -22,7 +22,6 @@ const toast = useAppToast();
 const workspaceId = computed(() => workspaceStore.currentWorkspaceId);
 const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug ?? "");
 
-// Composables
 const {
   briefings,
   generations,
@@ -30,16 +29,20 @@ const {
   pagination,
   isLoadingBriefings,
   isLoadingGenerations,
+  isLoadingWorkspaceEligibility,
+  isWorkspaceEligible,
+  workspaceRestrictionReason,
   error,
   fetchBriefings,
-  fetchRecentGenerations,
   fetchGenerations,
   fetchSubscriptions,
+  fetchWorkspaceEligibility,
   generateBriefing,
 } = useBriefings(workspaceId);
 
-// State
 const isInitializing = ref(true);
+const isPageReady = ref(false);
+
 const activeTab = ref<"templates" | "history">("templates");
 const selectedBriefing = ref<Briefing | null>(null);
 const isGenerating = ref(false);
@@ -47,17 +50,14 @@ const showGenerateModal = ref(false);
 const showInfoModal = ref(false);
 const infoBriefing = ref<Briefing | null>(null);
 
-// Modal states
 const showSubscribeModal = ref(false);
 const showManageSubscriptionModal = ref(false);
 const selectedSubscription = ref<BriefingSubscription | null>(null);
 
-// Get subscription for a briefing
 function getSubscription(briefingId: number): BriefingSubscription | null {
   return subscriptions.value.find((s) => s.briefing_id === briefingId) ?? null;
 }
 
-// History filters
 const historyFilters = ref({
   search: '',
   status: [] as string[],
@@ -68,7 +68,6 @@ const historyFilters = ref({
   direction: 'desc' as 'asc' | 'desc',
 })
 
-// Initial data fetch
 onMounted(async () => {
   try {
     if (workspaceId.value) {
@@ -76,40 +75,43 @@ onMounted(async () => {
         fetchBriefings(),
         fetchGenerations({ perPage: 20 }),
         fetchSubscriptions(),
+        fetchWorkspaceEligibility(),
       ]);
     }
   } finally {
     isInitializing.value = false;
+    setTimeout(() => {
+      isPageReady.value = true;
+    }, 100);
   }
 });
 
-// Handle info - show expanded briefing details
 function handleInfo(briefing: Briefing) {
   infoBriefing.value = briefing;
   showInfoModal.value = true;
 }
 
-// Handle generate from info modal
-function handleGenerateFromInfo(briefing: Briefing) {
+function handleViewFromInfo(briefing: Briefing) {
   showInfoModal.value = false;
   infoBriefing.value = null;
-  handleGenerate(briefing);
+  router.push(`/${workspaceSlug.value}/briefings/${briefing.slug}`);
 }
 
-// Handle subscribe from info modal
 function handleSubscribeFromInfo(briefing: Briefing) {
   showInfoModal.value = false;
   infoBriefing.value = null;
   handleSubscribe(briefing);
 }
 
-// Handle generate - open modal to collect parameters
 function handleGenerate(briefing: Briefing) {
+  if (!isWorkspaceEligible.value) {
+    toast.error(workspaceRestrictionReason.value || "Briefing generation is currently unavailable.");
+    return;
+  }
   selectedBriefing.value = briefing;
   showGenerateModal.value = true;
 }
 
-// Handle actual generation after modal submission
 async function handleConfirmGenerate(parameters: Record<string, unknown>) {
   if (!selectedBriefing.value) return;
 
@@ -119,7 +121,6 @@ async function handleConfirmGenerate(parameters: Record<string, unknown>) {
   try {
     const generation = await generateBriefing(selectedBriefing.value.id, { parameters });
     if (generation) {
-      // Navigate to generation progress page
       router.push(`/${workspaceSlug.value}/briefings/${selectedBriefing.value.slug}?generation=${generation.id}`);
     }
   } catch (e: unknown) {
@@ -131,28 +132,24 @@ async function handleConfirmGenerate(parameters: Record<string, unknown>) {
   }
 }
 
-// Handle subscribe
 function handleSubscribe(briefing: Briefing) {
   selectedBriefing.value = briefing;
   showSubscribeModal.value = true;
 }
 
-// Handle manage subscription
 function handleManageSubscription(subscription: BriefingSubscription) {
   selectedSubscription.value = subscription;
   showManageSubscriptionModal.value = true;
 }
 
-// View generation
 function handleViewGeneration(generationId: number) {
   router.push(`/${workspaceSlug.value}/briefings/generations/${generationId}`);
 }
 
-// Handle filters change
 function handleFiltersChange(filters: typeof historyFilters.value) {
   historyFilters.value = filters;
   fetchGenerations({
-    page: 1, // Reset to first page on filter change
+    page: 1,
     perPage: 20,
     search: filters.search || undefined,
     status: filters.status.length > 0 ? filters.status : undefined,
@@ -164,7 +161,6 @@ function handleFiltersChange(filters: typeof historyFilters.value) {
   });
 }
 
-// Handle page change
 function handlePageChange(page: number) {
   fetchGenerations({
     page,
@@ -179,260 +175,340 @@ function handlePageChange(page: number) {
   });
 }
 
-// Statistics
 const totalGenerations = computed(() => pagination.value.total);
 const activeSubscriptions = computed(
   () => subscriptions.value.filter((s) => s.is_active).length
 );
 
-// Empty states
 const hasTemplates = computed(() => briefings.value.length > 0);
 const hasHistory = computed(() => generations.value.length > 0);
+
+// Featured briefing (first one or most popular)
+const featuredBriefing = computed(() => briefings.value[0] ?? null);
+const otherBriefings = computed(() => briefings.value.slice(1));
+
+// Recent generations for quick access
+const recentGenerations = computed(() => generations.value.slice(0, 3));
 </script>
 
 <template>
   <BaseContainer>
-    <div class="min-h-[calc(100vh-64px)] -m-4 sm:-m-6 lg:-m-8">
-      <!-- Hero Section -->
-      <div class="bg-bg-elevated border-b border-border-subtle">
-        <div class="px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-          <div class="max-w-4xl">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 text-xs font-medium text-accent bg-accent/10 rounded-full">
-              <Icon
-                name="lucide:sparkles"
-                class="w-3.5 h-3.5"
-              />
-              AI-Powered Intelligence
+    <div class="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div class="relative mx-auto">
+      <!-- Page Header -->
+      <header class="mb-12">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1">
+              <span class="relative flex size-2">
+                <span class="absolute inline-flex size-full animate-ping rounded-full bg-blue-400 opacity-75" />
+                <span class="relative inline-flex size-2 rounded-full bg-blue-500" />
+              </span>
+              <span class="text-xs font-medium text-blue-700">AI-Powered</span>
             </div>
-
-            <!-- Title -->
-            <h1 class="text-4xl lg:text-5xl font-bold text-text-primary tracking-tight mb-4">
+            <h1 class="text-3xl font-bold tracking-tight text-slate-900 lg:text-4xl">
               Briefings
             </h1>
-
-            <!-- Description -->
-            <p class="text-lg text-text-secondary max-w-2xl leading-relaxed">
-              Transform your development data into narrative intelligence.
-              Get personalized updates, celebrate achievements, and share
-              progress with stakeholders.
+            <p class="mt-2 max-w-2xl text-base text-slate-600">
+              Transform your development data into compelling narratives. Celebrate achievements, track progress, and keep your team aligned.
             </p>
-
-            <!-- Quick Stats -->
-            <div class="flex items-center gap-6 mt-8">
-              <div class="flex items-center gap-2 text-sm text-text-muted">
-                <div class="w-8 h-8 rounded-lg bg-bg-surface flex items-center justify-center">
-                  <Icon
-                    name="lucide:file-text"
-                    class="w-4 h-4 text-text-secondary"
-                  />
-                </div>
-                <span>
-                  <strong class="text-text-primary">{{ totalGenerations }}</strong>
-                  generated
-                </span>
-              </div>
-              <div class="flex items-center gap-2 text-sm text-text-muted">
-                <div class="w-8 h-8 rounded-lg bg-bg-surface flex items-center justify-center">
-                  <Icon
-                    name="lucide:bell"
-                    class="w-4 h-4 text-text-secondary"
-                  />
-                </div>
-                <span>
-                  <strong class="text-text-primary">{{ activeSubscriptions }}</strong>
-                  active subscriptions
-                </span>
-              </div>
-            </div>
           </div>
+
+          <!-- Quick Stats -->
+          <div class="flex items-center gap-6 rounded-2xl border border-slate-200/60 bg-white/80 px-6 py-4 shadow-sm backdrop-blur-sm">
+            <template v-if="isInitializing">
+              <div class="text-center">
+                <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
+                <div class="mt-1 h-3 w-16 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div class="h-8 w-px bg-slate-200" />
+              <div class="text-center">
+                <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
+                <div class="mt-1 h-3 w-12 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div class="h-8 w-px bg-slate-200" />
+              <div class="text-center">
+                <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
+                <div class="mt-1 h-3 w-16 animate-pulse rounded bg-slate-100" />
+              </div>
+            </template>
+            <template v-else>
+              <div class="text-center">
+                <p class="text-2xl font-bold tabular-nums text-slate-900">{{ totalGenerations }}</p>
+                <p class="text-xs text-slate-500">Generated</p>
+              </div>
+              <div class="h-8 w-px bg-slate-200" />
+              <div class="text-center">
+                <p class="text-2xl font-bold tabular-nums text-slate-900">{{ activeSubscriptions }}</p>
+                <p class="text-xs text-slate-500">Active</p>
+              </div>
+              <div class="h-8 w-px bg-slate-200" />
+              <div class="text-center">
+                <p class="text-2xl font-bold tabular-nums text-slate-900">{{ briefings.length }}</p>
+                <p class="text-xs text-slate-500">Templates</p>
+              </div>
+            </template>
+          </div>
+        </div>
+      </header>
+
+      <div
+        v-if="!isLoadingWorkspaceEligibility && !isWorkspaceEligible"
+        class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"
+      >
+        <Icon name="lucide:info" class="mt-0.5 size-4 text-amber-600" />
+        <div class="space-y-0.5">
+          <p class="text-sm font-medium">Briefing generation is currently unavailable.</p>
+          <p class="text-xs text-amber-800">
+            {{ workspaceRestrictionReason || "Your workspace does not meet the current requirements." }}
+          </p>
         </div>
       </div>
 
-      <!-- Content Area -->
-      <div class="px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <!-- Tab Navigation -->
-        <div class="flex items-center gap-1 p-1 mb-8 bg-bg-surface rounded-xl w-fit">
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-            :class="
-              activeTab === 'templates'
-                ? 'bg-bg-elevated text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary'
-            "
-            @click="activeTab = 'templates'"
+      <!-- Main Layout: Two Column -->
+      <div class="grid gap-8 lg:grid-cols-3">
+        <!-- Left Column: Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Featured Briefing Skeleton -->
+          <section
+            v-if="isInitializing && activeTab === 'templates'"
+            class="transition-all duration-700 delay-100"
           >
-            <span class="flex items-center gap-2">
-              <Icon
-                name="lucide:layout-grid"
-                class="w-4 h-4"
-              />
-              Templates
-            </span>
-          </button>
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-            :class="
-              activeTab === 'history'
-                ? 'bg-bg-elevated text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary'
-            "
-            @click="activeTab = 'history'"
+            <div class="overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-6 lg:p-8">
+              <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
+                <div class="size-16 animate-pulse rounded-2xl bg-slate-200 lg:size-20" />
+                <div class="flex-1 space-y-3">
+                  <div class="h-5 w-20 animate-pulse rounded-md bg-slate-200" />
+                  <div class="h-7 w-48 animate-pulse rounded bg-slate-200" />
+                  <div class="space-y-2">
+                    <div class="h-4 w-full animate-pulse rounded bg-slate-100" />
+                    <div class="h-4 w-2/3 animate-pulse rounded bg-slate-100" />
+                  </div>
+                  <div class="flex gap-3 pt-2">
+                    <div class="h-10 w-32 animate-pulse rounded-lg bg-slate-200" />
+                    <div class="h-10 w-28 animate-pulse rounded-lg bg-slate-100" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Featured Briefing -->
+          <section
+            v-else-if="featuredBriefing && activeTab === 'templates'"
+            class="transition-all duration-700 delay-100"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
           >
-            <span class="flex items-center gap-2">
-              <Icon
-                name="lucide:history"
-                class="w-4 h-4"
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-6 shadow-sm transition-all hover:shadow-sm lg:p-8">
+
+              <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
+                <!-- Icon -->
+                <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25 lg:size-20">
+                  <Icon name="lucide:sparkles" class="size-8 text-white lg:size-10" />
+                </div>
+
+                <!-- Content -->
+                <div class="flex-1">
+                  <div class="mb-2 flex items-center gap-2">
+                    <span class="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Featured</span>
+                    <span v-if="getSubscription(featuredBriefing.id)?.is_active" class="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">Active</span>
+                  </div>
+                  <h2 class="text-xl font-semibold text-slate-900 lg:text-2xl">{{ featuredBriefing.title }}</h2>
+                  <p class="mt-2 text-sm text-slate-600 lg:text-base">{{ featuredBriefing.description }}</p>
+
+                  <div class="mt-4 flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-white/80"
+                      :disabled="!isWorkspaceEligible"
+                      @click="handleGenerate(featuredBriefing)"
+                    >
+                      <Icon name="lucide:play" class="size-4" />
+                      Generate Now
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+                      @click="handleInfo(featuredBriefing)"
+                    >
+                      Learn More
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Tab Navigation -->
+          <div
+            class="flex items-center gap-1 border-b border-slate-200 transition-all duration-700 delay-150"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+          >
+            <button
+              type="button"
+              class="relative px-4 py-3 text-sm font-medium transition-colors"
+              :class="activeTab === 'templates' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+              @click="activeTab = 'templates'"
+            >
+              All Templates
+              <span
+                v-if="activeTab === 'templates'"
+                class="absolute inset-x-0 -bottom-px h-0.5 bg-slate-900"
               />
-              History
+            </button>
+            <button
+              type="button"
+              class="relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
+              :class="activeTab === 'history' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+              @click="activeTab = 'history'"
+            >
+              Generation History
               <span
                 v-if="totalGenerations > 0"
-                class="px-1.5 py-0.5 text-xs bg-bg-surface rounded-md"
+                class="rounded-full bg-slate-100 px-2 py-0.5 text-xs tabular-nums"
               >
                 {{ totalGenerations }}
               </span>
-            </span>
-          </button>
-        </div>
-
-        <!-- Templates Tab -->
-        <div v-if="activeTab === 'templates'">
-          <!-- Loading State -->
-          <div
-            v-if="isLoadingBriefings || isInitializing"
-            class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            <BaseSkeleton
-              v-for="i in 6"
-              :key="i"
-              class="h-72 rounded-2xl"
-            />
+              <span
+                v-if="activeTab === 'history'"
+                class="absolute inset-x-0 -bottom-px h-0.5 bg-slate-900"
+              />
+            </button>
           </div>
 
-          <!-- Error State -->
-          <div
-            v-else-if="error"
-            class="text-center py-16"
-          >
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-error/10 flex items-center justify-center">
-              <Icon
-                name="lucide:alert-circle"
-                class="w-8 h-8 text-error"
-              />
-            </div>
-            <h3 class="text-lg font-semibold text-text-primary mb-2">
-              Failed to load briefings
-            </h3>
-            <p class="text-sm text-text-muted mb-6">
-              {{ error }}
-            </p>
-            <BaseButton
-              variant="secondary"
-              @click="fetchBriefings()"
+          <!-- Templates Tab Content -->
+          <div v-if="activeTab === 'templates'">
+            <!-- Loading -->
+            <div
+              v-if="isLoadingBriefings || isInitializing"
+              class="grid gap-4 sm:grid-cols-2"
             >
-              <Icon
-                name="lucide:refresh-cw"
-                class="w-4 h-4 mr-2"
-              />
-              Try again
-            </BaseButton>
-          </div>
-
-          <!-- Empty State -->
-          <div
-            v-else-if="!hasTemplates"
-            class="text-center py-16"
-          >
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-bg-surface flex items-center justify-center">
-              <Icon
-                name="lucide:file-text"
-                class="w-8 h-8 text-text-muted"
-              />
+              <div
+                v-for="i in 4"
+                :key="i"
+                class="flex h-full flex-col rounded-xl border border-slate-200/60 bg-white"
+              >
+                <!-- Header skeleton -->
+                <div class="flex items-start justify-between p-4 pb-0">
+                  <div class="size-11 animate-pulse rounded-xl bg-slate-200" />
+                </div>
+                <!-- Content skeleton -->
+                <div class="flex flex-1 flex-col p-4">
+                  <div class="h-5 w-32 animate-pulse rounded bg-slate-200" />
+                  <div class="mt-2 h-3 w-20 animate-pulse rounded bg-slate-100" />
+                  <div class="mt-3 space-y-2">
+                    <div class="h-3 w-full animate-pulse rounded bg-slate-100" />
+                    <div class="h-3 w-3/4 animate-pulse rounded bg-slate-100" />
+                  </div>
+                  <div class="mt-3 flex gap-2">
+                    <div class="h-5 w-12 animate-pulse rounded-md bg-slate-100" />
+                    <div class="h-5 w-20 animate-pulse rounded-md bg-slate-100" />
+                  </div>
+                </div>
+                <!-- Actions skeleton -->
+                <div class="flex items-center gap-2 border-t border-slate-100 p-3">
+                  <div class="h-9 flex-1 animate-pulse rounded-lg bg-slate-200" />
+                  <div class="size-9 animate-pulse rounded-lg bg-slate-100" />
+                </div>
+              </div>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary mb-2">
-              No briefing templates available
-            </h3>
-            <p class="text-sm text-text-muted max-w-md mx-auto">
-              Briefing templates will appear here once they're configured for your workspace.
-            </p>
-          </div>
 
-          <!-- Briefing Templates Grid -->
-          <div
-            v-else
-            class="grid gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
-          >
-            <BriefingsBriefingCard
-              v-for="briefing in briefings"
-              :key="briefing.id"
-              :briefing="briefing"
-              :subscription="getSubscription(briefing.id)"
-              :is-eligible="true"
-              @generate="handleGenerate"
-              @subscribe="handleSubscribe"
-              @manage="handleManageSubscription"
-              @info="handleInfo"
-            />
-          </div>
-        </div>
-
-        <!-- History Tab -->
-        <div v-else-if="activeTab === 'history'">
-          <!-- Filters -->
-          <BriefingsHistoryFilters
-            :briefings="briefings"
-            @filters-change="handleFiltersChange"
-          />
-
-          <!-- Loading State -->
-          <div
-            v-if="isLoadingGenerations || isInitializing"
-            class="space-y-4 mt-6"
-          >
-            <BaseSkeleton
-              v-for="i in 5"
-              :key="i"
-              class="h-20 rounded-xl"
-            />
-          </div>
-
-          <!-- Empty State -->
-          <div
-            v-else-if="!hasHistory"
-            class="text-center py-16"
-          >
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-bg-surface flex items-center justify-center">
-              <Icon
-                name="lucide:history"
-                class="w-8 h-8 text-text-muted"
-              />
-            </div>
-            <h3 class="text-lg font-semibold text-text-primary mb-2">
-              {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId || historyFilters.dateFrom || historyFilters.dateTo ? 'No results found' : 'No briefings generated yet' }}
-            </h3>
-            <p class="text-sm text-text-muted max-w-md mx-auto mb-6">
-              {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId || historyFilters.dateFrom || historyFilters.dateTo ? 'Try adjusting your filters to find what you\'re looking for.' : 'Generate your first briefing to see it here. Each generation creates a unique narrative based on your latest activity.' }}
-            </p>
-            <BaseButton
-              variant="primary"
-              @click="activeTab = 'templates'"
+            <!-- Error -->
+            <div
+              v-else-if="error"
+              class="rounded-xl border border-slate-200 bg-white p-10 text-center"
             >
-              <Icon
-                name="lucide:sparkles"
-                class="w-4 h-4 mr-2"
+              <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-red-50">
+                <Icon name="lucide:alert-circle" class="size-6 text-red-500" />
+              </div>
+              <h3 class="mt-4 font-semibold text-slate-900">Failed to load briefings</h3>
+              <p class="mt-1 text-sm text-slate-500">{{ error }}</p>
+              <button
+                class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                @click="fetchBriefings()"
+              >
+                Try again
+              </button>
+            </div>
+
+            <!-- Empty -->
+            <div
+              v-else-if="!hasTemplates"
+              class="rounded-xl border border-slate-200 bg-white p-10 text-center"
+            >
+              <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-100">
+                <Icon name="lucide:file-text" class="size-6 text-slate-400" />
+              </div>
+              <h3 class="mt-4 font-semibold text-slate-900">No templates available</h3>
+              <p class="mt-1 text-sm text-slate-500">Templates will appear once configured.</p>
+            </div>
+
+            <!-- Templates Grid (excluding featured) -->
+            <div
+              v-else
+              class="grid gap-4 sm:grid-cols-2"
+            >
+              <BriefingsBriefingCard
+                v-for="(briefing, index) in otherBriefings"
+                :key="briefing.id"
+                :briefing="briefing"
+                :subscription="getSubscription(briefing.id)"
+                :is-eligible="isWorkspaceEligible"
+                class="transition-all duration-500"
+                :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+                :style="{ transitionDelay: `${200 + index * 50}ms` }"
+                @generate="handleGenerate"
+                @subscribe="handleSubscribe"
+                @manage="handleManageSubscription"
+                @info="handleInfo"
               />
-              Browse Templates
-            </BaseButton>
+            </div>
           </div>
 
-          <!-- Generations List -->
-          <div
-            v-else
-            class="mt-6"
-          >
-            <div class="space-y-4">
+          <!-- History Tab Content -->
+          <div v-else-if="activeTab === 'history'">
+            <BriefingsHistoryFilters
+              :briefings="briefings"
+              @filters-change="handleFiltersChange"
+            />
+
+            <!-- Loading -->
+            <div
+              v-if="isLoadingGenerations || isInitializing"
+              class="mt-6 space-y-3"
+            >
+              <div
+                v-for="i in 5"
+                :key="i"
+                class="h-16 animate-pulse rounded-xl bg-slate-200/60"
+              />
+            </div>
+
+            <!-- Empty -->
+            <div
+              v-else-if="!hasHistory"
+              class="mt-6 rounded-xl border border-slate-200 bg-white p-10 text-center"
+            >
+              <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-100">
+                <Icon name="lucide:inbox" class="size-6 text-slate-400" />
+              </div>
+              <h3 class="mt-4 font-semibold text-slate-900">
+                {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId ? 'No results found' : 'No briefings generated yet' }}
+              </h3>
+              <p class="mt-1 text-sm text-slate-500">
+                {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId ? 'Try adjusting your filters.' : 'Generate your first briefing to see it here.' }}
+              </p>
+              <button
+                v-if="!(historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId)"
+                class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                @click="activeTab = 'templates'"
+              >
+                Browse Templates
+              </button>
+            </div>
+
+            <!-- Generations List -->
+            <div v-else class="mt-6 space-y-2">
               <BriefingsBriefingGenerationCard
                 v-for="generation in generations"
                 :key="generation.id"
@@ -441,34 +517,142 @@ const hasHistory = computed(() => generations.value.length > 0);
                 compact
                 @view="handleViewGeneration(generation.id)"
               />
-            </div>
 
-            <!-- Pagination -->
-            <BriefingsPagination
-              v-if="pagination.lastPage > 1"
-              :current-page="pagination.currentPage"
-              :last-page="pagination.lastPage"
-              :total="pagination.total"
-              :from="pagination.from"
-              :to="pagination.to"
-              @page-change="handlePageChange"
-            />
+              <BriefingsPagination
+                v-if="pagination.lastPage > 1"
+                :current-page="pagination.currentPage"
+                :last-page="pagination.lastPage"
+                :total="pagination.total"
+                :from="pagination.from"
+                :to="pagination.to"
+                class="mt-8"
+                @page-change="handlePageChange"
+              />
+            </div>
           </div>
         </div>
+
+        <!-- Right Column: Sidebar -->
+        <aside
+          class="space-y-6 transition-all duration-700 delay-200"
+          :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+        >
+          <!-- Quick Actions -->
+          <div class="rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm">
+            <h3 class="mb-4 text-sm font-semibold text-slate-900">Quick Actions</h3>
+            <div class="space-y-2">
+              <button
+                type="button"
+                class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100"
+                @click="activeTab = 'templates'"
+              >
+                <div class="flex size-8 items-center justify-center rounded-md bg-blue-100">
+                  <Icon name="lucide:plus" class="size-4 text-blue-600" />
+                </div>
+                New Briefing
+              </button>
+              <button
+                type="button"
+                class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100"
+                @click="activeTab = 'history'"
+              >
+                <div class="flex size-8 items-center justify-center rounded-md bg-slate-200">
+                  <Icon name="lucide:history" class="size-4 text-slate-600" />
+                </div>
+                View History
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div
+            v-if="recentGenerations.length > 0"
+            class="rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm"
+          >
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-slate-900">Recent</h3>
+              <button
+                type="button"
+                class="text-xs font-medium text-blue-600 hover:text-blue-700"
+                @click="activeTab = 'history'"
+              >
+                View all
+              </button>
+            </div>
+            <div class="space-y-3">
+              <button
+                v-for="gen in recentGenerations"
+                :key="gen.id"
+                type="button"
+                class="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-slate-50"
+                @click="handleViewGeneration(gen.id)"
+              >
+                <div
+                  class="flex size-8 shrink-0 items-center justify-center rounded-md"
+                  :class="{
+                    'bg-emerald-100': gen.status === 'completed',
+                    'bg-blue-100': gen.status === 'processing' || gen.status === 'pending',
+                    'bg-red-100': gen.status === 'failed',
+                    'bg-slate-100': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
+                  }"
+                >
+                  <Icon
+                    :name="gen.status === 'completed' ? 'lucide:check' : gen.status === 'failed' ? 'lucide:x' : 'lucide:loader-2'"
+                    class="size-4"
+                    :class="{
+                      'text-emerald-600': gen.status === 'completed',
+                      'text-blue-600 animate-spin': gen.status === 'processing' || gen.status === 'pending',
+                      'text-red-600': gen.status === 'failed',
+                      'text-slate-500': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
+                    }"
+                  />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-medium text-slate-900">{{ gen.briefing?.title ?? 'Briefing' }}</p>
+                  <p class="text-xs text-slate-500">{{ new Date(gen.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }}</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- What are Briefings -->
+          <div class="rounded-xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm">
+            <div class="mb-3 flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+              <Icon name="lucide:lightbulb" class="size-5 text-white" />
+            </div>
+            <h3 class="mb-2 text-sm font-semibold text-slate-900">What are Briefings?</h3>
+            <p class="text-sm leading-relaxed text-slate-600">
+              AI-powered reports that transform your raw development data into meaningful narratives. Perfect for standups, team updates, and celebrating wins.
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <Icon name="lucide:zap" class="size-3" />
+                Automated
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <Icon name="lucide:clock" class="size-3" />
+                Schedulable
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <Icon name="lucide:share-2" class="size-3" />
+                Shareable
+              </span>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
 
-    <!-- Info Modal -->
+    <!-- Modals -->
     <BriefingsBriefingInfoModal
       v-if="infoBriefing"
       v-model="showInfoModal"
       :briefing="infoBriefing"
       :subscription="getSubscription(infoBriefing.id)"
-      @generate="handleGenerateFromInfo"
+      @view="handleViewFromInfo"
       @subscribe="handleSubscribeFromInfo"
     />
 
-    <!-- Generate Modal -->
     <BriefingsBriefingGenerateModal
       v-if="selectedBriefing"
       v-model="showGenerateModal"
@@ -477,34 +661,36 @@ const hasHistory = computed(() => generations.value.length > 0);
       @generate="handleConfirmGenerate"
     />
 
-    <!-- Generate Loading Overlay -->
+    <!-- Generation Overlay -->
     <Transition
-      enter-active-class="transition-opacity duration-200"
+      enter-active-class="transition-all duration-300"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-150"
+      leave-active-class="transition-all duration-200"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
       <div
         v-if="isGenerating"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-sm"
       >
         <div class="text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent/10 flex items-center justify-center">
-            <Icon
-              name="lucide:loader-2"
-              class="w-8 h-8 text-accent animate-spin"
-            />
+          <div class="relative mx-auto size-20">
+            <div class="absolute inset-0 animate-ping rounded-full bg-blue-100" />
+            <div class="relative flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30">
+              <Icon name="lucide:sparkles" class="size-8 animate-pulse text-white" />
+            </div>
           </div>
-          <h3 class="text-lg font-semibold text-white mb-2">
-            Starting Generation
-          </h3>
-          <p class="text-sm text-white/70">
-            Preparing {{ selectedBriefing?.title }}...
-          </p>
+          <h3 class="mt-6 text-lg font-semibold text-slate-900">Generating your briefing</h3>
+          <p class="mt-1 text-sm text-slate-500">{{ selectedBriefing?.title }}</p>
+          <div class="mt-6 flex justify-center gap-1">
+            <span class="size-2 animate-bounce rounded-full bg-blue-500" style="animation-delay: 0ms;" />
+            <span class="size-2 animate-bounce rounded-full bg-blue-500" style="animation-delay: 150ms;" />
+            <span class="size-2 animate-bounce rounded-full bg-blue-500" style="animation-delay: 300ms;" />
+          </div>
         </div>
       </div>
     </Transition>
+    </div>
   </BaseContainer>
 </template>

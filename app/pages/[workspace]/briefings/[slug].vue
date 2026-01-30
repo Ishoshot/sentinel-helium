@@ -33,13 +33,21 @@ const generationIdFromQuery = computed(() => {
 // Composables
 const {
   briefings,
+  currentBriefing,
   isLoadingBriefings,
+  isWorkspaceEligible,
+  workspaceRestrictionReason,
   fetchBriefings,
+  fetchBriefing,
+  fetchWorkspaceEligibility,
   generateBriefing,
 } = useBriefings(workspaceId);
 
 // Find the current briefing
 const briefing = computed<Briefing | null>(() => {
+  if (currentBriefing.value?.slug === briefingSlug.value) {
+    return currentBriefing.value;
+  }
   return briefings.value.find((b) => b.slug === briefingSlug.value) ?? null;
 });
 
@@ -82,6 +90,10 @@ watch(isFailed, (failed) => {
 onMounted(async () => {
   try {
     await fetchBriefings();
+    await fetchWorkspaceEligibility();
+    if (briefingSlug.value) {
+      await fetchBriefing(briefingSlug.value);
+    }
 
     // If we have a generation ID from query, start tracking it
     if (generationIdFromQuery.value) {
@@ -105,6 +117,12 @@ function handleOpenGenerateModal() {
 // Start a new generation with parameters
 async function handleGenerate(parameters: Record<string, unknown>) {
   if (!briefing.value) return;
+  if (!isWorkspaceEligible.value) {
+    toast.error(
+      workspaceRestrictionReason.value || "Briefing generation is currently unavailable."
+    );
+    return;
+  }
 
   showGenerateModal.value = false;
   isStartingGeneration.value = true;
@@ -177,6 +195,9 @@ const hasParameters = computed(() => {
   const schema = briefing.value?.parameter_schema;
   return schema && Object.keys(schema.properties || {}).length > 0;
 });
+
+const isGenerationAllowed = computed(() => isWorkspaceEligible.value);
+const restrictionReason = computed(() => workspaceRestrictionReason.value);
 </script>
 
 <template>
@@ -312,7 +333,7 @@ const hasParameters = computed(() => {
             <BaseButton
               variant="primary"
               size="lg"
-              :disabled="isStartingGeneration"
+              :disabled="isStartingGeneration || !isGenerationAllowed"
               @click="handleOpenGenerateModal"
             >
               <Icon
@@ -327,6 +348,13 @@ const hasParameters = computed(() => {
               />
               {{ isStartingGeneration ? 'Starting...' : 'Generate Briefing' }}
             </BaseButton>
+
+            <p
+              v-if="!isGenerationAllowed && restrictionReason"
+              class="max-w-md text-center text-sm text-text-muted"
+            >
+              {{ restrictionReason }}
+            </p>
 
             <button
               type="button"
