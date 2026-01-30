@@ -52,14 +52,50 @@
 
 /* Components layer - reusable component styles */
 @layer components {
-  /* Focus ring utility */
+  /* Focus ring utility - modern subtle style */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+    @apply focus:outline-none focus:ring-1 focus:ring-accent/40;
   }
 
   /* Smooth transitions */
   .transition-default {
     @apply transition-all duration-150 ease-in-out;
+  }
+
+  /* Modern input focus styles */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-accent-primary) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  /* Input base styles */
+  .input-modern {
+    @apply border border-border-subtle bg-bg-elevated rounded-xl px-4 py-2.5 text-sm text-text-primary placeholder-text-muted transition-all duration-200;
+  }
+
+  .input-modern:hover:not(:focus):not(:disabled) {
+    @apply border-border-muted;
+  }
+
+  .input-modern:focus {
+    @apply border-accent outline-none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  }
+
+  .input-modern:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .input-modern.input-error {
+    @apply border-error;
+  }
+
+  .input-modern.input-error:focus {
+    @apply border-error;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
   }
 }
 

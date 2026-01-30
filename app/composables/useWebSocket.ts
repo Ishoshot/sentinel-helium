@@ -10,16 +10,21 @@ import type {
   BriefingProgressEvent,
   BriefingCompletedEvent,
   BriefingFailedEvent,
+  ConfigPrCreatedEvent,
 } from '~/types';
 import { useAppToast } from '~/composables/shared/useAppToast';
 
-type BriefingEventHandler<T> = (event: T) => void;
+type EventHandler<T> = (event: T) => void;
 
 interface BriefingEventListeners {
-  onStarted?: BriefingEventHandler<BriefingStartedEvent>;
-  onProgress?: BriefingEventHandler<BriefingProgressEvent>;
-  onCompleted?: BriefingEventHandler<BriefingCompletedEvent>;
-  onFailed?: BriefingEventHandler<BriefingFailedEvent>;
+  onStarted?: EventHandler<BriefingStartedEvent>;
+  onProgress?: EventHandler<BriefingProgressEvent>;
+  onCompleted?: EventHandler<BriefingCompletedEvent>;
+  onFailed?: EventHandler<BriefingFailedEvent>;
+}
+
+interface RepositoryEventListeners {
+  onConfigPrCreated?: EventHandler<ConfigPrCreatedEvent>;
 }
 
 /**
@@ -93,6 +98,56 @@ export function useWebSocket(workspaceId: Ref<number | null>) {
   }
 
   /**
+   * Subscribe to the workspace repositories channel
+   */
+  function subscribeToRepositories(listeners: RepositoryEventListeners) {
+    if (!workspaceId.value) {
+      const message = 'No workspace ID provided';
+      error.value = message;
+      toast.error(message);
+      return;
+    }
+
+    try {
+      const channelName = `workspace.${workspaceId.value}.repositories`;
+
+      // Subscribe to private channel
+      const repositoriesChannel = $echo.private(channelName);
+
+      // Handle subscription success
+      repositoriesChannel.subscribed(() => {
+        console.log(`[WebSocket] Successfully subscribed to ${channelName}`);
+      });
+
+      // Handle subscription errors
+      repositoriesChannel.error((err: Error) => {
+        console.error(`[WebSocket] Repositories subscription error:`, err);
+      });
+
+      // Register event listeners using the broadcastAs event names
+      if (listeners.onConfigPrCreated) {
+        repositoriesChannel.listen('.config-pr.created', listeners.onConfigPrCreated);
+      }
+
+      return repositoriesChannel;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to connect to WebSocket';
+      error.value = message;
+      toast.error(message);
+    }
+  }
+
+  /**
+   * Unsubscribe from the repositories channel
+   */
+  function unsubscribeFromRepositories() {
+    if (workspaceId.value) {
+      const channelName = `workspace.${workspaceId.value}.repositories`;
+      $echo.leave(channelName);
+    }
+  }
+
+  /**
    * Unsubscribe from the current channel
    */
   function unsubscribe() {
@@ -138,7 +193,9 @@ export function useWebSocket(workspaceId: Ref<number | null>) {
 
     // Methods
     subscribeToBriefings,
+    subscribeToRepositories,
     unsubscribe,
+    unsubscribeFromRepositories,
     reconnect,
   };
 }
