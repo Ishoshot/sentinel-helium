@@ -1,0 +1,57 @@
+# Sentinel Configuration
+# Documentation: https://docs.usesentinel.ai/configuration
+version: 1
+
+# Review settings
+review:
+  # Minimum severity to report: critical, high, medium, low, info
+  min_severity: low
+  # Maximum findings per review
+  max_findings: 25
+  # Review tone: strict, balanced, educational
+  tone: balanced
+
+# Categories to analyze
+  categories:
+    security: true
+    correctness: true
+    performance: true
+    maintainability: true
+    style: true
+    testing: true
+    documentation: true
+
+# Trigger rules
+triggers:
+  # Only review PRs targeting these branches (supports glob patterns)
+  target_branches:
+    - main
+    - master
+    - develop
+  # Skip PRs from these source branches
+  skip_source_branches:
+    - dependabot/**
+    - renovate/**
+  # Skip PRs with these labels
+  skip_labels:
+    - skip-review
+    - no-sentinel
+
+# Path rules
+paths:
+  # Files/directories to ignore (supports glob patterns)
+  ignore:
+    - "**/*.lock"
+    - "**/vendor/**"
+    - "**/node_modules/**"
+    - "**/*.min.js"
+    - "**/*.min.css"
+
+# Annotation settings
+annotations:
+  # Style: inline, review, check_run
+  style: inline
+  # Group similar findings
+  grouped: true
+  # Include fix suggestions
+  include_suggestions: true
