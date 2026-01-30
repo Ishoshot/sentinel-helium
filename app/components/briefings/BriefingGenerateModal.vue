@@ -38,6 +38,8 @@ const hasParameters = computed(() => {
   return schema && Object.keys(schema.properties || {}).length > 0
 })
 
+const outputFormats = computed(() => props.briefing.output_formats || [])
+
 // Close modal
 function close() {
   emit('update:modelValue', false)
@@ -56,56 +58,86 @@ function handleGenerate() {
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <template #header>
-      <div class="flex items-center gap-3">
-        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-bg-surface">
+      <div class="flex items-start gap-4">
+        <div class="flex size-12 items-center justify-center rounded-2xl bg-bg-surface ring-1 ring-border-muted">
           <Icon
             :name="briefing.icon || 'lucide:file-text'"
-            class="w-5 h-5 text-text-secondary"
+            class="size-5 text-text-secondary"
           />
         </div>
-        <div>
-          <h2 class="text-lg font-semibold text-text-primary">
+        <div class="min-w-0">
+          <h2 class="truncate text-lg font-semibold text-text-primary">
             {{ briefing.title }}
           </h2>
-          <p class="text-sm text-text-muted">
-            Configure and generate
-          </p>
+          <p class="text-sm text-text-muted">Configure and generate</p>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <span
+              v-if="briefing.requires_ai"
+              class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-muted"
+            >
+              <Icon name="lucide:sparkles" class="size-3" />
+              AI
+            </span>
+            <span
+              v-if="briefing.is_schedulable"
+              class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-muted"
+            >
+              <Icon name="lucide:calendar" class="size-3" />
+              Schedulable
+            </span>
+            <span
+              v-for="format in outputFormats"
+              :key="format"
+              class="inline-flex items-center rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-muted"
+            >
+              {{ format.toUpperCase() }}
+            </span>
+          </div>
         </div>
       </div>
     </template>
 
     <div class="space-y-6">
       <!-- Description -->
-      <p class="text-sm text-text-secondary leading-relaxed">
-        {{ briefing.description }}
-      </p>
+      <div class="rounded-xl border border-border-muted bg-bg-surface px-4 py-3">
+        <p class="text-sm leading-relaxed text-text-secondary">
+          {{ briefing.description }}
+        </p>
+      </div>
 
       <!-- Parameter form -->
       <div v-if="hasParameters">
-        <h3 class="text-sm font-medium text-text-primary mb-4">
+        <h3 class="mb-3 text-sm font-medium text-text-primary">
           Configuration
         </h3>
-        <BriefingParameterForm
-          v-model="parameters"
-          :schema="briefing.parameter_schema"
-          :disabled="loading"
-        />
+        <div class="rounded-xl border border-border-muted bg-bg-elevated p-4">
+          <BriefingParameterForm
+            v-model="parameters"
+            :schema="briefing.parameter_schema"
+            :disabled="loading"
+          />
+        </div>
       </div>
 
       <!-- No parameters message -->
       <div
         v-else
-        class="text-center py-6"
+        class="flex items-start gap-3 rounded-xl border border-border-muted bg-bg-surface px-4 py-3"
       >
-        <div class="flex items-center justify-center w-12 h-12 mx-auto mb-3 rounded-xl bg-bg-surface">
+        <div class="flex size-10 items-center justify-center rounded-lg bg-bg-elevated">
           <Icon
             name="lucide:check-circle"
-            class="w-6 h-6 text-success"
+            class="size-5 text-success"
           />
         </div>
-        <p class="text-sm text-text-secondary">
-          This briefing is ready to generate with default settings.
-        </p>
+        <div class="space-y-0.5">
+          <p class="text-sm font-medium text-text-primary">
+            No configuration needed
+          </p>
+          <p class="text-sm text-text-secondary">
+            This briefing generates with default settings.
+          </p>
+        </div>
       </div>
     </div>
 

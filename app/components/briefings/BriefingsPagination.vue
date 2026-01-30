@@ -7,14 +7,18 @@ interface Props {
   currentPage: number
   lastPage: number
   total: number
-  from: number
-  to: number
+  from: number | null
+  to: number | null
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
   'page-change': [page: number]
 }>()
+
+// Safe display values
+const displayFrom = computed(() => props.from ?? 1)
+const displayTo = computed(() => props.to ?? props.total)
 
 // Calculate visible page numbers (show max 7 pages)
 const visiblePages = computed(() => {
@@ -59,12 +63,12 @@ function goToPage(page: number) {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-4 pt-6 border-t border-border-subtle">
+  <div class="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4">
     <!-- Results Info -->
-    <div class="text-sm text-text-muted">
-      Showing <span class="font-medium text-text-primary">{{ from }}</span> to
-      <span class="font-medium text-text-primary">{{ to }}</span> of
-      <span class="font-medium text-text-primary">{{ total }}</span> results
+    <div class="text-sm text-slate-500">
+      Showing <span class="font-medium text-slate-900">{{ displayFrom }}</span> to
+      <span class="font-medium text-slate-900">{{ displayTo }}</span> of
+      <span class="font-medium text-slate-900">{{ total }}</span> results
     </div>
 
     <!-- Page Controls -->
@@ -76,17 +80,17 @@ function goToPage(page: number) {
       <button
         type="button"
         :disabled="currentPage === 1"
-        class="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex size-9 items-center justify-center rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           currentPage === 1
-            ? 'text-text-muted cursor-not-allowed'
-            : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
+            ? 'text-slate-300'
+            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
         "
         @click="goToPage(currentPage - 1)"
       >
         <Icon
           name="lucide:chevron-left"
-          class="w-5 h-5"
+          class="size-5"
         />
       </button>
 
@@ -98,11 +102,11 @@ function goToPage(page: number) {
         <button
           v-if="typeof page === 'number'"
           type="button"
-          class="min-w-[40px] h-10 px-3 rounded-lg text-sm font-medium transition-colors"
+          class="flex size-9 items-center justify-center rounded-lg text-sm font-medium transition-all"
           :class="
             page === currentPage
-              ? 'bg-accent text-white'
-              : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
+              ? 'bg-slate-900 text-white'
+              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
           "
           @click="goToPage(page)"
         >
@@ -110,9 +114,9 @@ function goToPage(page: number) {
         </button>
         <span
           v-else
-          class="px-2 text-text-muted"
+          class="flex size-9 items-center justify-center text-slate-400"
         >
-          {{ page }}
+          ...
         </span>
       </template>
 
@@ -120,17 +124,17 @@ function goToPage(page: number) {
       <button
         type="button"
         :disabled="currentPage === lastPage"
-        class="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex size-9 items-center justify-center rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           currentPage === lastPage
-            ? 'text-text-muted cursor-not-allowed'
-            : 'text-text-secondary hover:text-text-primary hover:bg-bg-surface'
+            ? 'text-slate-300'
+            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
         "
         @click="goToPage(currentPage + 1)"
       >
         <Icon
           name="lucide:chevron-right"
-          class="w-5 h-5"
+          class="size-5"
         />
       </button>
     </div>

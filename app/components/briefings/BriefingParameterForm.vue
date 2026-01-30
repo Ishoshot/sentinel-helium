@@ -123,7 +123,7 @@ function formatLabel(name: string): string {
             type="checkbox"
             :checked="getValue(name) as boolean"
             :disabled="disabled"
-            class="w-4 h-4 rounded border-border-muted text-accent focus:ring-accent focus:ring-offset-0 transition-colors"
+            class="w-4 h-4 rounded border-border-muted text-accent focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] transition-colors"
             @change="handleInput(name, $event)"
           >
           <span class="text-sm text-text-primary group-hover:text-text-primary/80">
@@ -160,7 +160,7 @@ function formatLabel(name: string): string {
         <select
           :value="getValue(name)"
           :disabled="disabled"
-          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] disabled:opacity-50 disabled:cursor-not-allowed"
           @change="updateValue(name, ($event.target as HTMLSelectElement).value)"
         >
           <option
@@ -198,7 +198,7 @@ function formatLabel(name: string): string {
           type="date"
           :value="getValue(name)"
           :disabled="disabled"
-          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] disabled:opacity-50 disabled:cursor-not-allowed"
           @input="handleInput(name, $event)"
         >
       </template>
@@ -225,7 +225,7 @@ function formatLabel(name: string): string {
           :max="property.maximum"
           :step="property.type === 'integer' ? 1 : 'any'"
           :disabled="disabled"
-          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] disabled:opacity-50 disabled:cursor-not-allowed"
           @input="handleInput(name, $event)"
         >
       </template>
@@ -252,7 +252,7 @@ function formatLabel(name: string): string {
           :maxlength="property.maxLength"
           :disabled="disabled"
           :placeholder="property.description || `Enter ${formatLabel(name).toLowerCase()}`"
-          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default placeholder:text-text-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] disabled:opacity-50 disabled:cursor-not-allowed"
           @input="handleInput(name, $event)"
         >
       </template>

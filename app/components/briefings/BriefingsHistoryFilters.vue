@@ -136,13 +136,13 @@ function clearFilters() {
         v-model="search"
         type="search"
         placeholder="Search by briefing title..."
-        class="w-full h-12 pl-12 pr-12 text-sm bg-bg-elevated border border-border-subtle rounded-xl placeholder:text-text-muted text-text-primary transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent hover:border-border-muted shadow-sm"
+        class="w-full h-12 pl-12 pr-12 text-sm bg-bg-elevated border border-border-subtle rounded-xl placeholder:text-text-muted text-text-primary transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] hover:border-border-muted shadow-sm"
         @keydown.escape="search = ''"
       >
       <button
         v-if="search.trim()"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-surface transition-all focus:outline-none focus:ring-2 focus:ring-accent"
+        class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-surface transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
         aria-label="Clear search"
         @click="search = ''"
       >
@@ -166,7 +166,7 @@ function clearFilters() {
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
             :class="status
               ? 'border-accent text-accent bg-accent/5'
               : 'border-border-subtle text-text-secondary'"
@@ -197,7 +197,7 @@ function clearFilters() {
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30 max-w-[180px]"
+            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] max-w-[180px]"
             :class="briefingId
               ? 'border-accent text-accent bg-accent/5'
               : 'border-border-subtle text-text-secondary'"
@@ -227,7 +227,7 @@ function clearFilters() {
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
             :class="dateRangeDisplay
               ? 'border-accent text-accent bg-accent/5'
               : 'border-border-subtle text-text-secondary'"
@@ -253,7 +253,7 @@ function clearFilters() {
             <input
               :value="dateRange.from"
               type="date"
-              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
               @input="dateRange = { ...dateRange, from: ($event.target as HTMLInputElement).value }"
             >
           </div>
@@ -262,7 +262,7 @@ function clearFilters() {
             <input
               :value="dateRange.to"
               type="date"
-              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
               :min="dateRange.from || undefined"
               @input="dateRange = { ...dateRange, to: ($event.target as HTMLInputElement).value }"
             >
@@ -291,7 +291,7 @@ function clearFilters() {
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border border-border-subtle rounded-xl text-sm font-medium text-text-secondary transition-all hover:shadow-sm hover:text-text-primary hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border border-border-subtle rounded-xl text-sm font-medium text-text-secondary transition-all hover:shadow-sm hover:text-text-primary hover:border-border-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
           >
             <Icon
               name="lucide:arrow-up-down"
@@ -307,7 +307,7 @@ function clearFilters() {
       <button
         v-if="hasActiveFilters"
         type="button"
-        class="h-10 px-4 flex items-center gap-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent/30 rounded-xl"
+        class="h-10 px-4 flex items-center gap-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] rounded-xl"
         @click="clearFilters"
       >
         <Icon
@@ -328,7 +328,7 @@ function clearFilters() {
       <button
         v-if="search.trim()"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-bg-elevated border border-border-subtle text-xs font-medium text-text-secondary hover:bg-bg-surface hover:border-border-muted transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-bg-elevated border border-border-subtle text-xs font-medium text-text-secondary hover:bg-bg-surface hover:border-border-muted transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] group"
         @click="search = ''"
       >
         <span class="text-text-primary">{{ search.trim() }}</span>
@@ -341,7 +341,7 @@ function clearFilters() {
       <button
         v-if="status"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] group"
         @click="status = null"
       >
         <span>{{ statusOptions.find(o => o.value === status)?.label }}</span>
@@ -354,7 +354,7 @@ function clearFilters() {
       <button
         v-if="briefingId"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group max-w-[200px]"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] group max-w-[200px]"
         @click="briefingId = null"
       >
         <span class="truncate">{{ briefingOptions.find(o => o.value === briefingId)?.label }}</span>
@@ -367,7 +367,7 @@ function clearFilters() {
       <button
         v-if="dateRangeDisplay"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)] group"
         @click="dateRange = { from: null, to: null }"
       >
         <Icon
