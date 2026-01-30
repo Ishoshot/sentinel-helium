@@ -10,8 +10,8 @@ import DomainMembersInvitationCard from '~/components/domain/members/InvitationC
 import DomainMembersInviteMemberModal from '~/components/domain/members/InviteMemberModal.vue'
 
 /**
- * Workspace members page - Premium team management experience
- * Features: Stats header, search, role grouping, rich member cards
+ * Workspace members page
+ * Clean, functional team management following Sentinel UX principles
  */
 
 definePageMeta({
@@ -22,14 +22,10 @@ const toast = useAppToast()
 const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
 
-// Get workspace ID as ref for composables
 const workspaceId = computed(() => workspaceStore.currentWorkspaceId)
 
 const {
   members,
-  owner,
-  admins,
-  regularMembers,
   isLoading: membersLoading,
   error: membersError,
   fetchMembers,
@@ -58,50 +54,22 @@ const resendingInvitationId = ref<number | null>(null)
 const isProcessing = ref(false)
 const inviteError = ref('')
 
-// Check if current user can manage members (owner or admin)
 const canManage = computed(() => {
   const currentMember = members.value.find(m => m.user_id === userStore.user?.id)
   return currentMember?.role === MemberRole.Owner || currentMember?.role === MemberRole.Admin
 })
 
-// Stats
-const stats = computed(() => [
-  {
-    label: 'Total Members',
-    value: members.value.length,
-    icon: 'lucide:users',
-    color: 'text-text-primary',
-    bg: 'bg-bg-surface',
-  },
-  {
-    label: 'Admins',
-    value: admins.value.length + (owner.value ? 1 : 0),
-    icon: 'lucide:shield',
-    color: 'text-accent',
-    bg: 'bg-accent-light',
-  },
-  {
-    label: 'Pending',
-    value: invitations.value.filter(i => !!i && !i.is_expired).length,
-    icon: 'lucide:mail',
-    color: 'text-warning',
-    bg: 'bg-warning-light',
-  },
-])
-
-// Filtered members based on search
+// Filtered and grouped members
 const filteredMembers = computed(() => {
-  const validMembers = members.value.filter(m => !!m)
-  if (!searchQuery.value.trim()) return validMembers
-
-  const query = searchQuery.value.toLowerCase()
-  return validMembers.filter(m =>
-    m.user.name.toLowerCase().includes(query) ||
-    m.user.email.toLowerCase().includes(query)
+  const valid = members.value.filter(m => !!m)
+  if (!searchQuery.value.trim()) return valid
+  const q = searchQuery.value.toLowerCase()
+  return valid.filter(m =>
+    m.user.name.toLowerCase().includes(q) ||
+    m.user.email.toLowerCase().includes(q)
   )
 })
 
-// Grouped filtered members
 const groupedMembers = computed(() => {
   const filtered = filteredMembers.value
   return {
@@ -111,73 +79,57 @@ const groupedMembers = computed(() => {
   }
 })
 
-// Has any filtered results
 const hasFilteredResults = computed(() =>
   !!groupedMembers.value.owner ||
   groupedMembers.value.admins.length > 0 ||
   groupedMembers.value.members.length > 0
 )
 
-// Filtered invitations based on search
 const filteredInvitations = computed(() => {
-  const validInvitations = invitations.value.filter(i => !!i)
-  if (!searchQuery.value.trim()) return validInvitations
-
-  const query = searchQuery.value.toLowerCase()
-  return validInvitations.filter(i =>
-    i.email.toLowerCase().includes(query)
-  )
+  const valid = invitations.value.filter(i => !!i)
+  if (!searchQuery.value.trim()) return valid
+  const q = searchQuery.value.toLowerCase()
+  return valid.filter(i => i.email.toLowerCase().includes(q))
 })
 
-// Pending member for removal modal
 const pendingMember = computed(() =>
-  pendingMemberId.value
-    ? members.value.find(m => m.id === pendingMemberId.value)
-    : null
+  pendingMemberId.value ? members.value.find(m => m.id === pendingMemberId.value) : null
 )
 
-// Pending invitation for cancel modal
 const pendingInvitation = computed(() =>
-  pendingInvitationId.value
-    ? invitations.value.find(i => i.id === pendingInvitationId.value)
-    : null
+  pendingInvitationId.value ? invitations.value.find(i => i.id === pendingInvitationId.value) : null
 )
 
-// Combined loading state
 const isLoading = computed(() => membersLoading.value || invitationsLoading.value)
 
-// Fetch data on mount
+const pendingCount = computed(() => invitations.value.filter(i => !!i && !i.is_expired).length)
+
 onMounted(() => {
   fetchMembers()
   fetchInvitations()
 })
 
-// Handle role change
 async function handleRoleChange(memberId: number, role: Exclude<MemberRole, MemberRole.Owner>) {
   const result = await updateMemberRole(memberId, role)
   if (result) {
-    toast.success('Role updated successfully')
+    toast.success('Role updated')
   } else if (membersError.value) {
     toast.error(membersError.value)
   }
 }
 
-// Handle member removal - show modal
 function handleRemoveMember(memberId: number) {
   pendingMemberId.value = memberId
   showRemoveMemberModal.value = true
 }
 
-// Confirm member removal
 async function confirmRemoveMember() {
   if (!pendingMemberId.value) return
-
   isProcessing.value = true
   const success = await removeMember(pendingMemberId.value)
   isProcessing.value = false
-
   if (success) {
-    toast.success('Member removed from workspace')
+    toast.success('Member removed')
     showRemoveMemberModal.value = false
     pendingMemberId.value = null
   } else if (membersError.value) {
@@ -185,7 +137,6 @@ async function confirmRemoveMember() {
   }
 }
 
-// Handle invitation
 async function handleInvite(email: string, role: Exclude<MemberRole, MemberRole.Owner>) {
   inviteError.value = ''
   const invitation = await createInvitation({ email, role })
@@ -197,20 +148,16 @@ async function handleInvite(email: string, role: Exclude<MemberRole, MemberRole.
   }
 }
 
-// Handle invitation cancellation - show modal
 function handleCancelInvitation(invitationId: number) {
   pendingInvitationId.value = invitationId
   showCancelInvitationModal.value = true
 }
 
-// Confirm invitation cancellation
 async function confirmCancelInvitation() {
   if (!pendingInvitationId.value) return
-
   isProcessing.value = true
   const success = await cancelInvitation(pendingInvitationId.value)
   isProcessing.value = false
-
   if (success) {
     toast.success('Invitation cancelled')
     showCancelInvitationModal.value = false
@@ -220,7 +167,6 @@ async function confirmCancelInvitation() {
   }
 }
 
-// Handle resend invitation
 async function handleResendInvitation(invitationId: number) {
   resendingInvitationId.value = invitationId
   try {
@@ -237,319 +183,423 @@ async function handleResendInvitation(invitationId: number) {
 </script>
 
 <template>
-  <BaseContainer>
-    <!-- Page Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
+  <BaseContainer class="space-y-8">
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-text-primary">
-          Team Members
+        <h1 class="text-2xl font-semibold text-gray-900">
+          Members
         </h1>
-        <p class="mt-1 text-text-secondary">
-          Manage who has access to this workspace
+        <p class="mt-1 text-sm text-gray-500">
+          {{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}
+          <template v-if="pendingCount > 0">
+            · {{ pendingCount }} pending
+          </template>
         </p>
       </div>
 
-      <BaseButton
+      <button
         v-if="canManage"
+        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
         @click="showInviteModal = true"
       >
         <Icon
-          name="lucide:user-plus"
-          class="w-4 h-4 mr-1.5"
+          name="lucide:plus"
+          class="size-4"
         />
-        Invite member
-      </BaseButton>
+        Invite
+      </button>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
-      <div
-        v-for="stat in stats"
-        :key="stat.label"
-        class="p-5 bg-bg-elevated border border-border-subtle rounded-xl"
+    <!-- Search -->
+    <div class="relative max-w-sm">
+      <Icon
+        name="lucide:search"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+      />
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search members..."
+        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
       >
-        <div class="flex items-center gap-4">
-          <div
-            class="w-12 h-12 rounded-xl flex items-center justify-center"
-            :class="stat.bg"
-          >
-            <Icon
-              :name="stat.icon"
-              class="w-6 h-6"
-              :class="stat.color"
-            />
-          </div>
-          <div>
-            <p class="text-2xl font-semibold text-text-primary">
-              {{ stat.value }}
-            </p>
-            <p class="text-sm text-text-muted">
-              {{ stat.label }}
-            </p>
-          </div>
-        </div>
-      </div>
+      <button
+        v-if="searchQuery"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        @click="searchQuery = ''"
+      >
+        <Icon
+          name="lucide:x"
+          class="size-4"
+        />
+      </button>
     </div>
 
-    <!-- Search Bar -->
-    <div class="mb-8">
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon
-            name="lucide:search"
-            class="w-4 h-4 text-text-muted"
-          />
-        </div>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Search by name or email..."
-          class="w-full pl-10 pr-4 py-3 text-sm text-text-primary bg-bg-elevated border border-border-subtle rounded-xl transition-all duration-200 placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent"
-        >
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <button
-            v-if="searchQuery"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center"
-            @click="searchQuery = ''"
-          >
-            <Icon
-              name="lucide:x"
-              class="w-4 h-4 text-text-muted hover:text-text-primary"
-            />
-          </button>
-        </Transition>
-      </div>
-    </div>
-
-    <!-- Loading State -->
+    <!-- Loading -->
     <div
       v-if="isLoading && members.length === 0"
-      class="space-y-4"
+      class="space-y-3"
     >
       <div
         v-for="i in 4"
         :key="i"
-        class="p-4 bg-bg-elevated border border-border-subtle rounded-xl"
+        class="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4"
       >
-        <div class="flex items-center gap-4">
-          <BaseSkeleton
-            variant="circular"
-            class="w-12 h-12"
-          />
-          <div class="flex-1 space-y-2">
-            <BaseSkeleton class="h-4 w-32" />
-            <BaseSkeleton class="h-3 w-48" />
-          </div>
+        <BaseSkeleton class="size-10 rounded-full" />
+        <div class="flex-1 space-y-2">
+          <BaseSkeleton class="h-4 w-32" />
+          <BaseSkeleton class="h-3 w-48" />
         </div>
       </div>
     </div>
 
-    <!-- Members Content -->
+    <!-- Content -->
     <template v-else>
-      <!-- No results state -->
-      <BaseCard
+      <!-- No results -->
+      <div
         v-if="searchQuery && !hasFilteredResults && filteredInvitations.length === 0"
-        class="mb-6"
+        class="py-12 text-center"
       >
-        <BaseEmptyState
-          icon="lucide:search-x"
-          title="No results found"
-          :description="`No members or invitations match '${searchQuery}'`"
-          compact
+        <p class="text-sm text-gray-500">
+          No members match "{{ searchQuery }}"
+        </p>
+        <button
+          class="mt-2 text-sm text-gray-900 underline underline-offset-2"
+          @click="searchQuery = ''"
         >
-          <BaseButton
-            variant="secondary"
-            size="sm"
-            @click="searchQuery = ''"
-          >
-            Clear search
-          </BaseButton>
-        </BaseEmptyState>
-      </BaseCard>
+          Clear search
+        </button>
+      </div>
 
       <template v-else>
-        <!-- Owner Section -->
-        <section
-          v-if="groupedMembers.owner"
-          class="mb-10"
-        >
-          <div class="flex items-center gap-2 mb-4">
-            <Icon
-              name="lucide:crown"
-              class="w-4 h-4 text-warning"
-            />
-            <h2 class="text-sm font-medium text-text-secondary">
-              Owner
-            </h2>
-          </div>
-          <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMembersMemberCard
-              :member="groupedMembers.owner"
-              :can-manage="canManage"
-              :current-user-id="userStore.user?.id || 0"
-              @change-role="handleRoleChange"
-              @remove="handleRemoveMember"
-            />
-          </div>
-        </section>
-
-        <!-- Admins Section -->
-        <section
-          v-if="groupedMembers.admins.length > 0"
-          class="mb-10"
-        >
-          <div class="flex items-center gap-2 mb-4">
-            <Icon
-              name="lucide:shield"
-              class="w-4 h-4 text-accent"
-            />
-            <h2 class="text-sm font-medium text-text-secondary">
-              Administrators
-            </h2>
-            <span class="px-1.5 py-0.5 text-xs font-medium text-accent bg-accent/10 rounded">
-              {{ groupedMembers.admins.length }}
-            </span>
-          </div>
-          <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMembersMemberCard
-              v-for="member in groupedMembers.admins"
-              :key="member.id"
-              :member="member"
-              :can-manage="canManage"
-              :current-user-id="userStore.user?.id || 0"
-              @change-role="handleRoleChange"
-              @remove="handleRemoveMember"
-            />
-          </div>
-        </section>
-
-        <!-- Members Section -->
-        <section
-          v-if="groupedMembers.members.length > 0"
-          class="mb-10"
-        >
-          <div class="flex items-center gap-2 mb-4">
-            <Icon
-              name="lucide:users"
-              class="w-4 h-4 text-text-muted"
-            />
-            <h2 class="text-sm font-medium text-text-secondary">
-              Members
-            </h2>
-            <span class="px-1.5 py-0.5 text-xs font-medium text-text-muted bg-bg-surface rounded">
-              {{ groupedMembers.members.length }}
-            </span>
-          </div>
-          <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            <DomainMembersMemberCard
-              v-for="member in groupedMembers.members"
-              :key="member.id"
-              :member="member"
-              :can-manage="canManage"
-              :current-user-id="userStore.user?.id || 0"
-              @change-role="handleRoleChange"
-              @remove="handleRemoveMember"
-            />
-          </div>
-        </section>
-
-        <!-- Pending Invitations Section -->
-        <section
-          v-if="filteredInvitations.length > 0 || (canManage && invitations.length > 0)"
-        >
-          <div class="flex items-center gap-2 mb-4">
-            <Icon
-              name="lucide:mail"
-              class="w-4 h-4 text-warning"
-            />
-            <h2 class="text-sm font-medium text-text-secondary">
-              Pending Invitations
-            </h2>
-            <span class="px-1.5 py-0.5 text-xs font-medium text-warning bg-warning-light rounded">
-              {{ filteredInvitations.length }}
-            </span>
-          </div>
-
-          <div
-            v-if="filteredInvitations.length > 0"
-            class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
-          >
-            <DomainMembersInvitationCard
-              v-for="invitation in filteredInvitations"
-              :key="invitation.id"
-              :invitation="invitation"
-              :can-manage="canManage"
-              :is-resending="resendingInvitationId === invitation.id"
-              @cancel="handleCancelInvitation"
-              @resend="handleResendInvitation"
-            />
-          </div>
-
-          <BaseCard
-            v-else-if="canManage && !searchQuery"
-            class="border-dashed"
-          >
-            <BaseEmptyState
-              icon="lucide:mail"
-              title="No pending invitations"
-              description="Invite team members to collaborate in this workspace"
-              compact
-            >
-              <BaseButton
-                variant="secondary"
-                size="sm"
-                @click="showInviteModal = true"
+        <!-- Members Table -->
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50/50">
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  Member
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  Role
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  Joined
+                </th>
+                <th
+                  v-if="canManage"
+                  class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500"
+                >
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Owner -->
+              <tr
+                v-if="groupedMembers.owner"
+                class="group"
               >
-                <Icon
-                  name="lucide:user-plus"
-                  class="w-4 h-4 mr-1.5"
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <BaseAvatar
+                      :src="groupedMembers.owner.user.avatar_url"
+                      :name="groupedMembers.owner.user.name"
+                      size="sm"
+                    />
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="truncate text-sm font-medium text-gray-900">
+                          {{ groupedMembers.owner.user.name }}
+                        </span>
+                        <span
+                          v-if="groupedMembers.owner.user_id === userStore.user?.id"
+                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                        >
+                          you
+                        </span>
+                      </div>
+                      <p class="truncate text-sm text-gray-500">
+                        {{ groupedMembers.owner.user.email }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <Icon
+                      name="lucide:crown"
+                      class="size-3.5 text-amber-500"
+                    />
+                    Owner
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">
+                  {{ new Date(groupedMembers.owner.joined_at || groupedMembers.owner.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
+                </td>
+                <td
+                  v-if="canManage"
+                  class="px-4 py-3"
                 />
-                Invite member
-              </BaseButton>
-            </BaseEmptyState>
-          </BaseCard>
-        </section>
+              </tr>
 
-        <!-- Solo workspace prompt -->
-        <BaseCard
+              <!-- Admins -->
+              <tr
+                v-for="member in groupedMembers.admins"
+                :key="member.id"
+                class="group"
+              >
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <BaseAvatar
+                      :src="member.user.avatar_url"
+                      :name="member.user.name"
+                      size="sm"
+                    />
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="truncate text-sm font-medium text-gray-900">
+                          {{ member.user.name }}
+                        </span>
+                        <span
+                          v-if="member.user_id === userStore.user?.id"
+                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                        >
+                          you
+                        </span>
+                      </div>
+                      <p class="truncate text-sm text-gray-500">
+                        {{ member.user.email }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <Icon
+                      name="lucide:shield"
+                      class="size-3.5 text-blue-500"
+                    />
+                    Admin
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">
+                  {{ new Date(member.joined_at || member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
+                </td>
+                <td
+                  v-if="canManage"
+                  class="px-4 py-3"
+                >
+                  <div
+                    v-if="member.user_id !== userStore.user?.id"
+                    class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
+                  >
+                    <button
+                      class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      title="Change role"
+                      @click="handleRoleChange(member.id, MemberRole.Member)"
+                    >
+                      <Icon
+                        name="lucide:arrow-down"
+                        class="size-4"
+                      />
+                    </button>
+                    <button
+                      class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      title="Remove"
+                      @click="handleRemoveMember(member.id)"
+                    >
+                      <Icon
+                        name="lucide:x"
+                        class="size-4"
+                      />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Members -->
+              <tr
+                v-for="member in groupedMembers.members"
+                :key="member.id"
+                class="group"
+              >
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <BaseAvatar
+                      :src="member.user.avatar_url"
+                      :name="member.user.name"
+                      size="sm"
+                    />
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="truncate text-sm font-medium text-gray-900">
+                          {{ member.user.name }}
+                        </span>
+                        <span
+                          v-if="member.user_id === userStore.user?.id"
+                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                        >
+                          you
+                        </span>
+                      </div>
+                      <p class="truncate text-sm text-gray-500">
+                        {{ member.user.email }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="text-sm text-gray-500">
+                    Member
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-500">
+                  {{ new Date(member.joined_at || member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
+                </td>
+                <td
+                  v-if="canManage"
+                  class="px-4 py-3"
+                >
+                  <div
+                    v-if="member.user_id !== userStore.user?.id"
+                    class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
+                  >
+                    <button
+                      class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      title="Promote to admin"
+                      @click="handleRoleChange(member.id, MemberRole.Admin)"
+                    >
+                      <Icon
+                        name="lucide:arrow-up"
+                        class="size-4"
+                      />
+                    </button>
+                    <button
+                      class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      title="Remove"
+                      @click="handleRemoveMember(member.id)"
+                    >
+                      <Icon
+                        name="lucide:x"
+                        class="size-4"
+                      />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr v-if="!groupedMembers.owner && groupedMembers.admins.length === 0 && groupedMembers.members.length === 0">
+                <td
+                  :colspan="canManage ? 4 : 3"
+                  class="px-4 py-8 text-center text-sm text-gray-500"
+                >
+                  No members found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pending Invitations -->
+        <div
+          v-if="filteredInvitations.length > 0"
+          class="space-y-4"
+        >
+          <h2 class="text-sm font-medium text-gray-700">
+            Pending invitations
+          </h2>
+
+          <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+            <table class="w-full">
+              <tbody class="divide-y divide-gray-100">
+                <tr
+                  v-for="invitation in filteredInvitations"
+                  :key="invitation.id"
+                  class="group"
+                >
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                      <div class="flex size-8 items-center justify-center rounded-full bg-gray-100">
+                        <Icon
+                          name="lucide:mail"
+                          class="size-4 text-gray-400"
+                        />
+                      </div>
+                      <div class="min-w-0">
+                        <p class="truncate text-sm font-medium text-gray-900">
+                          {{ invitation.email }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Invited by {{ invitation.invited_by.name }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-sm text-gray-500">
+                      {{ invitation.role === MemberRole.Admin ? 'Admin' : 'Member' }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span
+                      class="text-sm"
+                      :class="invitation.is_expired ? 'text-amber-600' : 'text-gray-500'"
+                    >
+                      {{ invitation.is_expired ? 'Expired' : `Expires ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` }}
+                    </span>
+                  </td>
+                  <td
+                    v-if="canManage"
+                    class="px-4 py-3"
+                  >
+                    <div class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
+                      <button
+                        class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
+                        title="Resend"
+                        :disabled="resendingInvitationId === invitation.id"
+                        @click="handleResendInvitation(invitation.id)"
+                      >
+                        <Icon
+                          :name="resendingInvitationId === invitation.id ? 'lucide:loader-2' : 'lucide:send'"
+                          class="size-4"
+                          :class="{ 'animate-spin': resendingInvitationId === invitation.id }"
+                        />
+                      </button>
+                      <button
+                        class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        title="Cancel"
+                        @click="handleCancelInvitation(invitation.id)"
+                      >
+                        <Icon
+                          name="lucide:x"
+                          class="size-4"
+                        />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Empty team prompt -->
+        <div
           v-if="members.length === 1 && invitations.length === 0 && canManage && !searchQuery"
-          class="mt-6 border-accent/20 bg-accent/[0.02]"
+          class="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
         >
-          <div class="flex items-start gap-4">
-            <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-              <Icon
-                name="lucide:users"
-                class="w-6 h-6 text-accent"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-sm font-semibold text-text-primary">
-                You're the only one here
-              </h3>
-              <p class="text-sm text-text-muted mt-1">
-                Invite your team to collaborate on code reviews and share insights together.
-              </p>
-              <BaseButton
-                class="mt-3"
-                size="sm"
-                @click="showInviteModal = true"
-              >
-                <Icon
-                  name="lucide:user-plus"
-                  class="w-4 h-4 mr-1.5"
-                />
-                Invite your first teammate
-              </BaseButton>
-            </div>
-          </div>
-        </BaseCard>
+          <p class="text-sm text-gray-600">
+            You're the only member in this workspace.
+          </p>
+          <button
+            class="mt-3 text-sm font-medium text-gray-900 underline underline-offset-2"
+            @click="showInviteModal = true"
+          >
+            Invite your team
+          </button>
+        </div>
       </template>
     </template>
 
@@ -561,69 +611,62 @@ async function handleResendInvitation(invitationId: number) {
       @submit="handleInvite"
     />
 
-    <!-- Remove member confirmation modal -->
+    <!-- Remove member modal -->
     <BaseModal
       v-model="showRemoveMemberModal"
-      title="Remove team member"
+      title="Remove member"
       size="sm"
     >
       <div class="space-y-4">
         <div
           v-if="pendingMember"
-          class="flex items-center gap-3 p-3 bg-bg-surface rounded-xl"
+          class="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
         >
           <BaseAvatar
             :src="pendingMember.user.avatar_url"
             :name="pendingMember.user.name"
-            size="md"
+            size="sm"
           />
           <div>
-            <p class="text-sm font-medium text-text-primary">
+            <p class="text-sm font-medium text-gray-900">
               {{ pendingMember.user.name }}
             </p>
-            <p class="text-xs text-text-muted">
+            <p class="text-xs text-gray-500">
               {{ pendingMember.user.email }}
             </p>
           </div>
         </div>
 
-        <div class="p-3 bg-error-light rounded-lg">
-          <div class="flex items-start gap-2">
-            <Icon
-              name="lucide:alert-triangle"
-              class="w-4 h-4 text-error flex-shrink-0 mt-0.5"
-            />
-            <p class="text-sm text-error">
-              This person will immediately lose access to the workspace and all its resources.
-            </p>
-          </div>
-        </div>
+        <p class="text-sm text-gray-600">
+          This person will immediately lose access to the workspace.
+        </p>
       </div>
 
       <template #footer>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <BaseButton
-            variant="secondary"
+        <div class="flex gap-3">
+          <button
+            class="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             @click="showRemoveMemberModal = false"
           >
             Cancel
-          </BaseButton>
-          <BaseButton
-            variant="danger"
-            :loading="isProcessing"
+          </button>
+          <button
+            class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            :disabled="isProcessing"
             @click="confirmRemoveMember"
           >
             <Icon
-              name="lucide:user-minus"
-              class="w-4 h-4 mr-1.5"
+              v-if="isProcessing"
+              name="lucide:loader-2"
+              class="size-4 animate-spin"
             />
-            Remove member
-          </BaseButton>
+            Remove
+          </button>
         </div>
       </template>
     </BaseModal>
 
-    <!-- Cancel invitation confirmation modal -->
+    <!-- Cancel invitation modal -->
     <BaseModal
       v-model="showCancelInvitationModal"
       title="Cancel invitation"
@@ -632,44 +675,49 @@ async function handleResendInvitation(invitationId: number) {
       <div class="space-y-4">
         <div
           v-if="pendingInvitation"
-          class="flex items-center gap-3 p-3 bg-bg-surface rounded-xl"
+          class="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
         >
-          <div class="w-10 h-10 rounded-xl bg-warning-light flex items-center justify-center">
+          <div class="flex size-8 items-center justify-center rounded-full bg-gray-200">
             <Icon
               name="lucide:mail"
-              class="w-5 h-5 text-warning"
+              class="size-4 text-gray-500"
             />
           </div>
           <div>
-            <p class="text-sm font-medium text-text-primary">
+            <p class="text-sm font-medium text-gray-900">
               {{ pendingInvitation.email }}
             </p>
-            <p class="text-xs text-text-muted">
+            <p class="text-xs text-gray-500">
               Invited as {{ pendingInvitation.role_label }}
             </p>
           </div>
         </div>
 
-        <p class="text-sm text-text-secondary">
-          This invitation link will no longer work. You can always send a new invitation later.
+        <p class="text-sm text-gray-600">
+          The invitation link will no longer work.
         </p>
       </div>
 
       <template #footer>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <BaseButton
-            variant="secondary"
+        <div class="flex gap-3">
+          <button
+            class="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             @click="showCancelInvitationModal = false"
           >
-            Keep invitation
-          </BaseButton>
-          <BaseButton
-            variant="danger"
-            :loading="isProcessing"
+            Keep
+          </button>
+          <button
+            class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            :disabled="isProcessing"
             @click="confirmCancelInvitation"
           >
+            <Icon
+              v-if="isProcessing"
+              name="lucide:loader-2"
+              class="size-4 animate-spin"
+            />
             Cancel invitation
-          </BaseButton>
+          </button>
         </div>
       </template>
     </BaseModal>

@@ -55,7 +55,7 @@ defineExpose({ reset })
         v-model="email"
         type="email"
         placeholder="Email address"
-        class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+        class="w-full px-3 py-2 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default placeholder:text-text-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
         :class="{ 'border-error': error }"
       >
     </div>
@@ -64,7 +64,7 @@ defineExpose({ reset })
     <div class="relative">
       <select
         v-model="role"
-        class="appearance-none px-3 py-2 pr-8 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+        class="appearance-none px-3 py-2 pr-8 text-sm text-text-primary bg-bg-elevated border border-border-muted rounded-lg transition-default focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
       >
         <option
           v-for="r in roles"
