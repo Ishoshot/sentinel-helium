@@ -19,7 +19,7 @@ export const TOAST_DURATION_ERROR = 6000;
 export const TOAST_DURATION_WARNING = 5000;
 
 /** Duration for info toast notifications */
-export const TOAST_DURATION_INFO = 4000;
+export const TOAST_DURATION_INFO = 8000;
 
 // ============================================================================
 // Clipboard Feedback (milliseconds)

@@ -66,7 +66,7 @@ function getStyle(type: ToastType) {
         <div
           v-for="toast in toasts"
           :key="toast.id"
-          class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-full border shadow-lg backdrop-blur-sm max-w-md"
+          class="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-full border shadow-lg backdrop-blur-sm max-w-xl"
           :class="[getStyle(toast.type).bg, getStyle(toast.type).border]"
           role="alert"
         >
@@ -81,6 +81,15 @@ function getStyle(type: ToastType) {
           <span class="text-sm font-medium text-text-primary truncate">
             {{ toast.title }}
           </span>
+
+          <!-- Action button -->
+          <button
+            v-if="toast.action"
+            class="shrink-0 text-sm font-semibold text-accent hover:text-accent/80 underline underline-offset-2 transition-default"
+            @click="toast.action.onClick"
+          >
+            {{ toast.action.label }}
+          </button>
 
           <!-- Dismiss button -->
           <button
