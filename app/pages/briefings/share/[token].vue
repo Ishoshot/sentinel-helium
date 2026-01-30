@@ -57,7 +57,10 @@ async function handleUnlock() {
       class="mx-auto max-w-lg rounded-2xl border border-border-subtle bg-bg-elevated p-8 text-center"
     >
       <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-warning/10 text-warning">
-        <Icon name="lucide:link-2" class="size-6" />
+        <Icon
+          name="lucide:link-2"
+          class="size-6"
+        />
       </div>
       <h2 class="mt-4 text-lg font-semibold text-text-primary">
         Missing share token
@@ -108,7 +111,10 @@ async function handleUnlock() {
       class="mx-auto max-w-lg rounded-2xl border border-border-subtle bg-bg-elevated p-8 text-center"
     >
       <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-error/10 text-error">
-        <Icon name="lucide:alert-circle" class="size-6" />
+        <Icon
+          name="lucide:alert-circle"
+          class="size-6"
+        />
       </div>
       <h2 class="mt-4 text-lg font-semibold text-text-primary">
         Unable to load briefing
