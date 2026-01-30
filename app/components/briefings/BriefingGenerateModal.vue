@@ -69,20 +69,28 @@ function handleGenerate() {
           <h2 class="truncate text-lg font-semibold text-text-primary">
             {{ briefing.title }}
           </h2>
-          <p class="text-sm text-text-muted">Configure and generate</p>
+          <p class="text-sm text-text-muted">
+            Configure and generate
+          </p>
           <div class="mt-2 flex flex-wrap items-center gap-2">
             <span
               v-if="briefing.requires_ai"
               class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-muted"
             >
-              <Icon name="lucide:sparkles" class="size-3" />
+              <Icon
+                name="lucide:sparkles"
+                class="size-3"
+              />
               AI
             </span>
             <span
               v-if="briefing.is_schedulable"
               class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-muted"
             >
-              <Icon name="lucide:calendar" class="size-3" />
+              <Icon
+                name="lucide:calendar"
+                class="size-3"
+              />
               Schedulable
             </span>
             <span

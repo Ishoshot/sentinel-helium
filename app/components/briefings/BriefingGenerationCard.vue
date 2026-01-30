@@ -195,7 +195,9 @@ function handleShare() {
           <h3 class="font-medium text-slate-900">
             {{ generation.briefing?.title ?? 'Briefing' }}
           </h3>
-          <p class="text-sm text-slate-500">{{ timeAgo }}</p>
+          <p class="text-sm text-slate-500">
+            {{ timeAgo }}
+          </p>
         </div>
       </div>
 
@@ -243,7 +245,10 @@ function handleShare() {
         class="mt-4 flex items-center gap-2 text-sm text-slate-600"
       >
         <span class="flex size-6 items-center justify-center rounded-md bg-amber-100 ring-1 ring-amber-200">
-          <Icon name="lucide:trophy" class="size-3.5 text-amber-600" />
+          <Icon
+            name="lucide:trophy"
+            class="size-3.5 text-amber-600"
+          />
         </span>
         <span class="font-medium text-slate-900">{{ achievementsCount }}</span>
         achievement{{ achievementsCount !== 1 ? 's' : '' }}
@@ -274,7 +279,10 @@ function handleShare() {
               type="button"
               class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
             >
-              <Icon name="lucide:download" class="size-4" />
+              <Icon
+                name="lucide:download"
+                class="size-4"
+              />
             </button>
           </template>
         </BaseDropdown>
@@ -284,7 +292,10 @@ function handleShare() {
           class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
           @click="handleShare"
         >
-          <Icon name="lucide:share" class="size-4" />
+          <Icon
+            name="lucide:share"
+            class="size-4"
+          />
         </button>
       </div>
     </div>
@@ -295,9 +306,14 @@ function handleShare() {
       class="p-5"
     >
       <div class="flex items-start gap-3 rounded-lg bg-red-50 p-4 ring-1 ring-red-100">
-        <Icon name="lucide:alert-circle" class="mt-0.5 size-5 shrink-0 text-red-500" />
+        <Icon
+          name="lucide:alert-circle"
+          class="mt-0.5 size-5 shrink-0 text-red-500"
+        />
         <div>
-          <p class="font-medium text-red-800">Generation failed</p>
+          <p class="font-medium text-red-800">
+            Generation failed
+          </p>
           <p
             v-if="generation.error_message"
             class="mt-1 text-sm text-red-700"

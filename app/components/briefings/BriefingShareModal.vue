@@ -249,7 +249,10 @@ const shareUrl = computed(() => {
       class="space-y-6"
     >
       <!-- Password Protection -->
-      <div class="rounded-xl border border-border-subtle p-4 transition-all" :class="{ 'border-accent/30 bg-accent/[0.02]': isPasswordEnabled }">
+      <div
+        class="rounded-xl border border-border-subtle p-4 transition-all"
+        :class="{ 'border-accent/30 bg-accent/[0.02]': isPasswordEnabled }"
+      >
         <div class="flex items-start justify-between gap-4">
           <div class="flex items-start gap-3">
             <div
@@ -308,7 +311,10 @@ const shareUrl = computed(() => {
       </div>
 
       <!-- Expiry Duration -->
-      <div class="rounded-xl border border-border-subtle p-4 transition-all" :class="{ 'border-accent/30 bg-accent/[0.02]': isExpiryEnabled }">
+      <div
+        class="rounded-xl border border-border-subtle p-4 transition-all"
+        :class="{ 'border-accent/30 bg-accent/[0.02]': isExpiryEnabled }"
+      >
         <div class="flex items-start justify-between gap-4">
           <div class="flex items-start gap-3">
             <div
@@ -378,7 +384,10 @@ const shareUrl = computed(() => {
       </div>
 
       <!-- Max Accesses -->
-      <div class="rounded-xl border border-border-subtle p-4 transition-all" :class="{ 'border-accent/30 bg-accent/[0.02]': isMaxAccessesEnabled }">
+      <div
+        class="rounded-xl border border-border-subtle p-4 transition-all"
+        :class="{ 'border-accent/30 bg-accent/[0.02]': isMaxAccessesEnabled }"
+      >
         <div class="flex items-start justify-between gap-4">
           <div class="flex items-start gap-3">
             <div

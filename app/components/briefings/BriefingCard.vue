@@ -129,7 +129,10 @@ function handleManage() {
       </div>
 
       <!-- Active indicator -->
-      <div v-if="hasSubscription" class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 ring-1 ring-emerald-100">
+      <div
+        v-if="hasSubscription"
+        class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 ring-1 ring-emerald-100"
+      >
         <span class="relative flex size-1.5">
           <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
           <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
@@ -167,14 +170,20 @@ function handleManage() {
           v-if="briefing.requires_ai"
           class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 ring-1 ring-indigo-100"
         >
-          <Icon name="lucide:sparkles" class="size-3" />
+          <Icon
+            name="lucide:sparkles"
+            class="size-3"
+          />
           AI
         </span>
         <span
           v-if="briefing.is_schedulable"
           class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200"
         >
-          <Icon name="lucide:calendar" class="size-3" />
+          <Icon
+            name="lucide:calendar"
+            class="size-3"
+          />
           Schedulable
         </span>
       </div>
@@ -184,7 +193,10 @@ function handleManage() {
         v-if="hasSubscription && nextDelivery"
         class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500"
       >
-        <Icon name="lucide:clock" class="size-3.5" />
+        <Icon
+          name="lucide:clock"
+          class="size-3.5"
+        />
         Next: {{ nextDelivery.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }}
       </p>
     </div>
