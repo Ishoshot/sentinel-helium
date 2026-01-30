@@ -6,11 +6,10 @@ import { useWorkspaceStore } from "~/stores/useWorkspaceStore";
 import { useAppToast } from "~/composables/shared/useAppToast";
 import { useMembers } from "~/composables/members/useMembers";
 import { useBilling } from "~/composables/billing/useBilling";
-import DomainBillingPlanCard from "~/components/domain/billing/PlanCard.vue";
 
 /**
- * Billing page - Premium plan management and usage visibility
- * State-of-the-art design with visual hierarchy and polish
+ * Billing page - Premium subscription management
+ * Sophisticated depth design with rich layering and elegant interactions
  */
 
 definePageMeta({
@@ -54,6 +53,7 @@ const showPromotionModal = ref(false);
 const billingInterval = ref<BillingInterval>("monthly");
 const showPaymentProcessingAlert = ref(false);
 const isInitializing = ref(true);
+const isPageReady = ref(false);
 
 const currentMember = computed(() =>
   members.value.find((m) => m.user_id === userStore.user?.id)
@@ -72,26 +72,26 @@ const planOrder: Record<PlanTier, number> = {
   sanctum: 3,
 };
 
-const tierConfig: Record<PlanTier, { icon: string; iconBg: string; iconColor: string }> = {
+const tierConfig: Record<PlanTier, { icon: string; gradient: string; glowColor: string }> = {
   foundation: {
     icon: "lucide:layers",
-    iconBg: "bg-slate-100 dark:bg-slate-800",
-    iconColor: "text-slate-600 dark:text-slate-400",
+    gradient: "from-slate-500 to-slate-600",
+    glowColor: "rgba(100, 116, 139, 0.3)",
   },
   illuminate: {
     icon: "lucide:sparkles",
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
+    gradient: "from-blue-500 to-indigo-600",
+    glowColor: "rgba(59, 130, 246, 0.4)",
   },
   orchestrate: {
     icon: "lucide:zap",
-    iconBg: "bg-violet-100 dark:bg-violet-900/30",
-    iconColor: "text-violet-600 dark:text-violet-400",
+    gradient: "from-violet-500 to-purple-600",
+    glowColor: "rgba(139, 92, 246, 0.4)",
   },
   sanctum: {
     icon: "lucide:shield-check",
-    iconBg: "bg-amber-100 dark:bg-amber-900/30",
-    iconColor: "text-amber-600 dark:text-amber-400",
+    gradient: "from-amber-500 to-orange-600",
+    glowColor: "rgba(245, 158, 11, 0.4)",
   },
 };
 
@@ -107,11 +107,6 @@ const sortedPlans = computed(() =>
 
 const highlightedTier: PlanTier = "illuminate";
 
-const isLoading = computed(
-  () =>
-    isLoadingPlans.value || isLoadingSubscription.value || isLoadingUsage.value
-);
-
 const usageProgress = computed(() => {
   if (!usage.value || !currentPlan.value) return null;
   if (currentPlan.value.monthly_runs_limit === null) return null;
@@ -122,7 +117,7 @@ const usageProgress = computed(() => {
 
 const usageLimitLabel = computed(() => {
   if (!currentPlan.value) return "—";
-  if (currentPlan.value.monthly_runs_limit === null) return "Unlimited";
+  if (currentPlan.value.monthly_runs_limit === null) return "∞";
   return currentPlan.value.monthly_runs_limit.toLocaleString();
 });
 
@@ -155,27 +150,27 @@ const statusConfig = computed(() => {
   const configs = {
     active: {
       label: "Active",
-      variant: "success" as const,
-      icon: "lucide:check-circle",
-      pulse: false,
+      bgClass: "bg-emerald-400/20",
+      textClass: "text-emerald-400",
+      dotClass: "bg-emerald-400",
     },
     trialing: {
       label: "Trial",
-      variant: "warning" as const,
-      icon: "lucide:clock",
-      pulse: true,
+      bgClass: "bg-amber-400/20",
+      textClass: "text-amber-400",
+      dotClass: "bg-amber-400",
     },
     past_due: {
       label: "Past due",
-      variant: "warning" as const,
-      icon: "lucide:alert-circle",
-      pulse: true,
+      bgClass: "bg-amber-400/20",
+      textClass: "text-amber-400",
+      dotClass: "bg-amber-400",
     },
     canceled: {
       label: "Canceled",
-      variant: "error" as const,
-      icon: "lucide:x-circle",
-      pulse: false,
+      bgClass: "bg-red-400/20",
+      textClass: "text-red-400",
+      dotClass: "bg-red-400",
     },
   };
   return configs[currentStatus.value as keyof typeof configs] ?? configs.active;
@@ -187,7 +182,7 @@ const trialEndsLabel = computed(() => {
 });
 
 const planActionLabel = (plan: Plan) => {
-  if (currentPlan.value?.id === plan.id) return "Current plan";
+  if (currentPlan.value?.id === plan.id) return "Current";
   if (!hasPricingForInterval(plan, billingInterval.value)) {
     return "Contact sales";
   }
@@ -203,9 +198,7 @@ const planActionLabel = (plan: Plan) => {
 const planActionDisabled = (plan: Plan) => {
   if (currentPlan.value?.id === plan.id) return true;
   if (!canManage.value) return true;
-  // Foundation is free, no pricing check needed
   if (plan.tier === "foundation") {
-    // Only enable downgrade to foundation if currently on a paid plan
     return currentPlan.value?.tier === "foundation";
   }
   if (!hasPricingForInterval(plan, billingInterval.value)) return true;
@@ -247,23 +240,43 @@ const yearlySavingsLabel = computed(() => {
   return savings;
 });
 
-// Circular progress computations
-const circleRadius = 54;
-const circleCircumference = 2 * Math.PI * circleRadius;
-const circleStrokeDashoffset = computed(() => {
-  if (usageProgress.value === null) return circleCircumference;
-  return circleCircumference - (usageProgress.value / 100) * circleCircumference;
-});
+function getPlanPrice(plan: Plan) {
+  if (!plan.currency) return "Custom";
+  if (billingInterval.value === "yearly") {
+    return plan.price_yearly ? `$${plan.price_yearly}` : "Custom";
+  }
+  return plan.price_monthly ? `$${plan.price_monthly}` : "Custom";
+}
+
+function getPlanPeriod(plan: Plan) {
+  if (!plan.currency) return "";
+  return billingInterval.value === "yearly" ? "/yr" : "/mo";
+}
+
+const featureLabels: Record<string, string> = {
+  byok_enabled: "BYOK",
+  custom_guidelines: "Custom guidelines",
+  priority_queue: "Priority queue",
+  api_access: "API access",
+  sso_enabled: "SSO",
+  audit_logs: "Audit logs",
+};
+
+// Sort features: enabled first, then disabled
+function getSortedFeatures(features: Record<string, boolean>) {
+  const entries = Object.entries(features);
+  return entries.sort(([, a], [, b]) => {
+    if (a === b) return 0;
+    return a ? -1 : 1;
+  });
+}
 
 async function handlePlanAction(plan: Plan) {
   if (planActionDisabled(plan)) return;
   promoCodeError.value = null;
   pendingPlanId.value = plan.id;
 
-  // Capture original plan tier before change for toast message
   const originalTier = currentPlan.value?.tier;
-
-  // For foundation (cancel/downgrade), no promo code
   const promoCodeToSend = plan.tier === "foundation" ? null : promoCode.value;
 
   const result = await changePlan(
@@ -278,7 +291,6 @@ async function handlePlanAction(plan: Plan) {
     return;
   }
 
-  // Direct change (no checkout needed)
   if (result.directChange) {
     await fetchSubscription();
     if (plan.tier === "foundation") {
@@ -291,7 +303,6 @@ async function handlePlanAction(plan: Plan) {
     return;
   }
 
-  // Checkout flow
   if (result.checkoutUrl) {
     if (result.promotion) {
       promotionNotice.value = result.promotion;
@@ -327,7 +338,6 @@ async function handleCancelSubscription() {
   isCanceling.value = true;
   const result = await changePlan("foundation", "monthly", null);
   isCanceling.value = false;
-  // Foundation is free, so it's always a direct change (no checkout)
   if (result.directChange) {
     showCancelModal.value = false;
     await fetchSubscription();
@@ -336,14 +346,10 @@ async function handleCancelSubscription() {
 }
 
 onMounted(async () => {
-  // Check for checkout success params
   const checkoutId = route.query.checkout_id as string | undefined;
   if (checkoutId) {
-    // Show toast and alert for payment processing
     toast.success("Payment received! Your subscription is being processed.");
     showPaymentProcessingAlert.value = true;
-
-    // Remove query param from URL without page reload
     router.replace({ query: {} });
   }
 
@@ -351,6 +357,9 @@ onMounted(async () => {
     await Promise.all([fetchMembers(), fetchPlans(), fetchSubscription(), fetchUsage()]);
   } finally {
     isInitializing.value = false;
+    setTimeout(() => {
+      isPageReady.value = true;
+    }, 50);
   }
 });
 
@@ -375,544 +384,612 @@ watch(showPromotionModal, (isOpen) => {
 </script>
 
 <template>
-  <div class="space-y-10">
-    <!-- Hero Section: Current Plan & Usage -->
-    <section>
-      <!-- Loading State -->
-      <div
-        v-if="isInitializing"
-        class="grid gap-6 lg:grid-cols-5"
-      >
-        <div class="lg:col-span-3">
-          <BaseSkeleton class="h-80 w-full rounded-2xl" />
-        </div>
-        <div class="lg:col-span-2">
-          <BaseSkeleton class="h-80 w-full rounded-2xl" />
-        </div>
+  <div class="billing-page min-h-screen">
+    <!-- Loading State -->
+    <div
+      v-if="isInitializing"
+      class="space-y-8"
+    >
+      <BaseSkeleton class="h-64 w-full rounded-3xl" />
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <BaseSkeleton
+          v-for="i in 4"
+          :key="i"
+          class="h-96 rounded-2xl"
+        />
       </div>
+    </div>
 
-      <!-- Content -->
-      <div
-        v-else
-        class="grid gap-6 lg:grid-cols-5"
+    <!-- Content -->
+    <div
+      v-else
+      class="space-y-12"
+    >
+      <!-- Payment Processing Alert -->
+      <Transition
+        enter-active-class="transition-all duration-500 ease-out"
+        enter-from-class="opacity-0 -translate-y-4"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition-all duration-300 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0 -translate-y-4"
       >
-        <!-- Current Plan Card -->
-        <div class="lg:col-span-3">
-          <div
-            v-if="!currentPlan"
-            class="h-full rounded-2xl border border-border-subtle bg-bg-elevated p-8"
-          >
-            <BaseEmptyState
-              icon="lucide:credit-card"
-              title="No plan assigned"
-              description="This workspace does not have a plan yet."
-              compact
-            />
-          </div>
-
-          <div
-            v-else
-            class="flex h-full flex-col rounded-2xl border border-border-subtle bg-bg-elevated"
-          >
-            <!-- Payment Processing Alert (outside main padding for consistent height) -->
-            <div
-              v-if="showPaymentProcessingAlert"
-              class="px-8 pt-6"
-            >
-              <div class="flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">
-                <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
-                  <Icon
-                    name="lucide:clock"
-                    class="size-4 text-accent"
-                  />
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-text-primary">
-                    Payment received
-                  </p>
-                  <p class="mt-0.5 text-xs text-text-muted">
-                    Your subscription is being processed. This usually takes up to 2 minutes.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  class="shrink-0 rounded-lg p-1 text-text-muted transition-colors hover:bg-bg-surface hover:text-text-secondary"
-                  @click="showPaymentProcessingAlert = false"
-                >
-                  <Icon
-                    name="lucide:x"
-                    class="size-4"
-                  />
-                </button>
-              </div>
-            </div>
-
-            <div class="flex flex-1 flex-col p-8">
-              <!-- Header -->
-              <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div class="flex items-start gap-4">
-                  <div
-                    class="flex size-14 shrink-0 items-center justify-center rounded-2xl"
-                    :class="currentTierConfig.iconBg"
-                  >
-                    <Icon
-                      :name="currentTierConfig.icon"
-                      class="size-7"
-                      :class="currentTierConfig.iconColor"
-                    />
-                  </div>
-                  <div>
-                    <div class="mb-1 flex flex-wrap items-center gap-2">
-                      <h2 class="text-2xl font-bold text-text-primary">
-                        {{ formatTierLabel(currentPlan.tier) }}
-                      </h2>
-                      <div
-                        class="flex items-center gap-1.5 rounded-full px-2.5 py-1"
-                        :class="{
-                          'bg-success-light text-success': statusConfig.variant === 'success',
-                          'bg-warning-light text-warning': statusConfig.variant === 'warning',
-                          'bg-error-light text-error': statusConfig.variant === 'error',
-                        }"
-                      >
-                        <span
-                          v-if="statusConfig.pulse"
-                          class="relative flex size-2"
-                        >
-                          <span
-                            class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
-                            :class="{
-                              'bg-warning': statusConfig.variant === 'warning',
-                              'bg-error': statusConfig.variant === 'error',
-                            }"
-                          />
-                          <span
-                            class="relative inline-flex size-2 rounded-full"
-                            :class="{
-                              'bg-warning': statusConfig.variant === 'warning',
-                              'bg-error': statusConfig.variant === 'error',
-                            }"
-                          />
-                        </span>
-                        <Icon
-                          v-else
-                          :name="statusConfig.icon"
-                          class="size-3.5"
-                        />
-                        <span class="text-xs font-semibold">{{ statusConfig.label }}</span>
-                      </div>
-                    </div>
-                    <p class="text-sm text-text-muted">
-                      Your workspace subscription
-                    </p>
-                  </div>
-                </div>
-
-                <div class="text-left sm:text-right">
-                  <div class="flex items-baseline gap-1 sm:justify-end">
-                    <span class="text-4xl font-bold tracking-tight text-text-primary">
-                      {{ currentPlan.price_monthly ? `$${currentPlan.price_monthly}` : "Custom" }}
-                    </span>
-                    <span class="text-sm text-text-muted">/mo</span>
-                  </div>
-                  <p class="mt-1 text-xs text-text-muted">
-                    {{ currentPlan.currency ? "Billed monthly" : "Contact sales" }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Stats Grid -->
-              <div class="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-xl bg-bg-surface p-4">
-                  <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon
-                      name="lucide:git-pull-request"
-                      class="size-4"
-                    />
-                    <span class="text-xs font-medium">Reviews / month</span>
-                  </div>
-                  <p class="text-2xl font-bold text-text-primary">
-                    {{ currentPlan.monthly_runs_limit === null ? "Unlimited" : currentPlan.monthly_runs_limit.toLocaleString() }}
-                  </p>
-                </div>
-                <div class="rounded-xl bg-bg-surface p-4">
-                  <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon
-                      name="lucide:users"
-                      class="size-4"
-                    />
-                    <span class="text-xs font-medium">Team members</span>
-                  </div>
-                  <p class="text-2xl font-bold text-text-primary">
-                    {{ currentPlan.team_size_limit === null ? "Unlimited" : currentPlan.team_size_limit.toLocaleString() }}
-                  </p>
-                </div>
-                <div class="rounded-xl bg-bg-surface p-4">
-                  <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon
-                      name="lucide:terminal"
-                      class="size-4"
-                    />
-                    <span class="text-xs font-medium">Commands / month</span>
-                  </div>
-                  <p class="text-2xl font-bold text-text-primary">
-                    {{ currentPlan.monthly_commands_limit == null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
-                  </p>
-                </div>
-                <div class="rounded-xl bg-bg-surface p-4">
-                  <div class="mb-2 flex items-center gap-2 text-text-muted">
-                    <Icon
-                      name="lucide:calendar"
-                      class="size-4"
-                    />
-                    <span class="text-xs font-medium">Billing cycle</span>
-                  </div>
-                  <p class="text-2xl font-bold text-text-primary">
-                    Monthly
-                  </p>
-                </div>
-              </div>
-
-              <!-- Trial Notice -->
-              <div
-                v-if="trialEndsLabel"
-                class="mb-6 flex items-center gap-3 rounded-xl border border-warning/20 bg-warning-light/50 p-4"
-              >
-                <Icon
-                  name="lucide:hourglass"
-                  class="size-5 text-warning"
-                />
-                <div>
-                  <p class="text-sm font-medium text-warning">
-                    Trial period active
-                  </p>
-                  <p class="text-xs text-warning/80">
-                    Ends on {{ trialEndsLabel }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <BaseButton
-                  variant="primary"
-                  :disabled="!canManage || currentPlan.tier === 'foundation'"
-                  :loading="isPortalLoading"
-                  @click="handleOpenPortal"
-                >
-                  <Icon
-                    name="lucide:credit-card"
-                    class="size-4"
-                  />
-                  Manage billing
-                </BaseButton>
-                <BaseButton
-                  v-if="currentPlan.tier !== 'foundation'"
-                  variant="ghost"
-                  :disabled="!canManage"
-                  @click="showCancelModal = true"
-                >
-                  Cancel subscription
-                </BaseButton>
-                <p
-                  v-if="!canManage"
-                  class="text-xs text-text-muted"
-                >
-                  Only workspace owners can manage billing.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Usage Card -->
-        <div class="lg:col-span-2">
-          <div class="h-full rounded-2xl border border-border-subtle bg-bg-elevated p-6">
-            <div
-              v-if="isLoadingUsage && !usage"
-              class="flex h-full items-center justify-center"
-            >
+        <div
+          v-if="showPaymentProcessingAlert"
+          class="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent p-5"
+        >
+          <div class="flex items-center gap-4">
+            <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20">
               <Icon
-                name="lucide:loader-2"
-                class="size-8 animate-spin text-text-muted"
+                name="lucide:check-circle"
+                class="size-6 text-emerald-500"
               />
             </div>
-
-            <div
-              v-else-if="usage"
-              class="flex h-full flex-col"
-            >
-              <!-- Header -->
-              <div class="mb-6 flex items-start justify-between">
-                <div>
-                  <h3 class="text-lg font-semibold text-text-primary">
-                    Usage
-                  </h3>
-                  <p class="text-xs text-text-muted">
-                    {{ usagePeriodLabel }}
-                  </p>
-                </div>
-                <div
-                  v-if="daysRemaining !== null"
-                  class="rounded-full bg-bg-surface px-2.5 py-1 text-xs font-medium text-text-muted"
-                >
-                  {{ daysRemaining }} days left
-                </div>
-              </div>
-
-              <!-- Circular Progress -->
-              <div class="mb-6 flex justify-center">
-                <div class="relative">
-                  <svg class="size-36 -rotate-90 transform">
-                    <!-- Background circle -->
-                    <circle
-                      cx="72"
-                      cy="72"
-                      :r="circleRadius"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="12"
-                      class="text-bg-surface"
-                    />
-                    <!-- Progress circle -->
-                    <circle
-                      v-if="usageProgress !== null"
-                      cx="72"
-                      cy="72"
-                      :r="circleRadius"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="12"
-                      stroke-linecap="round"
-                      :stroke-dasharray="circleCircumference"
-                      :stroke-dashoffset="circleStrokeDashoffset"
-                      class="transition-all duration-700 ease-out"
-                      :class="isLimitReached ? 'text-error' : isApproachingLimit ? 'text-warning' : 'text-accent'"
-                    />
-                  </svg>
-                  <!-- Center content -->
-                  <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span class="text-3xl font-bold text-text-primary">
-                      {{ usage.runs_count.toLocaleString() }}
-                    </span>
-                    <span class="text-xs text-text-muted">
-                      of {{ usageLimitLabel }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Stats Row -->
-              <div class="grid grid-cols-3 gap-3">
-                <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon
-                    name="lucide:git-pull-request"
-                    class="mx-auto mb-1 size-4 text-text-muted"
-                  />
-                  <p class="text-lg font-semibold text-text-primary">
-                    {{ usage.runs_count }}
-                  </p>
-                  <p class="text-[10px] text-text-muted">
-                    Reviews
-                  </p>
-                </div>
-                <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon
-                    name="lucide:search"
-                    class="mx-auto mb-1 size-4 text-text-muted"
-                  />
-                  <p class="text-lg font-semibold text-text-primary">
-                    {{ usage.findings_count }}
-                  </p>
-                  <p class="text-[10px] text-text-muted">
-                    Findings
-                  </p>
-                </div>
-                <div class="rounded-lg bg-bg-surface p-3 text-center">
-                  <Icon
-                    name="lucide:message-square"
-                    class="mx-auto mb-1 size-4 text-text-muted"
-                  />
-                  <p class="text-lg font-semibold text-text-primary">
-                    {{ usage.annotations_count }}
-                  </p>
-                  <p class="text-[10px] text-text-muted">
-                    Annotations
-                  </p>
-                </div>
-              </div>
-
-              <!-- Warning/Limit banners -->
-              <div class="mt-auto pt-4">
-                <div
-                  v-if="isLimitReached"
-                  class="flex items-start gap-3 rounded-xl border border-error/20 bg-error-light p-4"
-                >
-                  <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-error/10">
-                    <Icon
-                      name="lucide:alert-triangle"
-                      class="size-4 text-error"
-                    />
-                  </div>
-                  <div>
-                    <p class="text-sm font-semibold text-error">
-                      Limit reached
-                    </p>
-                    <p class="text-xs text-error/80">
-                      Upgrade to continue reviewing
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  v-else-if="isApproachingLimit"
-                  class="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning-light p-4"
-                >
-                  <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-warning/10">
-                    <Icon
-                      name="lucide:alert-circle"
-                      class="size-4 text-warning"
-                    />
-                  </div>
-                  <div>
-                    <p class="text-sm font-semibold text-warning">
-                      Approaching limit
-                    </p>
-                    <p class="text-xs text-warning/80">
-                      Consider upgrading soon
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div class="flex-1">
+              <p class="font-semibold text-text-primary">
+                Payment successful
+              </p>
+              <p class="text-sm text-text-muted">
+                Your subscription is being activated. This usually takes a moment.
+              </p>
             </div>
+            <button
+              type="button"
+              class="shrink-0 rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-surface hover:text-text-primary"
+              @click="showPaymentProcessingAlert = false"
+            >
+              <Icon
+                name="lucide:x"
+                class="size-4"
+              />
+            </button>
+          </div>
+          <div class="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        </div>
+      </Transition>
 
-            <BaseEmptyState
-              v-else
-              icon="lucide:bar-chart-3"
-              title="No usage data"
-              description="Usage will appear after reviews."
-              compact
+      <!-- Hero: Current Plan Card -->
+      <section
+        class="transition-all duration-700 ease-out"
+        :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+      >
+        <div
+          v-if="!currentPlan"
+          class="rounded-3xl border border-border-subtle bg-bg-elevated p-12 text-center"
+        >
+          <div class="mx-auto mb-6 flex size-20 items-center justify-center rounded-2xl bg-bg-surface">
+            <Icon
+              name="lucide:credit-card"
+              class="size-10 text-text-muted"
             />
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Plans Section -->
-    <section>
-      <!-- Section Header -->
-      <div
-        v-if="!isInitializing"
-        class="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between"
-      >
-        <div>
           <h2 class="text-2xl font-bold text-text-primary">
-            Choose your plan
+            No active subscription
           </h2>
-          <p class="mt-1 text-sm text-text-muted">
-            Compare plans and find the perfect fit for your team.
+          <p class="mt-2 text-text-muted">
+            Choose a plan below to unlock powerful code review features.
           </p>
         </div>
 
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
-          <!-- Billing Toggle -->
-          <div class="inline-flex items-center gap-1 rounded-xl border border-border-subtle bg-bg-surface p-1">
-            <button
-              type="button"
-              class="relative rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200"
-              :class="billingInterval === 'monthly'
-                ? 'bg-bg-elevated text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary'"
-              @click="billingInterval = 'monthly'"
-            >
-              Monthly
-            </button>
-            <button
-              type="button"
-              class="relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200"
-              :class="billingInterval === 'yearly'
-                ? 'bg-bg-elevated text-text-primary shadow-sm'
-                : 'text-text-muted hover:text-text-secondary'"
-              @click="billingInterval = 'yearly'"
-            >
-              Yearly
-              <span
-                v-if="yearlySavingsLabel"
-                class="rounded-full bg-success-light px-1.5 py-0.5 text-[10px] font-bold text-success"
+        <div
+          v-else
+          class="hero-card relative overflow-hidden rounded-3xl"
+        >
+          <!-- Dark gradient background -->
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+
+          <!-- Subtle pattern overlay -->
+          <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');" />
+
+          <!-- Glow effects -->
+          <div
+            class="absolute -right-32 -top-32 size-96 rounded-full blur-3xl"
+            :style="{ background: `radial-gradient(circle, ${currentTierConfig.glowColor} 0%, transparent 70%)` }"
+          />
+          <div class="absolute -bottom-24 -left-24 size-64 rounded-full bg-blue-500/10 blur-3xl" />
+
+          <!-- Content -->
+          <div class="relative z-10 p-8 lg:p-10">
+            <div class="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
+              <!-- Left: Plan info -->
+              <div class="flex-1">
+                <!-- Status badge -->
+                <div class="mb-6 flex flex-wrap items-center gap-3">
+                  <div
+                    class="flex items-center gap-2 rounded-full px-3 py-1.5"
+                    :class="statusConfig.bgClass"
+                  >
+                    <span
+                      class="size-2 rounded-full animate-pulse"
+                      :class="statusConfig.dotClass"
+                    />
+                    <span
+                      class="text-xs font-semibold uppercase tracking-wider"
+                      :class="statusConfig.textClass"
+                    >
+                      {{ statusConfig.label }}
+                    </span>
+                  </div>
+                  <div
+                    v-if="trialEndsLabel"
+                    class="flex items-center gap-2 rounded-full bg-amber-400/20 px-3 py-1.5"
+                  >
+                    <Icon
+                      name="lucide:clock"
+                      class="size-3.5 text-amber-400"
+                    />
+                    <span class="text-xs font-medium text-amber-400">
+                      Trial ends {{ trialEndsLabel }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Plan name & icon -->
+                <div class="mb-6 flex items-center gap-5">
+                  <div
+                    class="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg"
+                    :class="currentTierConfig.gradient"
+                  >
+                    <Icon
+                      :name="currentTierConfig.icon"
+                      class="size-8 text-white"
+                    />
+                  </div>
+                  <div>
+                    <h1 class="text-4xl font-bold tracking-tight text-white lg:text-5xl">
+                      {{ formatTierLabel(currentPlan.tier) }}
+                    </h1>
+                    <div class="mt-1 flex items-baseline gap-2">
+                      <span class="text-2xl font-semibold text-white/90">
+                        {{ currentPlan.price_monthly ? `$${currentPlan.price_monthly}` : "Custom" }}
+                      </span>
+                      <span class="text-sm text-white/50">/month</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Limits row -->
+                <div class="mb-8 flex flex-wrap gap-6">
+                  <div class="min-w-[100px]">
+                    <p class="text-xs font-medium uppercase tracking-wider text-white/40">
+                      Reviews
+                    </p>
+                    <p class="mt-1 text-xl font-bold text-white">
+                      {{ currentPlan.monthly_runs_limit === null ? "Unlimited" : currentPlan.monthly_runs_limit.toLocaleString() }}
+                    </p>
+                  </div>
+                  <div class="min-w-[100px]">
+                    <p class="text-xs font-medium uppercase tracking-wider text-white/40">
+                      Team
+                    </p>
+                    <p class="mt-1 text-xl font-bold text-white">
+                      {{ currentPlan.team_size_limit === null ? "Unlimited" : currentPlan.team_size_limit }}
+                    </p>
+                  </div>
+                  <div class="min-w-[100px]">
+                    <p class="text-xs font-medium uppercase tracking-wider text-white/40">
+                      Commands
+                    </p>
+                    <p class="mt-1 text-xl font-bold text-white">
+                      {{ currentPlan.monthly_commands_limit == null ? "Unlimited" : currentPlan.monthly_commands_limit.toLocaleString() }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-lg transition-all hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    :disabled="!canManage || currentPlan.tier === 'foundation' || isPortalLoading"
+                    @click="handleOpenPortal"
+                  >
+                    <Icon
+                      v-if="isPortalLoading"
+                      name="lucide:loader-2"
+                      class="size-4 animate-spin"
+                    />
+                    <Icon
+                      v-else
+                      name="lucide:settings"
+                      class="size-4"
+                    />
+                    Manage billing
+                  </button>
+                  <button
+                    v-if="currentPlan.tier !== 'foundation'"
+                    type="button"
+                    class="text-sm text-white/50 underline-offset-4 transition-colors hover:text-white/70 hover:underline"
+                    :disabled="!canManage"
+                    @click="showCancelModal = true"
+                  >
+                    Cancel subscription
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right: Usage widget -->
+              <div
+                v-if="usage"
+                class="w-full lg:w-80"
               >
-                -{{ yearlySavingsLabel }}%
-              </span>
-            </button>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                  <div class="mb-4 flex items-center justify-between">
+                    <div>
+                      <p class="text-sm font-medium text-white/70">
+                        This period
+                      </p>
+                      <p class="text-xs text-white/40">
+                        {{ usagePeriodLabel }}
+                      </p>
+                    </div>
+                    <span
+                      v-if="daysRemaining !== null"
+                      class="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-white/60"
+                    >
+                      {{ daysRemaining }}d left
+                    </span>
+                  </div>
+
+                  <!-- Circular progress -->
+                  <div class="mb-6 flex justify-center">
+                    <div class="relative size-32">
+                      <svg class="size-full -rotate-90">
+                        <circle
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="8"
+                          class="text-white/10"
+                        />
+                        <circle
+                          v-if="usageProgress !== null"
+                          cx="64"
+                          cy="64"
+                          r="56"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="8"
+                          stroke-linecap="round"
+                          :stroke-dasharray="351.86"
+                          :stroke-dashoffset="351.86 - (usageProgress / 100) * 351.86"
+                          class="transition-all duration-1000 ease-out"
+                          :class="isLimitReached ? 'text-red-400' : isApproachingLimit ? 'text-amber-400' : 'text-emerald-400'"
+                        />
+                      </svg>
+                      <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-3xl font-bold text-white">
+                          {{ usage.runs_count }}
+                        </span>
+                        <span class="text-xs text-white/50">
+                          / {{ usageLimitLabel }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Mini stats -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-white/5 p-3 text-center">
+                      <p class="text-lg font-bold text-white">
+                        {{ usage.findings_count }}
+                      </p>
+                      <p class="text-[10px] uppercase tracking-wider text-white/40">
+                        Findings
+                      </p>
+                    </div>
+                    <div class="rounded-xl bg-white/5 p-3 text-center">
+                      <p class="text-lg font-bold text-white">
+                        {{ usage.annotations_count }}
+                      </p>
+                      <p class="text-[10px] uppercase tracking-wider text-white/40">
+                        Annotations
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Warning -->
+                  <div
+                    v-if="isLimitReached"
+                    class="mt-4 flex items-center gap-2 rounded-lg bg-red-500/20 p-3"
+                  >
+                    <Icon
+                      name="lucide:alert-triangle"
+                      class="size-4 text-red-400"
+                    />
+                    <span class="text-xs font-medium text-red-300">
+                      Limit reached — upgrade to continue
+                    </span>
+                  </div>
+                  <div
+                    v-else-if="isApproachingLimit"
+                    class="mt-4 flex items-center gap-2 rounded-lg bg-amber-500/20 p-3"
+                  >
+                    <Icon
+                      name="lucide:alert-circle"
+                      class="size-4 text-amber-400"
+                    />
+                    <span class="text-xs font-medium text-amber-300">
+                      Approaching limit
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Plans Section -->
+      <section
+        class="transition-all delay-100 duration-700 ease-out pt-10"
+        :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+      >
+        <!-- Header -->
+        <div class="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-text-primary">
+              Available plans
+            </h2>
+            <p class="mt-1 text-text-muted">
+              Scale your code review as your team grows.
+            </p>
           </div>
 
-          <!-- Promo Code -->
-          <div class="w-full sm:w-64">
-            <div class="relative">
-              <Icon
-                name="lucide:tag"
-                class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
+          <div class="flex flex-wrap items-center gap-4">
+            <!-- Billing Toggle -->
+            <div class="relative grid grid-cols-2 rounded-xl bg-bg-surface p-1">
+              <button
+                type="button"
+                class="relative z-10 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+                :class="billingInterval === 'monthly' ? 'text-text-primary' : 'text-text-muted'"
+                @click="billingInterval = 'monthly'"
+              >
+                Monthly
+              </button>
+              <button
+                type="button"
+                class="relative z-10 flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+                :class="billingInterval === 'yearly' ? 'text-text-primary' : 'text-text-muted'"
+                @click="billingInterval = 'yearly'"
+              >
+                Yearly
+                <span
+                  v-if="yearlySavingsLabel"
+                  class="rounded-md bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white"
+                >
+                  -{{ yearlySavingsLabel }}%
+                </span>
+              </button>
+              <!-- Sliding indicator -->
+              <div
+                class="absolute inset-y-1 w-[calc(50%-2px)] rounded-lg bg-white shadow-sm transition-all duration-300 ease-out"
+                :class="billingInterval === 'monthly' ? 'left-1' : 'left-[calc(50%+1px)]'"
               />
+            </div>
+
+            <!-- Promo Code -->
+            <div class="relative">
               <input
                 v-model="promoCode"
                 type="text"
                 placeholder="Promo code"
-                class="w-full rounded-xl border bg-bg-elevated py-3 pl-10 pr-4 text-sm text-text-primary placeholder-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                :class="promoCodeError ? 'border-error' : 'border-border-subtle'"
+                class="w-54 rounded-xl border bg-bg-elevated px-4 py-2.5 text-sm text-text-primary placeholder-text-muted transition-all duration-200 focus:outline-none"
+                :class="promoCodeError
+                  ? 'border-red-400 focus:border-red-400 focus:shadow-[0_0_0_3px_rgba(248,113,113,0.1)]'
+                  : 'border-border-subtle hover:border-border-muted focus:border-accent focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]'"
                 :disabled="!canManage || isProcessing"
               >
+              <p
+                v-if="promoCodeError"
+                class="absolute -bottom-5 left-0 text-xs text-red-500"
+              >
+                {{ promoCodeError }}
+              </p>
             </div>
-            <p
-              v-if="promoCodeError"
-              class="mt-1.5 text-xs text-error"
-            >
-              {{ promoCodeError }}
-            </p>
           </div>
         </div>
-      </div>
 
-      <!-- Plans Grid Loading -->
-      <div
-        v-if="isInitializing || isLoadingPlans"
-        class="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
-      >
-        <BaseSkeleton class="h-96 w-full rounded-2xl" />
-        <BaseSkeleton class="h-96 w-full rounded-2xl" />
-        <BaseSkeleton class="h-96 w-full rounded-2xl" />
-        <BaseSkeleton class="h-96 w-full rounded-2xl" />
-      </div>
+        <!-- Plans Grid -->
+        <div
+          v-if="isLoadingPlans"
+          class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <BaseSkeleton
+            v-for="i in 4"
+            :key="i"
+            class="h-[480px] rounded-2xl"
+          />
+        </div>
 
-      <!-- Plans Grid Empty -->
-      <div
-        v-else-if="sortedPlans.length === 0"
-        class="rounded-2xl border border-border-subtle bg-bg-elevated p-12"
-      >
-        <BaseEmptyState
-          icon="lucide:layers"
-          title="Plans unavailable"
-          description="We could not load plans. Please try again later."
-        />
-      </div>
+        <div
+          v-else-if="sortedPlans.length === 0"
+          class="rounded-2xl border border-border-subtle bg-bg-elevated p-12 text-center"
+        >
+          <Icon
+            name="lucide:alert-circle"
+            class="mx-auto mb-4 size-12 text-text-muted"
+          />
+          <p class="text-text-muted">
+            Unable to load plans. Please try again.
+          </p>
+        </div>
 
-      <!-- Plans Grid Content -->
-      <div
-        v-else
-        class="grid gap-6 md:grid-cols-2 xl:grid-cols-4"
-      >
-        <DomainBillingPlanCard
-          v-for="plan in sortedPlans"
-          :key="plan.id"
-          :plan="plan"
-          :is-current="currentPlan?.id === plan.id"
-          :highlight="plan.tier === highlightedTier"
-          :can-manage="canManage"
-          :billing-interval="billingInterval"
-          :action-label="planActionLabel(plan)"
-          :action-disabled="planActionDisabled(plan)"
-          :action-loading="pendingPlanId === plan.id && isProcessing"
-          @action="handlePlanAction"
-        />
-      </div>
-    </section>
+        <div
+          v-else
+          class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <div
+            v-for="(plan, index) in sortedPlans"
+            :key="plan.id"
+            class="plan-card group relative flex flex-col rounded-2xl border bg-white transition-all duration-300"
+            :class="[
+              plan.tier === highlightedTier
+                ? 'border-accent shadow-xl shadow-accent/20 ring-1 ring-accent'
+                : 'border-border-subtle hover:border-border-muted hover:shadow-lg',
+              currentPlan?.id === plan.id && plan.tier !== highlightedTier ? 'ring-2 ring-accent/40' : ''
+            ]"
+            :style="{
+              animationDelay: `${index * 75}ms`,
+            }"
+          >
+            <div class="flex flex-1 flex-col p-6">
+              <!-- Header -->
+              <div class="mb-5">
+                <div class="mb-3 flex items-center justify-between">
+                  <div
+                    class="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br shadow-md"
+                    :class="tierConfig[plan.tier].gradient"
+                  >
+                    <Icon
+                      :name="tierConfig[plan.tier].icon"
+                      class="size-5 text-white"
+                    />
+                  </div>
+                  <span
+                    v-if="plan.tier === highlightedTier"
+                    class="rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-accent"
+                  >
+                    Popular
+                  </span>
+                  <span
+                    v-else-if="currentPlan?.id === plan.id"
+                    class="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700"
+                  >
+                    Current
+                  </span>
+                </div>
+                <h3 class="text-lg font-bold text-text-primary">
+                  {{ formatTierLabel(plan.tier) }}
+                </h3>
+                <p
+                  v-if="plan.description"
+                  class="mt-1 text-sm leading-relaxed text-text-muted"
+                >
+                  {{ plan.description }}
+                </p>
+              </div>
+
+              <!-- Price -->
+              <div class="mb-6">
+                <div class="flex items-baseline">
+                  <span class="text-4xl font-bold tracking-tight text-text-primary">
+                    {{ getPlanPrice(plan) }}
+                  </span>
+                  <span class="ml-1 text-sm text-text-muted">
+                    {{ getPlanPeriod(plan) }}
+                  </span>
+                </div>
+                <p
+                  v-if="plan.yearly_savings_percent > 0 && billingInterval === 'yearly'"
+                  class="mt-1.5 text-xs font-semibold text-emerald-600"
+                >
+                  Save {{ plan.yearly_savings_percent }}% vs monthly
+                </p>
+              </div>
+
+              <!-- Limits -->
+              <div class="mb-6 space-y-2.5 border-t border-border-subtle pt-5">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-text-muted">Reviews</span>
+                  <span class="text-sm font-semibold text-text-primary">
+                    {{ plan.monthly_runs_limit === null ? "Unlimited" : plan.monthly_runs_limit.toLocaleString() }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-text-muted">Team</span>
+                  <span class="text-sm font-semibold text-text-primary">
+                    {{ plan.team_size_limit === null ? "Unlimited" : plan.team_size_limit }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-text-muted">Commands</span>
+                  <span class="text-sm font-semibold text-text-primary">
+                    {{ plan.monthly_commands_limit == null ? "Unlimited" : plan.monthly_commands_limit.toLocaleString() }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Features -->
+              <div class="mb-6 flex-1 space-y-2">
+                <div
+                  v-for="[key, enabled] in getSortedFeatures(plan.features)"
+                  :key="key"
+                  class="flex items-center gap-2.5"
+                >
+                  <div
+                    class="flex size-5 items-center justify-center rounded-full"
+                    :class="enabled ? 'bg-emerald-100' : 'bg-slate-100'"
+                  >
+                    <Icon
+                      :name="enabled ? 'lucide:check' : 'lucide:minus'"
+                      class="size-3"
+                      :class="enabled ? 'text-emerald-600' : 'text-slate-400'"
+                    />
+                  </div>
+                  <span
+                    class="text-sm"
+                    :class="enabled ? 'text-text-secondary' : 'text-text-muted/60 line-through'"
+                  >
+                    {{ featureLabels[key] }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- CTA -->
+              <button
+                type="button"
+                class="w-full rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-200"
+                :class="[
+                  currentPlan?.id === plan.id
+                    ? 'cursor-default bg-emerald-50 text-emerald-700'
+                    : plan.tier === highlightedTier
+                      ? 'bg-accent text-white shadow-lg shadow-accent/30 hover:bg-accent-hover hover:shadow-xl hover:shadow-accent/40 active:scale-[0.98]'
+                      : 'bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98]',
+                  (!canManage || planActionDisabled(plan)) && currentPlan?.id !== plan.id ? 'cursor-not-allowed opacity-50' : ''
+                ]"
+                :disabled="!canManage || planActionDisabled(plan) || pendingPlanId === plan.id"
+                @click="handlePlanAction(plan)"
+              >
+                <span
+                  v-if="pendingPlanId === plan.id && isProcessing"
+                  class="flex items-center justify-center gap-2"
+                >
+                  <Icon
+                    name="lucide:loader-2"
+                    class="size-4 animate-spin"
+                  />
+                  Processing
+                </span>
+                <span
+                  v-else-if="currentPlan?.id === plan.id"
+                  class="flex items-center justify-center gap-2"
+                >
+                  <Icon
+                    name="lucide:check"
+                    class="size-4"
+                  />
+                  Current plan
+                </span>
+                <span v-else>
+                  {{ planActionLabel(plan) }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help text -->
+        <p
+          v-if="!canManage"
+          class="mt-4 text-center text-sm text-text-muted"
+        >
+          Only workspace owners can manage billing.
+        </p>
+      </section>
+    </div>
 
     <!-- Cancel Subscription Modal -->
     <BaseModal
@@ -920,75 +997,74 @@ watch(showPromotionModal, (isOpen) => {
       title="Cancel subscription"
       size="sm"
     >
-      <div class="space-y-4">
-        <!-- Illustration -->
+      <div class="space-y-6">
         <div class="flex justify-center">
-          <div class="flex size-16 items-center justify-center rounded-full bg-error-light">
-            <Icon
-              name="lucide:heart-crack"
-              class="size-8 text-error"
-            />
+          <div class="relative">
+            <div class="flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50">
+              <Icon
+                name="lucide:heart-crack"
+                class="size-10 text-red-500"
+              />
+            </div>
           </div>
         </div>
 
         <div class="text-center">
-          <h3 class="text-lg font-semibold text-text-primary">
-            We're sad to see you go
+          <h3 class="text-xl font-bold text-text-primary">
+            We'll miss you
           </h3>
           <p class="mt-2 text-sm text-text-muted">
-            Your subscription will remain active until the end of your billing period.
+            Your subscription will remain active until the end of the current billing period.
           </p>
         </div>
 
-        <div class="space-y-3">
-          <div class="flex items-start gap-3 rounded-xl bg-bg-surface p-4">
-            <Icon
-              name="lucide:check-circle"
-              class="mt-0.5 size-4 text-success"
-            />
-            <p class="text-sm text-text-secondary">
-              Keep access until period ends
-            </p>
+        <div class="space-y-2 rounded-xl bg-bg-surface p-4">
+          <div class="flex items-center gap-3">
+            <div class="flex size-6 items-center justify-center rounded-full bg-emerald-100">
+              <Icon
+                name="lucide:check"
+                class="size-3.5 text-emerald-600"
+              />
+            </div>
+            <span class="text-sm text-text-secondary">Keep access until period ends</span>
           </div>
-          <div class="flex items-start gap-3 rounded-xl bg-bg-surface p-4">
-            <Icon
-              name="lucide:arrow-down-circle"
-              class="mt-0.5 size-4 text-warning"
-            />
-            <p class="text-sm text-text-secondary">
-              Downgrade to Foundation plan after
-            </p>
+          <div class="flex items-center gap-3">
+            <div class="flex size-6 items-center justify-center rounded-full bg-amber-100">
+              <Icon
+                name="lucide:arrow-down"
+                class="size-3.5 text-amber-600"
+              />
+            </div>
+            <span class="text-sm text-text-secondary">Switch to Foundation (free) after</span>
           </div>
-          <div class="flex items-start gap-3 rounded-xl border border-error/20 bg-error-light p-4">
-            <Icon
-              name="lucide:alert-triangle"
-              class="mt-0.5 size-4 text-error"
-            />
-            <p class="text-sm text-error">
-              Active repos and reviews will be limited
-            </p>
+          <div class="flex items-center gap-3">
+            <div class="flex size-6 items-center justify-center rounded-full bg-red-100">
+              <Icon
+                name="lucide:alert-triangle"
+                class="size-3.5 text-red-600"
+              />
+            </div>
+            <span class="text-sm text-text-secondary">Limits will apply to reviews &amp; team</span>
           </div>
         </div>
       </div>
 
       <template #footer>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div class="flex gap-3">
           <BaseButton
             variant="secondary"
+            class="flex-1"
             @click="showCancelModal = false"
           >
             Keep subscription
           </BaseButton>
           <BaseButton
             variant="danger"
+            class="flex-1"
             :loading="isCanceling"
             @click="handleCancelSubscription"
           >
-            <Icon
-              name="lucide:x"
-              class="size-4"
-            />
-            Confirm cancellation
+            Cancel
           </BaseButton>
         </div>
       </template>
@@ -997,52 +1073,51 @@ watch(showPromotionModal, (isOpen) => {
     <!-- Promotion Checkout Modal -->
     <BaseModal
       v-model="showPromotionModal"
-      title="Promo code applied"
+      title="Discount applied"
       size="sm"
     >
-      <div class="space-y-4">
-        <!-- Success Illustration -->
+      <div class="space-y-6">
         <div class="flex justify-center">
           <div class="relative">
-            <div class="flex size-16 items-center justify-center rounded-full bg-success-light">
+            <div class="flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50">
               <Icon
                 name="lucide:ticket"
-                class="size-8 text-success"
+                class="size-10 text-emerald-500"
               />
             </div>
-            <div class="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-success text-white">
+            <div class="absolute -right-1 -top-1 flex size-7 items-center justify-center rounded-full bg-emerald-500 shadow-lg">
               <Icon
                 name="lucide:check"
-                class="size-3.5"
+                class="size-4 text-white"
               />
             </div>
           </div>
         </div>
 
         <div class="text-center">
-          <h3 class="text-lg font-semibold text-text-primary">
-            Great news!
+          <h3 class="text-xl font-bold text-text-primary">
+            Promo code applied!
           </h3>
-          <p class="mt-1 text-sm text-text-muted">
-            Your promo code has been applied successfully.
+          <p class="mt-2 text-sm text-text-muted">
+            Your discount will be applied at checkout.
           </p>
         </div>
 
-        <div class="rounded-xl border border-success/20 bg-success-light/50 p-4">
-          <div class="flex items-center justify-between">
+        <div class="overflow-hidden rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+          <div class="flex items-center justify-between p-4">
             <div>
-              <p class="text-xs text-text-muted">
-                Promo code
+              <p class="text-xs font-medium uppercase tracking-wider text-emerald-600/70">
+                Code
               </p>
-              <p class="font-mono text-sm font-bold text-text-primary">
+              <p class="mt-0.5 font-mono text-lg font-bold text-text-primary">
                 {{ promotionNotice?.code }}
               </p>
             </div>
             <div class="text-right">
-              <p class="text-xs text-text-muted">
+              <p class="text-xs font-medium uppercase tracking-wider text-emerald-600/70">
                 Discount
               </p>
-              <p class="text-lg font-bold text-success">
+              <p class="mt-0.5 text-2xl font-bold text-emerald-600">
                 {{ promotionNotice?.discount }}
               </p>
             </div>
@@ -1051,15 +1126,17 @@ watch(showPromotionModal, (isOpen) => {
       </div>
 
       <template #footer>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div class="flex gap-3">
           <BaseButton
             variant="ghost"
+            class="flex-1"
             @click="handlePromotionDismiss"
           >
             Not now
           </BaseButton>
           <BaseButton
             variant="primary"
+            class="flex-1"
             @click="handlePromotionCheckout"
           >
             <Icon
@@ -1073,3 +1150,26 @@ watch(showPromotionModal, (isOpen) => {
     </BaseModal>
   </div>
 </template>
+
+<style scoped>
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.plan-card {
+  animation: card-enter 0.5s ease-out both;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
