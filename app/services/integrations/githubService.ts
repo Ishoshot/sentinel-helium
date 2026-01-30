@@ -1,11 +1,12 @@
 import type {
   ApiResponse,
-  ApiListResponse,
+  ApiResourcePaginatedResponse,
   Connection,
   Repository,
   ConnectResponse,
   SyncRepositoriesResponse,
   UpdateRepositoryData,
+  CreateConfigPrResponse,
 } from "~/types";
 import { useApiClient } from "../core/api";
 
@@ -19,10 +20,10 @@ export function useGitHubService() {
    * Get current GitHub connection status
    */
   async function getConnection(
-    workspaceId: number
+    workspaceId: number,
   ): Promise<Connection | null> {
     const response = await $api<ApiResponse<Connection | null>>(
-      `/workspaces/${workspaceId}/github/connection`
+      `/workspaces/${workspaceId}/github/connection`,
     );
     return response.data;
   }
@@ -34,7 +35,7 @@ export function useGitHubService() {
   async function connect(workspaceId: number): Promise<ConnectResponse> {
     const response = await $api<ConnectResponse>(
       `/workspaces/${workspaceId}/github/connect`,
-      { method: "POST" }
+      { method: "POST" },
     );
     return response;
   }
@@ -49,13 +50,30 @@ export function useGitHubService() {
   }
 
   /**
-   * List all repositories for the workspace
+   * Query parameters for repository listing
    */
-  async function listRepositories(workspaceId: number): Promise<Repository[]> {
-    const response = await $api<ApiListResponse<Repository>>(
-      `/workspaces/${workspaceId}/repositories`
+  interface ListRepositoriesParams {
+    page?: number;
+    perPage?: number;
+  }
+
+  /**
+   * List repositories for the workspace with pagination
+   */
+  async function listRepositories(
+    workspaceId: number,
+    params: ListRepositoriesParams = {},
+  ): Promise<ApiResourcePaginatedResponse<Repository>> {
+    const queryParams: Record<string, number> = {};
+
+    if (params.page) queryParams.page = params.page;
+    if (params.perPage) queryParams.per_page = params.perPage;
+
+    const response = await $api<ApiResourcePaginatedResponse<Repository>>(
+      `/workspaces/${workspaceId}/repositories`,
+      { params: queryParams },
     );
-    return response.data;
+    return response;
   }
 
   /**
@@ -63,10 +81,10 @@ export function useGitHubService() {
    */
   async function getRepository(
     workspaceId: number,
-    repositoryId: number
+    repositoryId: number,
   ): Promise<Repository> {
     const response = await $api<ApiResponse<Repository>>(
-      `/workspaces/${workspaceId}/repositories/${repositoryId}`
+      `/workspaces/${workspaceId}/repositories/${repositoryId}`,
     );
     return response.data;
   }
@@ -75,11 +93,11 @@ export function useGitHubService() {
    * Sync repositories from GitHub
    */
   async function syncRepositories(
-    workspaceId: number
+    workspaceId: number,
   ): Promise<SyncRepositoriesResponse> {
     const response = await $api<SyncRepositoriesResponse>(
       `/workspaces/${workspaceId}/repositories/sync`,
-      { method: "POST" }
+      { method: "POST" },
     );
     return response;
   }
@@ -90,16 +108,30 @@ export function useGitHubService() {
   async function updateRepository(
     workspaceId: number,
     repositoryId: number,
-    data: UpdateRepositoryData
+    data: UpdateRepositoryData,
   ): Promise<Repository> {
     const response = await $api<ApiResponse<Repository>>(
       `/workspaces/${workspaceId}/repositories/${repositoryId}`,
       {
         method: "PATCH",
         body: data,
-      }
+      },
     );
     return response.data;
+  }
+
+  /**
+   * Create a config PR for a repository
+   */
+  async function createConfigPr(
+    workspaceId: number,
+    repositoryId: number,
+  ): Promise<CreateConfigPrResponse> {
+    const response = await $api<CreateConfigPrResponse>(
+      `/workspaces/${workspaceId}/repositories/${repositoryId}/create-config-pr`,
+      { method: "POST" },
+    );
+    return response;
   }
 
   return {
@@ -110,5 +142,6 @@ export function useGitHubService() {
     getRepository,
     syncRepositories,
     updateRepository,
+    createConfigPr,
   };
 }

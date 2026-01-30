@@ -1,6 +1,8 @@
-import type { Connection, Repository, UpdateRepositoryData } from "~/types";
+import type { Connection, Repository, UpdateRepositoryData, CreateConfigPrResponse } from "~/types";
 import { ConnectionStatus, InstallationStatus } from "~/types";
 import { useGitHubService } from "~/services/integrations/githubService";
+import { useWebSocket } from "~/composables/useWebSocket";
+import { useAppToast } from "~/composables/shared/useAppToast";
 import { ApiError } from "~/services/core/api";
 
 /**
@@ -8,6 +10,8 @@ import { ApiError } from "~/services/core/api";
  */
 export function useGitHub(workspaceId: Ref<number | null>) {
   const githubService = useGitHubService();
+  const { subscribeToRepositories, unsubscribeFromRepositories } = useWebSocket(workspaceId);
+  const toast = useAppToast();
 
   const connection = ref<Connection | null>(null);
   const repositories = ref<Repository[]>([]);
@@ -15,20 +19,31 @@ export function useGitHub(workspaceId: Ref<number | null>) {
   const isConnecting = ref(false);
   const isDisconnecting = ref(false);
   const isSyncing = ref(false);
+  const isCreatingConfigPr = ref(false);
   const error = ref<string | null>(null);
+
+  // Pagination state
+  const pagination = ref({
+    currentPage: 1,
+    lastPage: 1,
+    total: 0,
+    perPage: 20,
+    from: 0,
+    to: 0,
+  });
 
   // Computed properties
   const isConnected = computed(() => connection.value?.is_active ?? false);
   const isPending = computed(
-    () => connection.value?.status === ConnectionStatus.Pending
+    () => connection.value?.status === ConnectionStatus.Pending,
   );
   const isSuspended = computed(
     () =>
-      connection.value?.installation?.status === InstallationStatus.Suspended
+      connection.value?.installation?.status === InstallationStatus.Suspended,
   );
   const installation = computed(() => connection.value?.installation ?? null);
   const repositoriesCount = computed(
-    () => installation.value?.repositories_count ?? 0
+    () => installation.value?.repositories_count ?? 0,
   );
 
   /**
@@ -68,8 +83,18 @@ export function useGitHub(workspaceId: Ref<number | null>) {
       const response = await githubService.connect(workspaceId.value);
 
       if (response.installation_url) {
+        // Subscribe to repositories channel before opening GitHub
+        // This allows us to receive config PR creation events
+        subscribeToRepositories({
+          onConfigPrCreated: (event) => {
+            // Open the PR in a new tab when it's created
+            window.open(event.pr_url, '_blank', 'noopener,noreferrer');
+            toast.success(`Config PR created for ${event.repository_name}`);
+          },
+        });
+
         // Open GitHub in a new tab to install/configure the app
-        window.open(response.installation_url, '_blank', 'noopener,noreferrer');
+        window.open(response.installation_url, "_blank", "noopener,noreferrer");
         return;
       }
 
@@ -116,18 +141,31 @@ export function useGitHub(workspaceId: Ref<number | null>) {
   }
 
   /**
-   * List repositories
+   * List repositories with pagination
    */
-  async function fetchRepositories() {
+  async function fetchRepositories(page = 1) {
     if (!workspaceId.value) return;
 
     isLoading.value = true;
     error.value = null;
 
     try {
-      repositories.value = await githubService.listRepositories(
-        workspaceId.value
-      );
+      const response = await githubService.listRepositories(workspaceId.value, {
+        page,
+        perPage: pagination.value.perPage,
+      });
+
+      repositories.value = response.data;
+
+      // Update pagination from meta
+      pagination.value = {
+        currentPage: response.meta.current_page,
+        lastPage: response.meta.last_page,
+        total: response.meta.total,
+        perPage: response.meta.per_page,
+        from: response.meta.from,
+        to: response.meta.to,
+      };
     } catch (e) {
       error.value =
         e instanceof Error ? e.message : "Failed to fetch repositories";
@@ -162,7 +200,7 @@ export function useGitHub(workspaceId: Ref<number | null>) {
    */
   async function updateRepository(
     repositoryId: number,
-    data: UpdateRepositoryData
+    data: UpdateRepositoryData,
   ) {
     if (!workspaceId.value) return;
 
@@ -170,7 +208,7 @@ export function useGitHub(workspaceId: Ref<number | null>) {
       const updatedRepo = await githubService.updateRepository(
         workspaceId.value,
         repositoryId,
-        data
+        data,
       );
 
       // Update local state
@@ -184,6 +222,36 @@ export function useGitHub(workspaceId: Ref<number | null>) {
       error.value =
         e instanceof Error ? e.message : "Failed to update repository";
       throw e;
+    }
+  }
+
+  /**
+   * Create a config PR for a repository
+   */
+  async function createConfigPr(repositoryId: number): Promise<CreateConfigPrResponse | null> {
+    if (!workspaceId.value) {
+      error.value = "No workspace selected";
+      return null;
+    }
+
+    isCreatingConfigPr.value = true;
+    error.value = null;
+
+    try {
+      const response = await githubService.createConfigPr(workspaceId.value, repositoryId);
+      return response;
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 403) {
+        error.value = "You do not have permission to create config PR";
+      } else if (e instanceof ApiError && e.status === 404) {
+        error.value = "Repository not found";
+      } else {
+        error.value =
+          e instanceof Error ? e.message : "Failed to create config PR";
+      }
+      throw e;
+    } finally {
+      isCreatingConfigPr.value = false;
     }
   }
 
@@ -205,10 +273,12 @@ export function useGitHub(workspaceId: Ref<number | null>) {
     // State
     connection: readonly(connection),
     repositories: readonly(repositories),
+    pagination: readonly(pagination),
     isLoading: readonly(isLoading),
     isConnecting: readonly(isConnecting),
     isDisconnecting: readonly(isDisconnecting),
     isSyncing: readonly(isSyncing),
+    isCreatingConfigPr: readonly(isCreatingConfigPr),
     error: readonly(error),
 
     // Computed
@@ -225,6 +295,7 @@ export function useGitHub(workspaceId: Ref<number | null>) {
     fetchRepositories,
     syncRepositories,
     updateRepository,
+    createConfigPr,
     refresh,
     clearError,
   };

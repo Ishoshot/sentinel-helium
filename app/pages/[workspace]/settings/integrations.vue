@@ -5,12 +5,13 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useAppToast } from '~/composables/shared/useAppToast'
 import { useMembers } from '~/composables/members/useMembers'
 import { useGitHub } from '~/composables/integrations/useGitHub'
+import { useWebSocket } from '~/composables/useWebSocket'
 import DomainIntegrationsGitHubConnectionCard from '~/components/domain/integrations/GitHubConnectionCard.vue'
 import DomainIntegrationsIntegrationCard from '~/components/domain/integrations/IntegrationCard.vue'
 
 /**
- * Integrations settings page - Premium workspace integrations hub
- * Elevated design with clear visual hierarchy and rich interactions
+ * Integrations settings page
+ * Connect workspace tools and services
  */
 
 definePageMeta({
@@ -24,6 +25,10 @@ const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
 const workspaceId = computed(() => workspaceStore.currentWorkspaceId)
 const workspaceSlug = computed(() => workspaceStore.currentWorkspaceSlug)
+
+// Page ready state for animations
+const isInitializing = ref(true)
+const isPageReady = ref(false)
 
 // Composables
 const { members, fetchMembers } = useMembers(workspaceId)
@@ -40,6 +45,9 @@ const {
   syncRepositories,
   clearError,
 } = useGitHub(workspaceId)
+
+// WebSocket for config PR events
+const { subscribeToRepositories, unsubscribeFromRepositories } = useWebSocket(workspaceId)
 
 // Check permissions
 const currentMember = computed(() =>
@@ -63,32 +71,28 @@ const comingSoonIntegrations = [
     name: 'GitLab',
     description: 'Self-hosted and cloud Git repository management',
     icon: 'lucide:gitlab',
-    iconBg: 'bg-orange-50',
-    iconColor: 'text-orange-500',
+    iconGradient: 'from-orange-500 to-red-500',
     features: ['Merge request reviews', 'CI/CD integration', 'Issue tracking'],
   },
   {
     name: 'Bitbucket',
     description: 'Atlassian\'s Git solution for teams',
     icon: 'lucide:server',
-    iconBg: 'bg-blue-50',
-    iconColor: 'text-blue-500',
+    iconGradient: 'from-blue-500 to-indigo-500',
     features: ['Pull request reviews', 'Pipelines integration', 'Jira sync'],
   },
   {
     name: 'Azure DevOps',
     description: 'Microsoft\'s DevOps platform',
     icon: 'lucide:cloud',
-    iconBg: 'bg-sky-50',
-    iconColor: 'text-sky-500',
+    iconGradient: 'from-sky-500 to-blue-500',
     features: ['PR reviews', 'Boards integration', 'Pipeline triggers'],
   },
   {
     name: 'Slack',
     description: 'Real-time notifications and alerts',
     icon: 'lucide:message-square',
-    iconBg: 'bg-purple-50',
-    iconColor: 'text-purple-500',
+    iconGradient: 'from-purple-500 to-pink-500',
     features: ['Review notifications', 'Finding alerts', 'Team updates'],
   },
 ]
@@ -104,9 +108,7 @@ onMounted(async () => {
 
   if (success) {
     toast.success(success)
-    // Clear query params
     router.replace({ query: {} })
-    // Refresh connection after successful callback
     await fetchConnection()
   }
 
@@ -114,9 +116,37 @@ onMounted(async () => {
     toast.error(errorMsg)
     router.replace({ query: {} })
   }
+
+  isInitializing.value = false
+  setTimeout(() => {
+    isPageReady.value = true
+  }, 50)
+
+  // Subscribe to WebSocket for config PR events
+  subscribeToRepositories({
+    onConfigPrCreated: (event) => {
+      const opened = window.open(event.pr_url, '_blank', 'noopener,noreferrer')
+      if (!opened) {
+        toast.info({
+          title: 'Config branch ready!',
+          action: {
+            label: 'Open',
+            onClick: () => window.open(event.pr_url, '_blank', 'noopener,noreferrer'),
+          },
+        })
+      } else {
+        toast.success(`Config branch ready for ${event.repository_name}`)
+      }
+    },
+  })
 })
 
-// Watch for errors and show toast (only new errors, not stale ones)
+// Cleanup WebSocket subscription on unmount
+onUnmounted(() => {
+  unsubscribeFromRepositories()
+})
+
+// Watch for errors and show toast
 watch(error, (newError, oldError) => {
   if (newError && newError !== oldError) {
     toast.error(newError)
@@ -137,7 +167,7 @@ async function handleConnect() {
 async function handleDisconnect() {
   await disconnect()
   if (!error.value) {
-    toast.success('GitHub disconnected successfully')
+    toast.success('GitHub disconnected')
   }
 }
 
@@ -145,7 +175,7 @@ async function handleDisconnect() {
 async function handleSync() {
   await syncRepositories()
   if (!error.value) {
-    toast.success('Repositories synced successfully')
+    toast.success('Repositories synced')
   }
 }
 
@@ -156,87 +186,120 @@ function goToRepositories() {
 </script>
 
 <template>
-  <div>
-    <!-- Stats Summary - full width grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 my-10">
-      <!-- Active Integrations -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center">
-            <Icon
-              name="lucide:plug-zap"
-              class="w-6 h-6 text-success"
-            />
+  <div class="space-y-8">
+    <!-- Hero Header -->
+    <section
+      class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 transition-all duration-700 ease-out"
+      :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+    >
+      <!-- Decorative elements -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -right-20 -top-20 size-64 rounded-full bg-blue-500/10 blur-3xl" />
+        <div class="absolute -bottom-20 -left-20 size-64 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div class="absolute right-1/4 top-1/2 size-32 rounded-full bg-violet-500/10 blur-2xl" />
+      </div>
+
+      <!-- Grid pattern overlay -->
+      <div
+        class="absolute inset-0 opacity-[0.03]"
+        style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"
+      />
+
+      <div class="relative">
+        <div class="flex items-start justify-between gap-6">
+          <div class="flex items-center gap-5">
+            <div class="flex size-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm ring-1 ring-white/20">
+              <Icon
+                name="lucide:plug-zap"
+                class="size-8 text-white"
+              />
+            </div>
+            <div>
+              <h1 class="text-2xl font-semibold text-white">
+                Integrations
+              </h1>
+              <p class="mt-1 text-slate-400">
+                Connect your tools to unlock automated workflows
+              </p>
+            </div>
           </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              {{ activeIntegrationsCount }}
-            </p>
-            <p class="text-sm text-text-muted">
-              Active
-            </p>
+
+          <!-- Stats Pills -->
+          <div class="hidden items-center gap-3 sm:flex">
+            <div class="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm ring-1 ring-white/10">
+              <span class="flex size-2 rounded-full bg-emerald-400" />
+              <span class="text-sm font-medium text-white">{{ activeIntegrationsCount }} Active</span>
+            </div>
+            <div class="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm ring-1 ring-white/10">
+              <span class="flex size-2 rounded-full bg-slate-400" />
+              <span class="text-sm font-medium text-white">{{ comingSoonIntegrations.length }} Coming</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature highlights -->
+        <div class="mt-8 grid grid-cols-3 gap-4">
+          <div
+            class="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 transition-all duration-700 delay-100"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
+          >
+            <div class="flex size-9 items-center justify-center rounded-lg bg-emerald-500/20">
+              <Icon
+                name="lucide:zap"
+                class="size-4 text-emerald-400"
+              />
+            </div>
+            <span class="text-sm text-slate-300">Automated Reviews</span>
+          </div>
+          <div
+            class="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 transition-all duration-700 delay-150"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
+          >
+            <div class="flex size-9 items-center justify-center rounded-lg bg-blue-500/20">
+              <Icon
+                name="lucide:shield-check"
+                class="size-4 text-blue-400"
+              />
+            </div>
+            <span class="text-sm text-slate-300">Security Scanning</span>
+          </div>
+          <div
+            class="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 transition-all duration-700 delay-200"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
+          >
+            <div class="flex size-9 items-center justify-center rounded-lg bg-violet-500/20">
+              <Icon
+                name="lucide:bell"
+                class="size-4 text-violet-400"
+              />
+            </div>
+            <span class="text-sm text-slate-300">Real-time Alerts</span>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- Available Integrations -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-            <Icon
-              name="lucide:puzzle"
-              class="w-6 h-6 text-accent"
-            />
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              1
-            </p>
-            <p class="text-sm text-text-muted">
-              Available
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Coming Soon -->
-      <div class="p-5 rounded-xl bg-bg-elevated border border-border-subtle">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-bg-surface flex items-center justify-center">
-            <Icon
-              name="lucide:clock"
-              class="w-6 h-6 text-text-muted"
-            />
-          </div>
-          <div>
-            <p class="text-3xl font-bold text-text-primary">
-              {{ comingSoonIntegrations.length }}
-            </p>
-            <p class="text-sm text-text-muted">
-              Coming Soon
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Two Column Layout for main content - 60/40 split -->
-    <div class="grid xl:grid-cols-5 gap-8 my-10">
+    <!-- Main Content Grid -->
+    <div class="grid gap-8 xl:grid-cols-5 py-4">
       <!-- Left Column - Source Control (60%) -->
-      <div class="xl:col-span-3">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-9 h-9 rounded-xl bg-text-primary flex items-center justify-center">
+      <div
+        class="xl:col-span-3 transition-all duration-700 delay-200"
+        :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+      >
+        <!-- Section Header -->
+        <div class="mb-5 flex items-center gap-3">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-slate-900">
             <Icon
               name="lucide:git-branch"
-              class="w-4.5 h-4.5 text-white"
+              class="size-5 text-white"
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-text-primary">
+            <h2 class="text-base font-semibold text-slate-900">
               Source Control
             </h2>
-            <p class="text-sm text-text-muted">
-              Connect your repositories for automated code reviews
+            <p class="text-sm text-slate-500">
+              Connect repositories for automated code reviews
             </p>
           </div>
         </div>
@@ -255,43 +318,46 @@ function goToRepositories() {
         />
 
         <!-- Integration Benefits Card -->
-        <div class="mt-6 p-6 rounded-2xl bg-gradient-to-br from-accent/5 via-transparent to-transparent border border-accent/10">
+        <div
+          class="mt-6 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 transition-all duration-700 delay-300"
+          :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+        >
           <div class="flex items-start gap-4">
-            <div class="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-100">
               <Icon
                 name="lucide:lightbulb"
-                class="w-5 h-5 text-accent"
+                class="size-5 text-amber-600"
               />
             </div>
             <div>
-              <h3 class="text-sm font-semibold text-text-primary mb-1">
+              <h3 class="text-sm font-semibold text-slate-900">
                 Why connect integrations?
               </h3>
-              <p class="text-sm text-text-secondary mb-4">
-                Enable automated code reviews, security scanning, and real-time alerts across your workflow.
+              <p class="mt-1 text-sm text-slate-600">
+                Enable automated code reviews, security scanning, and real-time alerts across your entire workflow.
               </p>
-              <div class="flex flex-wrap gap-4">
-                <div class="flex items-center gap-2">
+              <div class="mt-4 flex flex-wrap gap-3">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
                   <Icon
-                    name="lucide:zap"
-                    class="w-4 h-4 text-accent"
+                    name="lucide:check"
+                    class="size-3 text-emerald-500"
                   />
-                  <span class="text-xs text-text-secondary">Automated reviews</span>
-                </div>
-                <div class="flex items-center gap-2">
+                  Instant feedback
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
                   <Icon
-                    name="lucide:shield-check"
-                    class="w-4 h-4 text-accent"
+                    name="lucide:check"
+                    class="size-3 text-emerald-500"
                   />
-                  <span class="text-xs text-text-secondary">Security scanning</span>
-                </div>
-                <div class="flex items-center gap-2">
+                  Zero setup
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
                   <Icon
-                    name="lucide:bell"
-                    class="w-4 h-4 text-accent"
+                    name="lucide:check"
+                    class="size-3 text-emerald-500"
                   />
-                  <span class="text-xs text-text-secondary">Real-time alerts</span>
-                </div>
+                  Secure by default
+                </span>
               </div>
             </div>
           </div>
@@ -299,37 +365,71 @@ function goToRepositories() {
       </div>
 
       <!-- Right Column - Coming Soon (40%) -->
-      <div class="xl:col-span-2">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-9 h-9 rounded-xl bg-bg-surface flex items-center justify-center">
+      <div
+        class="xl:col-span-2 transition-all duration-700 delay-250"
+        :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+      >
+        <!-- Section Header -->
+        <div class="mb-5 flex items-center gap-3">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600">
             <Icon
               name="lucide:sparkles"
-              class="w-4.5 h-4.5 text-text-muted"
+              class="size-5 text-white"
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-text-primary">
+            <h2 class="text-base font-semibold text-slate-900">
               Coming Soon
             </h2>
-            <p class="text-sm text-text-muted">
+            <p class="text-sm text-slate-500">
               More integrations on the roadmap
             </p>
           </div>
         </div>
 
-        <!-- Integration Stack - vertical layout -->
-        <div class="space-y-4">
+        <!-- Integration Stack -->
+        <div class="space-y-3">
           <DomainIntegrationsIntegrationCard
-            v-for="integration in comingSoonIntegrations"
+            v-for="(integration, index) in comingSoonIntegrations"
             :key="integration.name"
             :name="integration.name"
             :description="integration.description"
             :icon="integration.icon"
-            :icon-bg="integration.iconBg"
-            :icon-color="integration.iconColor"
+            :icon-gradient="integration.iconGradient"
             :features="integration.features"
             status="coming_soon"
+            class="transition-all duration-500"
+            :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
+            :style="{ transitionDelay: `${300 + index * 50}ms` }"
           />
+        </div>
+
+        <!-- Request Integration -->
+        <div
+          class="mt-6 rounded-xl border-2 border-dashed border-slate-200 p-5 text-center transition-all duration-700 delay-500"
+          :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+        >
+          <div class="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-slate-100">
+            <Icon
+              name="lucide:plus"
+              class="size-5 text-slate-400"
+            />
+          </div>
+          <p class="text-sm font-medium text-slate-700">
+            Need a different integration?
+          </p>
+          <p class="mt-1 text-xs text-slate-500">
+            Let us know what tools you'd like to connect
+          </p>
+          <button
+            class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-4 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200"
+          >
+            <Icon
+              name="lucide:message-circle"
+              class="size-3.5"
+            />
+            Request Integration
+          </button>
         </div>
       </div>
     </div>

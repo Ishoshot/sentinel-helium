@@ -3,8 +3,8 @@ import type { Connection } from '~/types'
 import { ConnectionStatus, InstallationStatus } from '~/types'
 
 /**
- * GitHubConnectionCard - Premium GitHub integration card
- * Hero-style design with rich visual states and smooth transitions
+ * GitHubConnectionCard - Premium+ GitHub integration card
+ * Refined design with elevated visual states and smooth transitions
  */
 
 interface Props {
@@ -53,59 +53,6 @@ const isHovered = ref(false)
 // Animation pulse for syncing
 const isSyncing = ref(false)
 
-// Status configuration with rich styling
-const statusConfig = computed(() => {
-  if (isConnected.value) {
-    return {
-      label: 'Connected',
-      icon: 'lucide:check-circle-2',
-      color: 'text-success',
-      bg: 'bg-success/10',
-      border: 'border-success/20',
-      ring: 'ring-success/20',
-      gradient: 'from-success/5 via-transparent to-transparent',
-      pulse: false,
-    }
-  }
-  if (isPending.value) {
-    return {
-      label: 'Awaiting Setup',
-      icon: 'lucide:loader-2',
-      color: 'text-warning',
-      bg: 'bg-warning/10',
-      border: 'border-warning/20',
-      ring: 'ring-warning/20',
-      gradient: 'from-warning/5 via-transparent to-transparent',
-      pulse: true,
-    }
-  }
-  if (isSuspended.value) {
-    return {
-      label: 'Suspended',
-      icon: 'lucide:alert-triangle',
-      color: 'text-warning',
-      bg: 'bg-warning/10',
-      border: 'border-warning/20',
-      ring: 'ring-warning/20',
-      gradient: 'from-warning/5 via-transparent to-transparent',
-      pulse: false,
-    }
-  }
-  if (isFailed.value) {
-    return {
-      label: 'Connection Failed',
-      icon: 'lucide:x-circle',
-      color: 'text-error',
-      bg: 'bg-error/10',
-      border: 'border-error/20',
-      ring: 'ring-error/20',
-      gradient: 'from-error/5 via-transparent to-transparent',
-      pulse: false,
-    }
-  }
-  return null
-})
-
 // Show disconnect confirmation
 const showDisconnectModal = ref(false)
 
@@ -139,26 +86,28 @@ const features = [
   >
     <!-- Main Card -->
     <div
-      class="relative overflow-hidden rounded-2xl border transition-all duration-300"
+      class="relative overflow-hidden rounded-2xl border bg-white transition-all duration-300"
       :class="[
-        statusConfig
-          ? `${statusConfig.border} ${isHovered ? 'shadow-elevated' : 'shadow-subtle'}`
-          : 'border-border-subtle hover:border-border-muted hover:shadow-elevated',
-        isConnected ? 'ring-1 ' + statusConfig?.ring : '',
+        isConnected
+          ? 'border-emerald-200 shadow-sm hover:shadow-md'
+          : isPending
+            ? 'border-amber-200'
+            : isFailed
+              ? 'border-red-200'
+              : 'border-slate-200 hover:border-slate-300 hover:shadow-md',
       ]"
     >
-      <!-- Status gradient overlay -->
-      <div
-        v-if="statusConfig"
-        class="absolute inset-0 bg-gradient-to-br pointer-events-none"
-        :class="statusConfig.gradient"
-      />
-
       <!-- Top accent line -->
       <div
-        class="absolute inset-x-0 top-0 h-0.5 transition-colors duration-300"
+        class="absolute inset-x-0 top-0 h-1 transition-colors duration-300"
         :class="[
-          isConnected ? 'bg-success' : isPending ? 'bg-warning' : isFailed ? 'bg-error' : 'bg-gradient-to-r from-transparent via-border-muted to-transparent',
+          isConnected
+            ? 'bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500'
+            : isPending
+              ? 'bg-gradient-to-r from-amber-400 to-orange-400'
+              : isFailed
+                ? 'bg-gradient-to-r from-red-400 to-rose-400'
+                : 'bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200',
         ]"
       />
 
@@ -168,7 +117,7 @@ const features = [
         class="p-8"
       >
         <div class="flex items-start gap-5">
-          <BaseSkeleton class="w-16 h-16 rounded-2xl flex-shrink-0" />
+          <BaseSkeleton class="size-14 flex-shrink-0 rounded-2xl" />
           <div class="flex-1 space-y-3">
             <BaseSkeleton class="h-5 w-32" />
             <BaseSkeleton class="h-4 w-48" />
@@ -183,42 +132,42 @@ const features = [
         class="relative p-6"
       >
         <!-- Header -->
-        <div class="flex items-start justify-between mb-6">
+        <div class="mb-6 flex items-start justify-between">
           <div class="flex items-start gap-4">
             <!-- GitHub Icon Container -->
             <div
-              class="relative flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300"
+              class="relative flex size-14 shrink-0 items-center justify-center rounded-2xl transition-all duration-300"
               :class="[
                 isConnected
-                  ? 'bg-text-primary'
+                  ? 'bg-slate-900'
                   : isPending
-                    ? 'bg-warning/10'
+                    ? 'bg-amber-100'
                     : isFailed
-                      ? 'bg-error/10'
-                      : 'bg-bg-surface group-hover:bg-bg-elevated',
+                      ? 'bg-red-100'
+                      : 'bg-slate-100 group-hover:bg-slate-200',
               ]"
             >
               <Icon
                 name="lucide:github"
-                class="w-7 h-7 transition-colors duration-300"
+                class="size-7 transition-colors duration-300"
                 :class="[
                   isConnected
                     ? 'text-white'
                     : isPending
-                      ? 'text-warning'
+                      ? 'text-amber-600'
                       : isFailed
-                        ? 'text-error'
-                        : 'text-text-primary',
+                        ? 'text-red-600'
+                        : 'text-slate-700',
                 ]"
               />
               <!-- Connected indicator -->
               <div
                 v-if="isConnected"
-                class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success border-2 border-bg-elevated flex items-center justify-center"
+                class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full border-2 border-white bg-emerald-500"
               >
                 <Icon
                   name="lucide:check"
-                  class="w-2.5 h-2.5 text-white"
+                  class="size-2.5 text-white"
                 />
               </div>
             </div>
@@ -226,24 +175,49 @@ const features = [
             <!-- Title & Description -->
             <div>
               <div class="flex items-center gap-3">
-                <h3 class="text-lg font-semibold text-text-primary">
+                <h3 class="text-lg font-semibold text-slate-900">
                   GitHub
                 </h3>
                 <!-- Status Badge -->
-                <div
-                  v-if="statusConfig"
-                  class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                  :class="[statusConfig.bg, statusConfig.color]"
+                <span
+                  v-if="isConnected"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600"
+                >
+                  <span class="flex size-1.5 rounded-full bg-emerald-500" />
+                  Connected
+                </span>
+                <span
+                  v-else-if="isPending"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600"
                 >
                   <Icon
-                    :name="statusConfig.icon"
-                    class="w-3.5 h-3.5"
-                    :class="{ 'animate-spin': statusConfig.pulse }"
+                    name="lucide:loader-2"
+                    class="size-3 animate-spin"
                   />
-                  {{ statusConfig.label }}
-                </div>
+                  Awaiting Setup
+                </span>
+                <span
+                  v-else-if="isSuspended"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-600"
+                >
+                  <Icon
+                    name="lucide:alert-triangle"
+                    class="size-3"
+                  />
+                  Suspended
+                </span>
+                <span
+                  v-else-if="isFailed"
+                  class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600"
+                >
+                  <Icon
+                    name="lucide:x-circle"
+                    class="size-3"
+                  />
+                  Failed
+                </span>
               </div>
-              <p class="text-sm text-text-muted mt-1">
+              <p class="mt-1 text-sm text-slate-500">
                 {{ isConnected
                   ? 'Source control integration active'
                   : 'Connect to enable AI-powered code reviews'
@@ -258,14 +232,14 @@ const features = [
             class="flex items-center gap-2"
           >
             <button
-              class="p-2 text-text-muted hover:text-text-primary hover:bg-bg-surface rounded-lg transition-default"
-              :class="{ 'animate-spin': isSyncing }"
+              class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-all"
               title="Sync repositories"
               @click="handleSync"
             >
               <Icon
                 name="lucide:refresh-cw"
-                class="w-4 h-4"
+                class="size-4"
+                :class="{ 'animate-spin': isSyncing }"
               />
             </button>
           </div>
@@ -274,19 +248,19 @@ const features = [
         <!-- Not Connected State -->
         <template v-if="isNotConnected">
           <!-- Features -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div
               v-for="feature in features"
               :key="feature.text"
-              class="flex flex-col items-center gap-2 p-4 rounded-xl bg-bg-surface/50 border border-transparent hover:border-border-subtle transition-default"
+              class="flex flex-col items-center gap-2 rounded-xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:bg-slate-50"
             >
-              <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <div class="flex size-10 items-center justify-center rounded-xl bg-white shadow-sm">
                 <Icon
                   :name="feature.icon"
-                  class="w-5 h-5 text-accent"
+                  class="size-5 text-slate-700"
                 />
               </div>
-              <span class="text-xs text-text-secondary text-center font-medium">
+              <span class="text-center text-xs font-medium text-slate-600">
                 {{ feature.text }}
               </span>
             </div>
@@ -297,32 +271,37 @@ const features = [
             v-if="canManage"
             class="flex flex-col gap-3"
           >
-            <BaseButton
-              size="lg"
-              :loading="isConnecting"
-              class="w-full justify-center"
+            <button
+              class="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="isConnecting"
               @click="$emit('connect')"
             >
               <Icon
-                name="lucide:github"
-                class="w-5 h-5 mr-2"
+                v-if="isConnecting"
+                name="lucide:loader-2"
+                class="size-5 animate-spin"
               />
-              Connect GitHub
-            </BaseButton>
-            <p class="text-xs text-text-muted text-center">
+              <Icon
+                v-else
+                name="lucide:github"
+                class="size-5"
+              />
+              {{ isConnecting ? 'Connecting...' : 'Connect GitHub' }}
+            </button>
+            <p class="text-center text-xs text-slate-500">
               We'll redirect you to GitHub to authorize access
             </p>
           </div>
           <div
             v-else
-            class="p-4 rounded-xl bg-bg-surface border border-border-subtle"
+            class="rounded-xl border border-slate-200 bg-slate-50 p-4"
           >
             <div class="flex items-center gap-3">
               <Icon
                 name="lucide:lock"
-                class="w-5 h-5 text-text-muted flex-shrink-0"
+                class="size-5 shrink-0 text-slate-400"
               />
-              <p class="text-sm text-text-muted">
+              <p class="text-sm text-slate-500">
                 Only workspace owners and admins can connect integrations.
               </p>
             </div>
@@ -333,40 +312,40 @@ const features = [
         <template v-else-if="isPending">
           <div class="mb-6">
             <!-- Progress steps -->
-            <div class="flex items-center gap-3 mb-4">
+            <div class="mb-4 flex items-center gap-3">
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-success flex items-center justify-center">
+                <div class="flex size-8 items-center justify-center rounded-full bg-emerald-500">
                   <Icon
                     name="lucide:check"
-                    class="w-4 h-4 text-white"
+                    class="size-4 text-white"
                   />
                 </div>
-                <span class="text-sm text-text-secondary">Authorized</span>
+                <span class="text-sm text-slate-600">Authorized</span>
               </div>
-              <div class="flex-1 h-px bg-border-muted" />
+              <div class="h-px flex-1 bg-slate-200" />
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-warning/20 border-2 border-warning flex items-center justify-center">
+                <div class="flex size-8 items-center justify-center rounded-full border-2 border-amber-400 bg-amber-50">
                   <Icon
                     name="lucide:loader-2"
-                    class="w-4 h-4 text-warning animate-spin"
+                    class="size-4 animate-spin text-amber-500"
                   />
                 </div>
-                <span class="text-sm text-warning font-medium">Install app</span>
+                <span class="text-sm font-medium text-amber-600">Install app</span>
               </div>
-              <div class="flex-1 h-px bg-border-subtle" />
+              <div class="h-px flex-1 bg-slate-200" />
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-bg-surface border border-border-muted flex items-center justify-center">
+                <div class="flex size-8 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
                   <Icon
                     name="lucide:check"
-                    class="w-4 h-4 text-text-muted"
+                    class="size-4 text-slate-300"
                   />
                 </div>
-                <span class="text-sm text-text-muted">Complete</span>
+                <span class="text-sm text-slate-400">Complete</span>
               </div>
             </div>
 
-            <div class="p-4 rounded-xl bg-warning/5 border border-warning/20">
-              <p class="text-sm text-text-secondary">
+            <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <p class="text-sm text-slate-600">
                 Complete the GitHub App installation to activate your connection. Select the repositories you want Sentinel to access.
               </p>
             </div>
@@ -376,31 +355,36 @@ const features = [
             v-if="canManage"
             class="flex items-center gap-3"
           >
-            <BaseButton
-              variant="secondary"
-              class="flex-1"
+            <button
+              class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               @click="showDisconnectModal = true"
             >
               Cancel
-            </BaseButton>
-            <BaseButton
-              :loading="isConnecting"
-              class="flex-1"
+            </button>
+            <button
+              class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="isConnecting"
               @click="$emit('connect')"
             >
               <Icon
+                v-if="isConnecting"
+                name="lucide:loader-2"
+                class="size-4 animate-spin"
+              />
+              <Icon
+                v-else
                 name="lucide:external-link"
-                class="w-4 h-4 mr-1.5"
+                class="size-4"
               />
               Continue on GitHub
-            </BaseButton>
+            </button>
           </div>
         </template>
 
         <!-- Connected State -->
         <template v-else-if="isConnected">
           <!-- Account Info -->
-          <div class="flex items-center gap-4 p-4 rounded-xl bg-bg-surface/50 border border-border-subtle mb-6">
+          <div class="mb-6 flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4">
             <div class="relative">
               <BaseAvatar
                 :src="accountAvatar"
@@ -409,39 +393,39 @@ const features = [
               />
               <div
                 v-if="isOrganization"
-                class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center border-2 border-bg-elevated"
+                class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full border-2 border-white bg-blue-500"
               >
                 <Icon
                   name="lucide:building-2"
-                  class="w-2.5 h-2.5 text-white"
+                  class="size-2.5 text-white"
                 />
               </div>
             </div>
-            <div class="flex-1 min-w-0">
+            <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <p class="font-semibold text-text-primary truncate">
+                <p class="truncate font-semibold text-slate-900">
                   {{ accountLogin }}
                 </p>
                 <span
                   v-if="isOrganization"
-                  class="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide bg-accent/10 text-accent rounded"
+                  class="rounded bg-blue-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-blue-600"
                 >
-                  Organization
+                  Org
                 </span>
               </div>
-              <p class="text-sm text-text-muted mt-0.5">
+              <p class="mt-0.5 text-sm text-slate-500">
                 Connected via GitHub App
               </p>
             </div>
 
             <!-- Stats -->
-            <div class="flex items-center gap-6 pl-4 border-l border-border-subtle">
+            <div class="flex items-center gap-6 border-l border-slate-200 pl-6">
               <div class="text-center">
-                <p class="text-2xl font-bold text-text-primary">
+                <p class="text-2xl font-bold text-slate-900">
                   {{ repositoriesCount }}
                 </p>
-                <p class="text-xs text-text-muted">
-                  {{ repositoriesCount === 1 ? 'Repository' : 'Repositories' }}
+                <p class="text-xs text-slate-500">
+                  {{ repositoriesCount === 1 ? 'Repo' : 'Repos' }}
                 </p>
               </div>
             </div>
@@ -453,56 +437,59 @@ const features = [
             class="flex items-center gap-3"
           >
             <button
-              class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-muted hover:text-error hover:bg-error/5 rounded-lg transition-default"
+              class="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
               @click="showDisconnectModal = true"
             >
               <Icon
                 name="lucide:unlink"
-                class="w-4 h-4"
+                class="size-4"
               />
               Disconnect
             </button>
             <div class="flex-1" />
-            <BaseButton
-              variant="secondary"
+            <button
+              class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               @click="$emit('viewRepositories')"
             >
               <Icon
                 name="lucide:folder-git-2"
-                class="w-4 h-4 mr-1.5"
+                class="size-4"
               />
               View Repositories
-            </BaseButton>
+            </button>
           </div>
           <div
             v-else
             class="flex justify-end"
           >
-            <BaseButton @click="$emit('viewRepositories')">
+            <button
+              class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800"
+              @click="$emit('viewRepositories')"
+            >
               <Icon
                 name="lucide:folder-git-2"
-                class="w-4 h-4 mr-1.5"
+                class="size-4"
               />
               View Repositories
-            </BaseButton>
+            </button>
           </div>
         </template>
 
         <!-- Suspended State -->
         <template v-else-if="isSuspended">
-          <div class="p-4 rounded-xl bg-warning/5 border border-warning/20 mb-6">
+          <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
             <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center flex-shrink-0">
+              <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100">
                 <Icon
                   name="lucide:alert-triangle"
-                  class="w-5 h-5 text-warning"
+                  class="size-5 text-amber-600"
                 />
               </div>
               <div>
-                <p class="text-sm font-medium text-warning">
+                <p class="text-sm font-medium text-amber-700">
                   App Suspended
                 </p>
-                <p class="text-sm text-text-secondary mt-1">
+                <p class="mt-1 text-sm text-slate-600">
                   The GitHub App has been suspended. Reactivate it in your GitHub settings to continue using Sentinel.
                 </p>
               </div>
@@ -513,42 +500,42 @@ const features = [
             v-if="canManage"
             class="flex items-center gap-3"
           >
-            <BaseButton
-              variant="secondary"
+            <button
+              class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               @click="showDisconnectModal = true"
             >
               Disconnect
-            </BaseButton>
-            <BaseButton
-              as="a"
+            </button>
+            <a
               :href="`https://github.com/settings/installations/${installation?.installation_id}`"
               target="_blank"
               rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800"
             >
               <Icon
                 name="lucide:external-link"
-                class="w-4 h-4 mr-1.5"
+                class="size-4"
               />
               Manage on GitHub
-            </BaseButton>
+            </a>
           </div>
         </template>
 
         <!-- Failed State -->
         <template v-else-if="isFailed">
-          <div class="p-4 rounded-xl bg-error/5 border border-error/20 mb-6">
+          <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
             <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl bg-error/20 flex items-center justify-center flex-shrink-0">
+              <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-red-100">
                 <Icon
                   name="lucide:x-circle"
-                  class="w-5 h-5 text-error"
+                  class="size-5 text-red-600"
                 />
               </div>
               <div>
-                <p class="text-sm font-medium text-error">
+                <p class="text-sm font-medium text-red-700">
                   Connection Failed
                 </p>
-                <p class="text-sm text-text-secondary mt-1">
+                <p class="mt-1 text-sm text-slate-600">
                   We couldn't complete the connection to GitHub. This might be due to network issues or permission problems.
                 </p>
               </div>
@@ -559,22 +546,29 @@ const features = [
             v-if="canManage"
             class="flex items-center gap-3"
           >
-            <BaseButton
-              variant="secondary"
+            <button
+              class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               @click="showDisconnectModal = true"
             >
               Cancel
-            </BaseButton>
-            <BaseButton
-              :loading="isConnecting"
+            </button>
+            <button
+              class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="isConnecting"
               @click="$emit('connect')"
             >
               <Icon
+                v-if="isConnecting"
+                name="lucide:loader-2"
+                class="size-4 animate-spin"
+              />
+              <Icon
+                v-else
                 name="lucide:refresh-cw"
-                class="w-4 h-4 mr-1.5"
+                class="size-4"
               />
               Try Again
-            </BaseButton>
+            </button>
           </div>
         </template>
       </div>
@@ -587,41 +581,45 @@ const features = [
       size="sm"
     >
       <div class="text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-error/10 flex items-center justify-center">
+        <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-red-100">
           <Icon
             name="lucide:unlink"
-            class="w-8 h-8 text-error"
+            class="size-8 text-red-600"
           />
         </div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2">
+        <h3 class="mb-2 text-lg font-semibold text-slate-900">
           Disconnect GitHub?
         </h3>
-        <p class="text-sm text-text-secondary">
+        <p class="text-sm text-slate-600">
           This will disable automated code reviews for all repositories in this workspace. You can reconnect anytime.
         </p>
       </div>
 
       <template #footer>
         <div class="flex gap-3">
-          <BaseButton
-            variant="secondary"
-            class="flex-1"
+          <button
+            class="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             @click="showDisconnectModal = false"
           >
             Cancel
-          </BaseButton>
-          <BaseButton
-            variant="danger"
-            class="flex-1"
-            :loading="isDisconnecting"
+          </button>
+          <button
+            class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="isDisconnecting"
             @click="handleDisconnect"
           >
             <Icon
+              v-if="isDisconnecting"
+              name="lucide:loader-2"
+              class="size-4 animate-spin"
+            />
+            <Icon
+              v-else
               name="lucide:unlink"
-              class="w-4 h-4 mr-1.5"
+              class="size-4"
             />
             Disconnect
-          </BaseButton>
+          </button>
         </div>
       </template>
     </BaseModal>
