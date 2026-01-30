@@ -1,63 +1,119 @@
 <script setup lang="ts">
 interface Props {
-  currentPage: number;
-  lastPage: number;
-  from: number;
-  to: number;
-  total: number;
-  itemType?: string; // 'reviews' | 'pull requests' | 'repositories'
+  currentPage: number
+  lastPage: number
+  from: number
+  to: number
+  total: number
+  itemType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   itemType: 'reviews',
-});
+})
 
 const emit = defineEmits<{
-  loadPage: [page: number];
-}>();
+  loadPage: [page: number]
+}>()
 
-const canGoPrevious = computed(() => props.currentPage > 1);
-const canGoNext = computed(() => props.currentPage < props.lastPage);
+const canGoPrevious = computed(() => props.currentPage > 1)
+const canGoNext = computed(() => props.currentPage < props.lastPage)
+
+/**
+ * Generate page numbers with ellipsis for large page counts
+ * Shows: first page, current ± 1, last page, with ellipsis where needed
+ */
+const visiblePages = computed(() => {
+  const pages: (number | 'ellipsis')[] = []
+  const current = props.currentPage
+  const last = props.lastPage
+
+  if (last <= 7) {
+    for (let i = 1; i <= last; i++) {
+      pages.push(i)
+    }
+    return pages
+  }
+
+  pages.push(1)
+
+  if (current > 3) {
+    pages.push('ellipsis')
+  }
+
+  const start = Math.max(2, current - 1)
+  const end = Math.min(last - 1, current + 1)
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+
+  if (current < last - 2) {
+    pages.push('ellipsis')
+  }
+
+  pages.push(last)
+
+  return pages
+})
 </script>
 
 <template>
   <div
     v-if="lastPage > 1"
-    class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border-subtle"
+    class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:flex-row"
   >
-    <p class="text-sm text-text-secondary font-medium">
-      Showing <span class="text-text-primary font-semibold">{{ from }}</span> to <span class="text-text-primary font-semibold">{{ to }}</span> of <span class="text-text-primary font-semibold">{{ total }}</span> {{ itemType }}
+    <p class="text-sm text-gray-500">
+      Showing <span class="font-medium text-gray-900">{{ from }}</span> to <span class="font-medium text-gray-900">{{ to }}</span> of <span class="font-medium text-gray-900">{{ total }}</span> {{ itemType }}
     </p>
-    <div class="flex items-center gap-2">
-      <BaseButton
-        variant="secondary"
-        size="sm"
+
+    <div class="flex items-center gap-1">
+      <button
+        type="button"
+        class="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canGoPrevious"
         @click="emit('loadPage', currentPage - 1)"
       >
         <Icon
           name="lucide:chevron-left"
-          class="w-4 h-4"
+          class="size-4"
         />
-        Previous
-      </BaseButton>
-      <div class="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-bg-elevated border border-border-subtle rounded-lg text-sm font-medium text-text-secondary">
-        <span class="text-text-primary">{{ currentPage }}</span>
-        <span class="text-text-muted">/</span>
-        <span>{{ lastPage }}</span>
-      </div>
-      <BaseButton
-        variant="secondary"
-        size="sm"
+      </button>
+
+      <template
+        v-for="(page, index) in visiblePages"
+        :key="index"
+      >
+        <span
+          v-if="page === 'ellipsis'"
+          class="px-1 text-gray-400"
+        >
+          ...
+        </span>
+        <button
+          v-else
+          type="button"
+          class="inline-flex size-9 items-center justify-center rounded-lg border text-sm font-medium transition-colors"
+          :class="page === currentPage
+            ? 'border-gray-900 bg-gray-900 text-white'
+            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'"
+          @click="emit('loadPage', page)"
+        >
+          {{ page }}
+        </button>
+      </template>
+
+      <button
+        type="button"
+        class="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canGoNext"
         @click="emit('loadPage', currentPage + 1)"
       >
-        Next
         <Icon
           name="lucide:chevron-right"
-          class="w-4 h-4"
+          class="size-4"
         />
-      </BaseButton>
+      </button>
     </div>
   </div>
 </template>

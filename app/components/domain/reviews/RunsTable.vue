@@ -65,87 +65,66 @@ const getRiskConfig = (run: Run) => {
   if (!level) return null
 
   const configs: Record<string, { color: string; bg: string; label: string }> = {
-    low: { color: 'text-success', bg: 'bg-success-light', label: 'Low' },
-    medium: { color: 'text-warning', bg: 'bg-warning-light', label: 'Medium' },
-    high: { color: 'text-error', bg: 'bg-error-light', label: 'High' },
-    critical: { color: 'text-error', bg: 'bg-error-light', label: 'Critical' },
+    low: { color: 'text-emerald-700', bg: 'bg-emerald-50', label: 'Low' },
+    medium: { color: 'text-amber-700', bg: 'bg-amber-50', label: 'Medium' },
+    high: { color: 'text-red-700', bg: 'bg-red-50', label: 'High' },
+    critical: { color: 'text-red-700', bg: 'bg-red-50', label: 'Critical' },
   }
 
   return configs[level] || null
 }
+
+// Get findings count
+const getFindingsCount = (run: Run) => {
+  return run.findings?.length ?? run.metrics?.findings_count ?? 0
+}
 </script>
 
 <template>
-  <div class="overflow-hidden bg-bg-elevated border border-border-subtle rounded-2xl shadow-sm">
+  <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
     <!-- Desktop Table View -->
     <div class="hidden lg:block overflow-x-auto">
-      <table
-        class="min-w-full w-full"
-        aria-label="Reviews"
-      >
-        <caption class="sr-only">
-          Reviews
-        </caption>
-        <thead class="bg-bg-surface/50 backdrop-blur-sm border-b border-border-subtle">
-          <tr>
-            <th
-              scope="col"
-              class="px-6 py-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider"
-            >
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50/50">
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
               Status
             </th>
-            <th
-              scope="col"
-              class="px-6 py-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider"
-            >
-              Review Details
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              Review
             </th>
             <th
               v-if="!props.hideRepository"
-              scope="col"
-              class="px-6 py-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider"
+              class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
             >
               Repository
             </th>
-            <th
-              scope="col"
-              class="px-6 py-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider"
-            >
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
               Author
             </th>
-            <th
-              scope="col"
-              class="px-6 py-4 text-right text-xs font-semibold text-text-muted uppercase tracking-wider"
-            >
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
               Duration
             </th>
-            <th
-              scope="col"
-              class="px-6 py-4 text-right text-xs font-semibold text-text-muted uppercase tracking-wider"
-            >
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
               Created
             </th>
-            <th
-              scope="col"
-              class="px-6 py-4 w-12"
-            >
+            <th class="w-10 px-4 py-3">
               <span class="sr-only">Actions</span>
             </th>
           </tr>
         </thead>
-        <tbody class="bg-bg-elevated divide-y divide-border-subtle/50">
+        <tbody class="divide-y divide-gray-100">
           <tr
             v-for="run in runs"
             :key="run.id"
             tabindex="0"
             role="link"
-            :aria-label="`Open review: ${getReviewTitle(run)}`"
-            class="group cursor-pointer transition-all duration-200 hover:bg-bg-surface/70 hover:shadow-sm focus-visible:outline-none focus-visible:bg-bg-surface/70 focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-inset"
+            class="group cursor-pointer transition-colors hover:bg-gray-50"
             @click="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
             @keydown.enter.prevent="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
           >
             <!-- Status -->
-            <td class="px-6 py-5 whitespace-nowrap">
+            <td class="px-4 py-4 whitespace-nowrap">
               <DomainRunStatusBadge
                 :status="run.status"
                 variant="badge"
@@ -153,21 +132,18 @@ const getRiskConfig = (run: Run) => {
             </td>
 
             <!-- Review / PR Info -->
-            <td class="px-6 py-5 max-w-md">
-              <div class="flex flex-col gap-1.5">
+            <td class="px-4 py-4 max-w-md">
+              <div class="space-y-1">
                 <!-- Title row with labels -->
                 <div class="flex items-center gap-2 flex-wrap">
                   <span
-                    class="text-sm font-semibold text-text-primary truncate group-hover:text-accent transition-colors"
+                    class="text-sm font-medium text-gray-900 group-hover:text-gray-700"
                     :title="getReviewTitle(run)"
                   >
                     {{ getReviewTitle(run) }}
                   </span>
                   <!-- Labels -->
-                  <div
-                    v-if="getLabels(run).visible.length > 0"
-                    class="flex items-center gap-1"
-                  >
+                  <template v-if="getLabels(run).visible.length > 0">
                     <BaseLabel
                       v-for="label in getLabels(run).visible"
                       :key="label.name"
@@ -177,65 +153,58 @@ const getRiskConfig = (run: Run) => {
                     />
                     <span
                       v-if="getLabels(run).remaining > 0"
-                      class="text-[10px] text-text-muted font-medium bg-bg-surface px-1.5 py-0.5 rounded"
+                      class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
                     >
                       +{{ getLabels(run).remaining }}
                     </span>
-                  </div>
+                  </template>
                   <!-- Risk Level -->
                   <span
                     v-if="getRiskConfig(run)"
-                    class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold"
+                    class="rounded px-1.5 py-0.5 text-[10px] font-medium"
                     :class="[getRiskConfig(run)?.bg, getRiskConfig(run)?.color]"
                   >
                     {{ getRiskConfig(run)?.label }}
                   </span>
+                  <!-- Findings -->
+                  <span
+                    v-if="getFindingsCount(run) > 0"
+                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                  >
+                    {{ getFindingsCount(run) }} {{ getFindingsCount(run) === 1 ? 'finding' : 'findings' }}
+                  </span>
                 </div>
-                <!-- Meta row: PR number, draft, branch movement -->
-                <div class="flex items-center gap-3 text-xs text-text-muted">
+                <!-- Meta row -->
+                <div class="flex items-center gap-3 text-xs text-gray-500">
                   <span
                     v-if="run.pull_request?.number || run.metadata?.pull_request_number"
                     class="inline-flex items-center gap-1 font-mono"
                   >
                     <Icon
                       name="lucide:git-pull-request"
-                      class="w-3 h-3"
+                      class="size-3"
                     />
                     #{{ run.pull_request?.number ?? run.metadata?.pull_request_number }}
                   </span>
                   <span
                     v-if="run.pull_request?.is_draft"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-bg-surface border border-border-subtle text-[10px] font-medium"
+                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
                   >
-                    <Icon
-                      name="lucide:file-edit"
-                      class="w-2.5 h-2.5"
-                    />
                     Draft
                   </span>
                   <!-- Branch movement -->
                   <div
                     v-if="getBranches(run).head"
-                    class="flex items-center gap-1.5 font-mono"
+                    class="flex items-center gap-1 font-mono"
                   >
                     <Icon
                       name="lucide:git-branch"
-                      class="w-3 h-3"
+                      class="size-3"
                     />
-                    <span
-                      class="truncate max-w-[100px]"
-                      :title="getBranches(run).head"
-                    >
-                      {{ getBranches(run).head }}
-                    </span>
+                    <span class="max-w-[100px] truncate">{{ getBranches(run).head }}</span>
                     <template v-if="getBranches(run).base">
-                      <span class="text-text-muted/50">→</span>
-                      <span
-                        class="truncate max-w-[80px]"
-                        :title="getBranches(run).base"
-                      >
-                        {{ getBranches(run).base }}
-                      </span>
+                      <span class="text-gray-300">→</span>
+                      <span class="max-w-[80px] truncate">{{ getBranches(run).base }}</span>
                     </template>
                   </div>
                 </div>
@@ -245,17 +214,17 @@ const getRiskConfig = (run: Run) => {
             <!-- Repository -->
             <td
               v-if="!props.hideRepository"
-              class="px-6 py-5 whitespace-nowrap"
+              class="px-4 py-4 whitespace-nowrap"
             >
-              <div class="flex items-center gap-2 text-sm text-text-secondary">
-                <div class="w-8 h-8 rounded-lg bg-bg-surface border border-border-subtle flex items-center justify-center shrink-0">
+              <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="flex size-8 items-center justify-center rounded-lg bg-gray-100">
                   <Icon
                     name="lucide:folder-git-2"
-                    class="w-4 h-4 text-text-muted"
+                    class="size-4 text-gray-500"
                   />
                 </div>
                 <span
-                  class="truncate max-w-[180px] font-medium"
+                  class="max-w-[180px] truncate"
                   :title="getRepositoryName(run)"
                 >
                   {{ getRepositoryName(run) }}
@@ -264,54 +233,50 @@ const getRiskConfig = (run: Run) => {
             </td>
 
             <!-- Author -->
-            <td class="px-6 py-5 whitespace-nowrap">
-              <div class="flex items-center gap-2.5">
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
                 <BaseAvatar
                   v-if="getAuthor(run)"
                   :src="getAuthor(run)?.avatar_url ?? undefined"
                   :name="getAuthor(run)?.login ?? 'Unknown'"
-                  size="md"
-                  class="ring-2 ring-border-subtle"
+                  size="sm"
                 />
                 <div
                   v-else
-                  class="w-9 h-9 rounded-full bg-bg-surface border border-border-subtle flex items-center justify-center"
+                  class="flex size-8 items-center justify-center rounded-full bg-gray-100"
                 >
                   <Icon
                     name="lucide:user"
-                    class="w-4 h-4 text-text-muted"
+                    class="size-4 text-gray-400"
                   />
                 </div>
-                <span
-                  class="text-sm text-text-secondary truncate max-w-[100px] font-medium"
-                  :title="getAuthor(run)?.login ?? ''"
-                >
+                <span class="max-w-[100px] truncate text-sm text-gray-600">
                   {{ getAuthor(run)?.login ?? '-' }}
                 </span>
               </div>
             </td>
 
             <!-- Duration -->
-            <td class="px-6 py-5 whitespace-nowrap text-right">
-              <div class="inline-flex items-center gap-1.5 text-sm text-text-secondary tabular-nums font-medium">
+            <td class="px-4 py-4 whitespace-nowrap text-right">
+              <span class="inline-flex items-center gap-1.5 text-sm tabular-nums text-gray-500">
                 <Icon
                   name="lucide:clock"
-                  class="w-3.5 h-3.5 text-text-muted"
+                  class="size-3.5"
                 />
                 {{ formatDuration(run.metrics?.duration_ms) }}
-              </div>
+              </span>
             </td>
 
             <!-- Date -->
-            <td class="px-6 py-5 whitespace-nowrap text-right text-sm text-text-secondary tabular-nums">
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm tabular-nums text-gray-500">
               {{ formatRelativeTime(run.created_at) }}
             </td>
 
             <!-- Action -->
-            <td class="px-6 py-5 whitespace-nowrap text-right">
+            <td class="px-4 py-4 whitespace-nowrap">
               <Icon
                 name="lucide:chevron-right"
-                class="w-5 h-5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all"
+                class="size-4 text-gray-300 group-hover:text-gray-500"
               />
             </td>
           </tr>
@@ -320,14 +285,13 @@ const getRiskConfig = (run: Run) => {
     </div>
 
     <!-- Mobile Card View -->
-    <div class="lg:hidden divide-y divide-border-subtle/50">
+    <div class="lg:hidden divide-y divide-gray-100">
       <div
         v-for="run in runs"
         :key="run.id"
         tabindex="0"
         role="link"
-        :aria-label="`Open review: ${getReviewTitle(run)}`"
-        class="group cursor-pointer p-5 transition-all duration-200 hover:bg-bg-surface/70 active:scale-[0.99] focus-visible:outline-none focus-visible:bg-bg-surface/70 focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-inset"
+        class="group cursor-pointer p-4 transition-colors hover:bg-gray-50"
         @click="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
         @keydown.enter.prevent="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
       >
@@ -338,32 +302,30 @@ const getRiskConfig = (run: Run) => {
               v-if="getAuthor(run)"
               :src="getAuthor(run)?.avatar_url ?? undefined"
               :name="getAuthor(run)?.login ?? 'Unknown'"
-              size="md"
-              class="ring-2 ring-border-subtle shrink-0"
+              size="sm"
             />
             <div
               v-else
-              class="w-9 h-9 rounded-full bg-bg-surface border border-border-subtle flex items-center justify-center shrink-0"
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100"
             >
               <Icon
                 name="lucide:user"
-                class="w-4 h-4 text-text-muted"
+                class="size-4 text-gray-400"
               />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
+              <p class="truncate text-sm font-medium text-gray-900">
                 {{ getReviewTitle(run) }}
               </p>
-              <p class="text-xs text-text-muted truncate">
+              <p class="text-xs text-gray-500">
                 {{ getAuthor(run)?.login ?? 'Unknown' }}
               </p>
             </div>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <!-- Risk Level -->
             <span
               v-if="getRiskConfig(run)"
-              class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold"
+              class="rounded px-1.5 py-0.5 text-[10px] font-medium"
               :class="[getRiskConfig(run)?.bg, getRiskConfig(run)?.color]"
             >
               {{ getRiskConfig(run)?.label }}
@@ -389,68 +351,63 @@ const getRiskConfig = (run: Run) => {
           />
           <span
             v-if="getLabels(run).remaining > 0"
-            class="text-[10px] text-text-muted font-medium bg-bg-surface px-1.5 py-0.5 rounded"
+            class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
           >
             +{{ getLabels(run).remaining }}
           </span>
         </div>
 
         <!-- Meta Info -->
-        <div class="flex flex-wrap items-center gap-3 text-xs text-text-muted mb-3">
+        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-3">
           <span
             v-if="run.pull_request?.number || run.metadata?.pull_request_number"
             class="inline-flex items-center gap-1 font-mono"
           >
             <Icon
               name="lucide:git-pull-request"
-              class="w-3 h-3"
+              class="size-3"
             />
             #{{ run.pull_request?.number ?? run.metadata?.pull_request_number }}
           </span>
           <span
             v-if="run.pull_request?.is_draft"
-            class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-bg-surface border border-border-subtle font-medium"
+            class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium"
           >
-            <Icon
-              name="lucide:file-edit"
-              class="w-2.5 h-2.5"
-            />
             Draft
           </span>
-          <!-- Branch movement -->
           <div
             v-if="getBranches(run).head"
-            class="inline-flex items-center gap-1.5 font-mono"
+            class="inline-flex items-center gap-1 font-mono"
           >
             <Icon
               name="lucide:git-branch"
-              class="w-3 h-3"
+              class="size-3"
             />
-            <span class="truncate max-w-[80px]">{{ getBranches(run).head }}</span>
+            <span class="max-w-[80px] truncate">{{ getBranches(run).head }}</span>
             <template v-if="getBranches(run).base">
-              <span class="text-text-muted/50">→</span>
-              <span class="truncate max-w-[60px]">{{ getBranches(run).base }}</span>
+              <span class="text-gray-300">→</span>
+              <span class="max-w-[60px] truncate">{{ getBranches(run).base }}</span>
             </template>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-between gap-3 pt-3 border-t border-border-subtle/50">
+        <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
           <div
             v-if="!props.hideRepository"
-            class="flex items-center gap-2 text-xs text-text-muted"
+            class="flex items-center gap-2 text-xs text-gray-500"
           >
             <Icon
               name="lucide:folder-git-2"
-              class="w-3.5 h-3.5"
+              class="size-3.5"
             />
-            <span class="truncate max-w-[140px] font-medium">{{ getRepositoryName(run) }}</span>
+            <span class="max-w-[140px] truncate">{{ getRepositoryName(run) }}</span>
           </div>
-          <div class="flex items-center gap-3 text-xs text-text-muted">
+          <div class="flex items-center gap-3 text-xs text-gray-500">
             <span class="inline-flex items-center gap-1 tabular-nums">
               <Icon
                 name="lucide:clock"
-                class="w-3 h-3"
+                class="size-3"
               />
               {{ formatDuration(run.metrics?.duration_ms) }}
             </span>

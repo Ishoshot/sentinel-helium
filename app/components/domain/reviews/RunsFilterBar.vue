@@ -1,85 +1,85 @@
 <script setup lang="ts">
-import type { Repository } from '~/types';
+import type { Repository } from '~/types'
 
 interface Props {
-  search: string;
-  statusFilter: string | null;
-  riskFilter: string | null;
-  repositoryFilter: number | null;
-  authorFilter: string | null;
-  dateRange: { from: string | null; to: string | null };
-  sortBy: 'created_at' | 'completed_at' | 'findings_count';
-  sortOrder: 'asc' | 'desc';
-  repositories: Repository[];
-  isLoadingRepos?: boolean;
+  search: string
+  statusFilter: string | null
+  riskFilter: string | null
+  repositoryFilter: number | null
+  authorFilter: string | null
+  dateRange: { from: string | null; to: string | null }
+  sortBy: 'created_at' | 'completed_at' | 'findings_count'
+  sortOrder: 'asc' | 'desc'
+  repositories: Repository[]
+  isLoadingRepos?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoadingRepos: false,
-});
+})
 
 const emit = defineEmits<{
-  'update:search': [value: string];
-  'update:statusFilter': [value: string | null];
-  'update:riskFilter': [value: string | null];
-  'update:repositoryFilter': [value: number | null];
-  'update:authorFilter': [value: string | null];
-  'update:dateRange': [value: { from: string | null; to: string | null }];
-  'update:sortBy': [value: 'created_at' | 'completed_at' | 'findings_count'];
-  'update:sortOrder': [value: 'asc' | 'desc'];
-  clearFilters: [];
-}>();
+  'update:search': [value: string]
+  'update:statusFilter': [value: string | null]
+  'update:riskFilter': [value: string | null]
+  'update:repositoryFilter': [value: number | null]
+  'update:authorFilter': [value: string | null]
+  'update:dateRange': [value: { from: string | null; to: string | null }]
+  'update:sortBy': [value: 'created_at' | 'completed_at' | 'findings_count']
+  'update:sortOrder': [value: 'asc' | 'desc']
+  clearFilters: []
+}>()
 
 // Computed wrappers for v-model behavior
 const search = computed({
   get: () => props.search,
   set: (value) => emit('update:search', value),
-});
+})
 
 const statusFilter = computed({
   get: () => props.statusFilter,
   set: (value) => emit('update:statusFilter', value),
-});
+})
 
 const riskFilter = computed({
   get: () => props.riskFilter,
   set: (value) => emit('update:riskFilter', value),
-});
+})
 
 const repositoryFilter = computed({
   get: () => props.repositoryFilter,
   set: (value) => emit('update:repositoryFilter', value),
-});
+})
 
 const authorFilter = computed({
   get: () => props.authorFilter,
   set: (value) => emit('update:authorFilter', value),
-});
+})
 
 const dateRange = computed({
   get: () => props.dateRange,
   set: (value) => emit('update:dateRange', value),
-});
+})
 
 const sortBy = computed({
   get: () => props.sortBy,
   set: (value) => emit('update:sortBy', value),
-});
+})
 
 const sortOrder = computed({
   get: () => props.sortOrder,
   set: (value) => emit('update:sortOrder', value),
-});
+})
 
 // Computed
 const dateRangeDisplay = computed(() => {
   if (props.dateRange.from && props.dateRange.to) {
-    return `${props.dateRange.from} - ${props.dateRange.to}`;
+    return `${props.dateRange.from} - ${props.dateRange.to}`
   }
-  if (props.dateRange.from) return `From ${props.dateRange.from}`;
-  if (props.dateRange.to) return `Until ${props.dateRange.to}`;
-  return null;
-});
+  if (props.dateRange.from) return `From ${props.dateRange.from}`
+  if (props.dateRange.to) return `Until ${props.dateRange.to}`
+  return null
+})
 
 const hasActiveFilters = computed(() =>
   Boolean(
@@ -90,7 +90,7 @@ const hasActiveFilters = computed(() =>
       props.authorFilter ||
       dateRangeDisplay.value
   )
-);
+)
 
 // Options
 const statusOptions = [
@@ -100,7 +100,7 @@ const statusOptions = [
   { label: 'Completed', value: 'completed' },
   { label: 'Failed', value: 'failed' },
   { label: 'Skipped', value: 'skipped' }
-];
+]
 
 const riskOptions = [
   { label: 'All Risks', value: null },
@@ -108,85 +108,82 @@ const riskOptions = [
   { label: 'High', value: 'high' },
   { label: 'Medium', value: 'medium' },
   { label: 'Low', value: 'low' }
-];
+]
 
 const repositoryOptions = computed(() => [
   { label: 'All Repositories', value: null },
   ...props.repositories.map(r => ({ label: r.full_name, value: r.id }))
-]);
+])
 
 const sortOptions = [
   { label: 'Newest First', value: 'created_at-desc' },
   { label: 'Oldest First', value: 'created_at-asc' },
   { label: 'Most Findings', value: 'findings_count-desc' },
   { label: 'Least Findings', value: 'findings_count-asc' },
-];
+]
 
 const currentSort = computed({
   get: () => `${props.sortBy}-${props.sortOrder}`,
   set: (val) => {
-    const [field, order] = val.split('-') as [typeof props.sortBy, typeof props.sortOrder];
-    emit('update:sortBy', field);
-    emit('update:sortOrder', order);
+    const [field, order] = val.split('-') as [typeof props.sortBy, typeof props.sortOrder]
+    emit('update:sortBy', field)
+    emit('update:sortOrder', order)
   }
-});
+})
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Search Bar - Full Width -->
-    <div class="relative">
+    <!-- Search Bar -->
+    <div class="relative max-w-md">
       <Icon
         name="lucide:search"
-        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted pointer-events-none"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400"
       />
       <input
         v-model="search"
         type="search"
         placeholder="Search by PR title, branch, or commit..."
-        class="w-full h-12 pl-12 pr-12 text-sm bg-bg-elevated border border-border-subtle rounded-xl placeholder:text-text-muted text-text-primary transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent hover:border-border-muted shadow-sm"
+        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
         @keydown.escape="search = ''"
       >
       <button
         v-if="props.search.trim()"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-surface transition-all focus:outline-none focus:ring-2 focus:ring-accent"
-        aria-label="Clear search"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
         @click="search = ''"
       >
         <Icon
           name="lucide:x"
-          class="w-4 h-4"
+          class="size-4"
         />
       </button>
     </div>
 
-    <!-- Filter Pills Row -->
-    <div class="flex flex-wrap items-center gap-3">
+    <!-- Filter Pills -->
+    <div class="flex flex-wrap items-center gap-2">
       <!-- Status Filter -->
       <BaseDropdown
         v-model="statusFilter"
         :options="statusOptions"
         placeholder="Status"
-        class="shrink-0"
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.statusFilter
-              ? 'border-accent text-accent bg-accent/5'
-              : 'border-border-subtle text-text-secondary'"
+              ? 'border-gray-900 bg-gray-900 text-white'
+              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
           >
             <Icon
               name="lucide:activity"
-              class="w-4 h-4"
-              :class="props.statusFilter ? 'text-accent' : 'text-text-muted'"
+              class="size-4"
             />
             <span>{{ statusOptions.find(o => o.value === props.statusFilter)?.label || 'Status' }}</span>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 opacity-60"
+              class="size-3.5 opacity-60"
             />
           </button>
         </template>
@@ -197,25 +194,23 @@ const currentSort = computed({
         v-model="riskFilter"
         :options="riskOptions"
         placeholder="Risk Level"
-        class="shrink-0"
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.riskFilter
-              ? 'border-warning text-warning bg-warning/5'
-              : 'border-border-subtle text-text-secondary'"
+              ? 'border-amber-600 bg-amber-50 text-amber-700'
+              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
           >
             <Icon
               name="lucide:shield-alert"
-              class="w-4 h-4"
-              :class="props.riskFilter ? 'text-warning' : 'text-text-muted'"
+              class="size-4"
             />
             <span>{{ riskOptions.find(o => o.value === props.riskFilter)?.label || 'Risk' }}</span>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 opacity-60"
+              class="size-3.5 opacity-60"
             />
           </button>
         </template>
@@ -226,26 +221,24 @@ const currentSort = computed({
         v-model="repositoryFilter"
         :options="repositoryOptions"
         placeholder="Repository"
-        class="shrink-0"
         searchable
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30 max-w-[200px]"
+            class="flex h-9 max-w-[200px] items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.repositoryFilter
-              ? 'border-accent text-accent bg-accent/5'
-              : 'border-border-subtle text-text-secondary'"
+              ? 'border-gray-900 bg-gray-900 text-white'
+              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
           >
             <Icon
               name="lucide:folder-git-2"
-              class="w-4 h-4 shrink-0"
-              :class="props.repositoryFilter ? 'text-accent' : 'text-text-muted'"
+              class="size-4 shrink-0"
             />
             <span class="truncate">{{ repositoryOptions.find(o => o.value === props.repositoryFilter)?.label || 'Repository' }}</span>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 opacity-60 shrink-0"
+              class="size-3.5 shrink-0 opacity-60"
             />
           </button>
         </template>
@@ -256,49 +249,42 @@ const currentSort = computed({
         :model-value="null"
         :options="[]"
         placeholder="Author"
-        class="shrink-0"
         menu-width="w-64"
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.authorFilter
-              ? 'border-accent text-accent bg-accent/5'
-              : 'border-border-subtle text-text-secondary'"
+              ? 'border-gray-900 bg-gray-900 text-white'
+              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
           >
             <Icon
               name="lucide:user"
-              class="w-4 h-4"
-              :class="props.authorFilter ? 'text-accent' : 'text-text-muted'"
+              class="size-4"
             />
-            <span class="truncate max-w-[100px]">{{ props.authorFilter?.trim() || 'Author' }}</span>
+            <span class="max-w-[100px] truncate">{{ props.authorFilter?.trim() || 'Author' }}</span>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 opacity-60"
+              class="size-3.5 opacity-60"
             />
           </button>
         </template>
 
-        <div class="p-4 w-full">
-          <div class="space-y-3">
-            <label class="text-xs font-semibold text-text-secondary uppercase tracking-wide">Filter by Author</label>
-            <input
-              :value="props.authorFilter"
-              type="text"
-              placeholder="Enter GitHub username"
-              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg placeholder:text-text-muted transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
-              @input="authorFilter = ($event.target as HTMLInputElement).value"
-              @keydown.enter="($event.target as HTMLInputElement).blur()"
-            >
-            <p class="text-xs text-text-muted">
-              Press Enter to apply filter
-            </p>
-          </div>
-          <div class="pt-3 mt-3 border-t border-border-subtle flex justify-end">
+        <div class="w-full space-y-3 p-3">
+          <label class="text-xs font-medium uppercase tracking-wide text-gray-500">Filter by Author</label>
+          <input
+            :value="props.authorFilter"
+            type="text"
+            placeholder="GitHub username"
+            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
+            @input="authorFilter = ($event.target as HTMLInputElement).value"
+            @keydown.enter="($event.target as HTMLInputElement).blur()"
+          >
+          <div class="flex justify-end border-t border-gray-100 pt-3">
             <button
               type="button"
-              class="text-sm text-accent hover:text-accent-hover font-medium transition-colors"
+              class="text-sm font-medium text-gray-600 hover:text-gray-900"
               @click="authorFilter = null"
             >
               Clear
@@ -312,56 +298,54 @@ const currentSort = computed({
         :model-value="null"
         :options="[]"
         placeholder="Date Range"
-        class="shrink-0"
         menu-width="w-72"
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border rounded-xl text-sm font-medium transition-all hover:shadow-sm hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="dateRangeDisplay
-              ? 'border-accent text-accent bg-accent/5'
-              : 'border-border-subtle text-text-secondary'"
+              ? 'border-gray-900 bg-gray-900 text-white'
+              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
           >
             <Icon
               name="lucide:calendar"
-              class="w-4 h-4"
-              :class="dateRangeDisplay ? 'text-accent' : 'text-text-muted'"
+              class="size-4"
             />
-            <span class="truncate max-w-[140px]">
+            <span class="max-w-[140px] truncate">
               {{ dateRangeDisplay ?? 'Date Range' }}
             </span>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 opacity-60"
+              class="size-3.5 opacity-60"
             />
           </button>
         </template>
 
-        <div class="p-4 space-y-4 w-full">
+        <div class="w-full space-y-4 p-3">
           <div class="space-y-2">
-            <label class="text-xs font-semibold text-text-secondary uppercase tracking-wide">From Date</label>
+            <label class="text-xs font-medium uppercase tracking-wide text-gray-500">From</label>
             <input
               :value="props.dateRange.from"
               type="date"
-              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-300 focus:outline-none focus:ring-0"
               @input="dateRange = { ...props.dateRange, from: ($event.target as HTMLInputElement).value }"
             >
           </div>
           <div class="space-y-2">
-            <label class="text-xs font-semibold text-text-secondary uppercase tracking-wide">To Date</label>
+            <label class="text-xs font-medium uppercase tracking-wide text-gray-500">To</label>
             <input
               :value="props.dateRange.to"
               type="date"
-              class="w-full h-10 px-3 text-sm bg-bg-surface border border-border-subtle rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-300 focus:outline-none focus:ring-0"
               :min="props.dateRange.from || undefined"
               @input="dateRange = { ...props.dateRange, to: ($event.target as HTMLInputElement).value }"
             >
           </div>
-          <div class="pt-3 border-t border-border-subtle flex justify-end">
+          <div class="flex justify-end border-t border-gray-100 pt-3">
             <button
               type="button"
-              class="text-sm text-accent hover:text-accent-hover font-medium transition-colors"
+              class="text-sm font-medium text-gray-600 hover:text-gray-900"
               @click="dateRange = { from: null, to: null }"
             >
               Clear
@@ -370,22 +354,21 @@ const currentSort = computed({
         </div>
       </BaseDropdown>
 
-      <div class="flex-1 min-w-[120px]" />
+      <div class="flex-1" />
 
       <!-- Sort -->
       <BaseDropdown
         v-model="currentSort"
         :options="sortOptions"
-        class="shrink-0"
       >
         <template #trigger>
           <button
             type="button"
-            class="h-10 px-4 flex items-center gap-2 bg-bg-elevated border border-border-subtle rounded-xl text-sm font-medium text-text-secondary transition-all hover:shadow-sm hover:text-text-primary hover:border-border-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+            class="flex h-9 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-gray-600 transition-colors hover:border-gray-300"
           >
             <Icon
               name="lucide:arrow-up-down"
-              class="w-4 h-4"
+              class="size-4"
             />
             <span class="hidden sm:inline">{{ sortOptions.find(o => o.value === currentSort)?.label }}</span>
             <span class="sm:hidden">Sort</span>
@@ -393,111 +376,111 @@ const currentSort = computed({
         </template>
       </BaseDropdown>
 
-      <!-- Clear all filters button -->
+      <!-- Clear all -->
       <button
         v-if="hasActiveFilters"
         type="button"
-        class="h-10 px-4 flex items-center gap-2 text-sm font-medium text-text-muted hover:text-text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent/30 rounded-xl"
+        class="flex h-9 items-center gap-1.5 px-2 text-sm font-medium text-gray-500 hover:text-gray-700"
         @click="emit('clearFilters')"
       >
         <Icon
           name="lucide:x-circle"
-          class="w-4 h-4"
+          class="size-4"
         />
         <span class="hidden sm:inline">Clear all</span>
       </button>
     </div>
 
-    <!-- Active Filters - Compact Chip Display -->
+    <!-- Active Filters Display -->
     <div
       v-if="hasActiveFilters"
-      class="flex flex-wrap items-center gap-2 pt-2"
+      class="flex flex-wrap items-center gap-2"
     >
-      <span class="text-xs font-semibold text-text-muted uppercase tracking-wide">Filtering:</span>
+      <span class="text-xs font-medium uppercase tracking-wide text-gray-400">Active:</span>
 
       <button
         v-if="props.search.trim()"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-bg-elevated border border-border-subtle text-xs font-medium text-text-secondary hover:bg-bg-surface hover:border-border-muted transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
         @click="search = ''"
       >
-        <span class="text-text-primary">{{ props.search.trim() }}</span>
+        "{{ props.search.trim() }}"
         <Icon
           name="lucide:x"
-          class="w-3 h-3 text-text-muted group-hover:text-text-secondary"
+          class="size-3 text-gray-400 group-hover:text-gray-600"
         />
       </button>
 
       <button
         v-if="props.statusFilter"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
         @click="statusFilter = null"
       >
-        <span>{{ statusOptions.find(o => o.value === props.statusFilter)?.label }}</span>
+        {{ statusOptions.find(o => o.value === props.statusFilter)?.label }}
         <Icon
           name="lucide:x"
-          class="w-3 h-3 opacity-60 group-hover:opacity-100"
+          class="size-3 text-gray-400 group-hover:text-gray-600"
         />
       </button>
 
       <button
         v-if="props.riskFilter"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-warning/10 border border-warning/20 text-xs font-medium text-warning hover:bg-warning/15 transition-all focus:outline-none focus:ring-2 focus:ring-warning/30 group"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700"
         @click="riskFilter = null"
       >
-        <span>{{ riskOptions.find(o => o.value === props.riskFilter)?.label }}</span>
+        {{ riskOptions.find(o => o.value === props.riskFilter)?.label }}
         <Icon
           name="lucide:x"
-          class="w-3 h-3 opacity-60 group-hover:opacity-100"
+          class="size-3 text-amber-500 group-hover:text-amber-700"
         />
       </button>
 
       <button
         v-if="props.repositoryFilter"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group max-w-[200px]"
+        class="group inline-flex max-w-[200px] items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
         @click="repositoryFilter = null"
       >
-        <span class="truncate">{{ repositoryOptions.find(o => o.value === props.repositoryFilter)?.label ?? props.repositories.find(r => r.id === props.repositoryFilter)?.full_name ?? props.repositories.find(r => r.id === props.repositoryFilter)?.name }}</span>
+        <span class="truncate">{{ repositoryOptions.find(o => o.value === props.repositoryFilter)?.label }}</span>
         <Icon
           name="lucide:x"
-          class="w-3 h-3 opacity-60 group-hover:opacity-100 shrink-0"
+          class="size-3 shrink-0 text-gray-400 group-hover:text-gray-600"
         />
       </button>
 
       <button
         v-if="props.authorFilter?.trim()"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
         @click="authorFilter = null"
       >
         <Icon
           name="lucide:user"
-          class="w-3 h-3"
+          class="size-3"
         />
-        <span>{{ props.authorFilter?.trim() }}</span>
+        {{ props.authorFilter?.trim() }}
         <Icon
           name="lucide:x"
-          class="w-3 h-3 opacity-60 group-hover:opacity-100"
+          class="size-3 text-gray-400 group-hover:text-gray-600"
         />
       </button>
 
       <button
         v-if="dateRangeDisplay"
         type="button"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20 text-xs font-medium text-accent hover:bg-accent/15 transition-all focus:outline-none focus:ring-2 focus:ring-accent/30 group"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
         @click="dateRange = { from: null, to: null }"
       >
         <Icon
           name="lucide:calendar"
-          class="w-3 h-3"
+          class="size-3"
         />
-        <span>{{ dateRangeDisplay }}</span>
+        {{ dateRangeDisplay }}
         <Icon
           name="lucide:x"
-          class="w-3 h-3 opacity-60 group-hover:opacity-100"
+          class="size-3 text-gray-400 group-hover:text-gray-600"
         />
       </button>
     </div>
