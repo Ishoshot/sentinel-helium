@@ -3,6 +3,7 @@ import type {
   BriefingGeneration,
   BriefingSubscription,
   BriefingShare,
+  BriefingWorkspaceEligibility,
   GenerateBriefingRequest,
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest,
@@ -29,13 +30,16 @@ export function useBriefings(workspaceId: Ref<number | null>) {
   const generations = ref<BriefingGeneration[]>([]);
   const currentGeneration = ref<BriefingGeneration | null>(null);
   const subscriptions = ref<BriefingSubscription[]>([]);
+  const workspaceEligibility = ref<BriefingWorkspaceEligibility | null>(null);
 
   // Loading states
   const isLoadingBriefings = ref(false);
   const isLoadingGenerations = ref(false);
   const isLoadingSubscriptions = ref(false);
+  const isLoadingWorkspaceEligibility = ref(false);
   const isGenerating = ref(false);
   const isProcessing = ref(false);
+  const isSubmittingFeedback = ref(false);
 
   // Error state
   const error = ref<string | null>(null);
@@ -45,7 +49,7 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     currentPage: 1,
     lastPage: 1,
     total: 0,
-    perPage: 10,
+    perPage: 20,
     from: 0,
     to: 0,
   });
@@ -76,6 +80,32 @@ export function useBriefings(workspaceId: Ref<number | null>) {
       return [];
     } finally {
       isLoadingBriefings.value = false;
+    }
+  }
+
+  /**
+   * Fetch workspace-level eligibility for generating briefings.
+   */
+  async function fetchWorkspaceEligibility() {
+    if (!workspaceId.value) {
+      toast.error("No workspace selected");
+      return null;
+    }
+
+    isLoadingWorkspaceEligibility.value = true;
+    error.value = null;
+
+    try {
+      const data = await briefingsService.getWorkspaceEligibility(workspaceId.value);
+      workspaceEligibility.value = data;
+      return data;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to check briefing eligibility";
+      error.value = message;
+      toast.error(message);
+      return null;
+    } finally {
+      isLoadingWorkspaceEligibility.value = false;
     }
   }
 
@@ -186,7 +216,7 @@ export function useBriefings(workspaceId: Ref<number | null>) {
   }
 
   /**
-   * Download a briefing
+   * Download a briefing - fetches a signed temporary URL from the backend
    */
   async function downloadBriefing(
     generationId: number,
@@ -197,9 +227,9 @@ export function useBriefings(workspaceId: Ref<number | null>) {
       return null;
     }
     try {
-      return briefingsService.getDownloadUrl(workspaceId.value, generationId, format);
-    } catch {
-      const message = "Failed to get download URL";
+      return await briefingsService.getDownloadUrl(workspaceId.value, generationId, format);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to get download URL";
       error.value = message;
       toast.error(message);
       return null;
@@ -242,14 +272,16 @@ export function useBriefings(workspaceId: Ref<number | null>) {
 
       generations.value = response.data;
 
-      // Update pagination from response (Laravel's PaginatedResponse has fields at root)
+      // Update pagination from response
+      // Handle both Laravel paginate() format (fields at root) and API Resource format (fields in meta)
+      const meta = 'meta' in response ? response.meta : response;
       pagination.value = {
-        currentPage: response.current_page,
-        lastPage: response.last_page,
-        total: response.total,
-        perPage: response.per_page,
-        from: response.from,
-        to: response.to,
+        currentPage: meta.current_page,
+        lastPage: meta.last_page,
+        total: meta.total,
+        perPage: meta.per_page,
+        from: meta.from ?? 0,
+        to: meta.to ?? 0,
       };
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to fetch generations";
@@ -300,11 +332,11 @@ export function useBriefings(workspaceId: Ref<number | null>) {
   }
 
   /**
-   * Get download URL for a format
+   * Get download URL for a format - fetches a signed temporary URL from the backend
    */
-  function getDownloadUrl(generationId: number, format: BriefingOutputFormat): string {
+  async function getDownloadUrl(generationId: number, format: BriefingOutputFormat): Promise<string> {
     if (!workspaceId.value) return "";
-    return briefingsService.getDownloadUrl(workspaceId.value, generationId, format);
+    return await briefingsService.getDownloadUrl(workspaceId.value, generationId, format);
   }
 
   /**
@@ -530,8 +562,49 @@ export function useBriefings(workspaceId: Ref<number | null>) {
   }
 
   // ============================================================================
+  // Feedback
+  // ============================================================================
+
+  /**
+   * Submit feedback for a briefing generation
+   */
+  async function submitFeedback(
+    generationId: number,
+    payload: { rating: number; comment?: string; tags?: string[] }
+  ): Promise<boolean> {
+    if (!workspaceId.value) {
+      toast.error("No workspace selected");
+      return false;
+    }
+
+    isSubmittingFeedback.value = true;
+    error.value = null;
+
+    try {
+      await briefingsService.submitFeedback(workspaceId.value, generationId, payload);
+      toast.success("Feedback received. Thank you!");
+      return true;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to submit feedback";
+      error.value = message;
+      toast.error(message);
+      return false;
+    } finally {
+      isSubmittingFeedback.value = false;
+    }
+  }
+
+  // ============================================================================
   // Computed
   // ============================================================================
+
+  const isWorkspaceEligible = computed(
+    () => workspaceEligibility.value?.can_generate !== false
+  );
+
+  const workspaceRestrictionReason = computed(
+    () => workspaceEligibility.value?.restriction_reason ?? null
+  );
 
   /**
    * Get subscription for a specific briefing
@@ -558,6 +631,7 @@ export function useBriefings(workspaceId: Ref<number | null>) {
       generations.value = [];
       currentGeneration.value = null;
       subscriptions.value = [];
+      workspaceEligibility.value = null;
     }
   });
 
@@ -568,18 +642,22 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     generations: readonly(generations),
     currentGeneration: readonly(currentGeneration),
     subscriptions: readonly(subscriptions),
+    workspaceEligibility: readonly(workspaceEligibility),
     pagination: readonly(pagination),
 
     // Loading states
     isLoadingBriefings: readonly(isLoadingBriefings),
     isLoadingGenerations: readonly(isLoadingGenerations),
     isLoadingSubscriptions: readonly(isLoadingSubscriptions),
+    isLoadingWorkspaceEligibility: readonly(isLoadingWorkspaceEligibility),
     isGenerating: readonly(isGenerating),
     isProcessing: readonly(isProcessing),
+    isSubmittingFeedback: readonly(isSubmittingFeedback),
     error: readonly(error),
 
     // Briefings
     fetchBriefings,
+    fetchWorkspaceEligibility,
     fetchBriefing,
 
     // Generations
@@ -602,5 +680,12 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     // Shares
     createShare,
     revokeShare,
+
+    // Feedback
+    submitFeedback,
+
+    // Eligibility
+    isWorkspaceEligible,
+    workspaceRestrictionReason,
   };
 }

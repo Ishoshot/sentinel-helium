@@ -5,12 +5,14 @@ import type {
   BriefingGeneration,
   BriefingSubscription,
   BriefingShare,
+  BriefingWorkspaceEligibility,
   GenerateBriefingRequest,
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest,
   CreateShareRequest,
   BriefingOutputFormat,
   PaginatedResponse,
+  ApiResourcePaginatedResponse,
 } from "~/types";
 import { useApiClient } from "../core/api";
 
@@ -39,16 +41,43 @@ export function useBriefingsService() {
   }
 
   /**
+   * Check workspace-level eligibility for generating briefings.
+   */
+  async function getWorkspaceEligibility(workspaceId: number): Promise<BriefingWorkspaceEligibility> {
+    const response = await $api<BriefingWorkspaceEligibility>(
+      `/workspaces/${workspaceId}/briefings/eligibility`
+    );
+
+    return {
+      can_generate: Boolean(response.can_generate),
+      restriction_reason: response.restriction_reason ?? null,
+    };
+  }
+
+  /**
    * Get a single briefing by slug
    */
   async function getBriefing(
     workspaceId: number,
     slug: string
   ): Promise<Briefing> {
-    const response = await $api<ApiResponse<Briefing> | Briefing>(
-      `/workspaces/${workspaceId}/briefings/${slug}`
-    );
-    return "data" in response ? response.data : response;
+    const response = await $api<
+      | (ApiResponse<Briefing> & {
+          can_generate?: boolean;
+          restriction_reason?: string | null;
+        })
+      | Briefing
+    >(`/workspaces/${workspaceId}/briefings/${slug}`);
+
+    if ("data" in response) {
+      return {
+        ...response.data,
+        can_generate: response.can_generate,
+        restriction_reason: response.restriction_reason ?? null,
+      };
+    }
+
+    return response;
   }
 
   // ============================================================================
@@ -89,7 +118,7 @@ export function useBriefingsService() {
       sort?: string;
       direction?: 'asc' | 'desc';
     }
-  ): Promise<PaginatedResponse<BriefingGeneration>> {
+  ): Promise<PaginatedResponse<BriefingGeneration> | ApiResourcePaginatedResponse<BriefingGeneration>> {
     const query = new URLSearchParams();
     if (params?.page) query.set("page", String(params.page));
     if (params?.perPage) query.set("per_page", String(params.perPage));
@@ -106,7 +135,7 @@ export function useBriefingsService() {
     const queryString = query.toString();
     const url = `/workspaces/${workspaceId}/briefing-generations${queryString ? `?${queryString}` : ""}`;
 
-    const response = await $api<PaginatedResponse<BriefingGeneration>>(url);
+    const response = await $api<PaginatedResponse<BriefingGeneration> | ApiResourcePaginatedResponse<BriefingGeneration>>(url);
     return response;
   }
 
@@ -124,16 +153,18 @@ export function useBriefingsService() {
   }
 
   /**
-   * Get download URL for a generation in a specific format
+   * Get download URL for a generation in a specific format.
+   * Makes an authenticated API call to retrieve a signed temporary URL.
    */
-  function getDownloadUrl(
+  async function getDownloadUrl(
     workspaceId: number,
     generationId: number,
     format: BriefingOutputFormat
-  ): string {
-    const config = useRuntimeConfig();
-    const baseURL = config.public.apiBaseUrl as string;
-    return `${baseURL}/workspaces/${workspaceId}/briefing-generations/${generationId}/download/${format}`;
+  ): Promise<string> {
+    const response = await $api<{ url: string; filename: string; content_type: string }>(
+      `/workspaces/${workspaceId}/briefing-generations/${generationId}/download/${format}`
+    );
+    return response.url;
   }
 
   // ============================================================================
@@ -237,9 +268,53 @@ export function useBriefingsService() {
     });
   }
 
+  // ============================================================================
+  // Briefing Feedback
+  // ============================================================================
+
+  /**
+   * Submit feedback for a briefing generation
+   */
+  async function submitFeedback(
+    workspaceId: number,
+    generationId: number,
+    payload: {
+      rating: number;
+      comment?: string;
+      tags?: string[];
+    }
+  ): Promise<void> {
+    await $api(`/workspaces/${workspaceId}/briefing-generations/${generationId}/feedback`, {
+      method: "POST",
+      body: payload,
+    });
+  }
+
+  // ============================================================================
+  // Public Briefing Share
+  // ============================================================================
+
+  /**
+   * Fetch a shared briefing by token (public endpoint)
+   */
+  async function getSharedBriefing(
+    token: string,
+    password?: string | null
+  ): Promise<BriefingGeneration> {
+    const query = new URLSearchParams();
+    if (password) query.set("password", password);
+    const queryString = query.toString();
+
+    const response = await $api<ApiResponse<BriefingGeneration> | BriefingGeneration>(
+      `/briefings/share/${token}${queryString ? `?${queryString}` : ""}`
+    );
+    return "data" in response ? response.data : response;
+  }
+
   return {
     // Briefings
     listBriefings,
+    getWorkspaceEligibility,
     getBriefing,
     // Generations
     generateBriefing,
@@ -254,5 +329,9 @@ export function useBriefingsService() {
     // Shares
     createShare,
     revokeShare,
+    // Feedback
+    submitFeedback,
+    // Public
+    getSharedBriefing,
   };
 }
