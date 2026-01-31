@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm nuxt prepare:*)",
+      "Bash(pnpm nuxt typecheck:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm build:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_wait_for",
+      "Bash(find:*)",
+      "Bash(npx nuxt typecheck:*)",
+      "Bash(git -C /Users/oluwatobi/Herd/dev/sentinel log --oneline -20)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ]
+}
