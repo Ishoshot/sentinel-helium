@@ -15,14 +15,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Calculate text color based on background brightness
-// Simple heuristic: if hex is light, use dark text, else white
+// Using YIQ formula: light backgrounds get dark text, dark backgrounds get white text
 const textColorClass = computed(() => {
   const hex = props.color
   const r = parseInt(hex.substring(0, 2), 16)
   const g = parseInt(hex.substring(2, 4), 16)
   const b = parseInt(hex.substring(4, 6), 16)
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
-  return yiq >= 128 ? 'text-text-primary' : 'text-white'
+  return yiq >= 128 ? 'text-gray-900' : 'text-white'
 })
 
 const classes = computed(() => {

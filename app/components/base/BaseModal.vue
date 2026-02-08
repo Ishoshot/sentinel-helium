@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * BaseModal - Modal dialog component
- * Follows Sentinel design system with calm presentation
+ * BaseModal - V2 Modal dialog component
+ * Dark theme with backdrop blur, subtle border, and spring animation
  */
 
 interface Props {
@@ -19,7 +19,6 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
-// Size classes
 const sizeClasses = computed(() => {
   const sizes = {
     sm: 'max-w-sm',
@@ -30,19 +29,16 @@ const sizeClasses = computed(() => {
   return sizes[props.size]
 })
 
-// Close modal
 function close() {
   emit('update:modelValue', false)
 }
 
-// Close on escape key
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     close()
   }
 }
 
-// Add/remove escape listener
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen) {
     document.addEventListener('keydown', handleKeydown)
@@ -74,24 +70,25 @@ onUnmounted(() => {
         v-if="modelValue"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <!-- Backdrop -->
+        <!-- Backdrop with blur -->
         <div
-          class="absolute inset-0 bg-black/50"
+          class="absolute inset-0 bg-black/60 backdrop-blur-sm"
           @click="close"
         />
 
         <!-- Modal content -->
         <Transition
-          enter-active-class="transition ease-out duration-200"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
+          enter-active-class="transition duration-300"
+          enter-from-class="opacity-0 scale-95 translate-y-2"
+          enter-to-class="opacity-100 scale-100 translate-y-0"
           leave-active-class="transition ease-in duration-150"
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
+          style="transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1)"
         >
           <div
             v-if="modelValue"
-            class="relative w-full bg-bg-elevated rounded-xl shadow-modal"
+            class="relative w-full bg-bg-elevated border border-border-subtle rounded-2xl shadow-modal"
             :class="sizeClasses"
           >
             <!-- Header -->
@@ -106,7 +103,7 @@ onUnmounted(() => {
               </slot>
 
               <button
-                class="p-1 text-text-muted hover:text-text-primary transition-default rounded-lg hover:bg-bg-surface"
+                class="p-1.5 text-text-muted hover:text-text-primary transition-all duration-150 rounded-lg hover:bg-bg-hover"
                 @click="close"
               >
                 <Icon
@@ -117,14 +114,14 @@ onUnmounted(() => {
             </div>
 
             <!-- Body -->
-            <div class="px-6 py-4">
+            <div class="px-6 py-5">
               <slot />
             </div>
 
             <!-- Footer -->
             <div
               v-if="$slots.footer"
-              class="px-6 py-4 border-t border-border-subtle bg-bg-surface/50 rounded-b-xl"
+              class="px-6 py-4 border-t border-border-subtle bg-bg-surface/30 rounded-b-2xl"
             >
               <slot name="footer" />
             </div>

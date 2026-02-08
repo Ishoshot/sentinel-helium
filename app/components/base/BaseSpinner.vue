@@ -1,15 +1,17 @@
 <script setup lang="ts">
 /**
- * BaseSpinner - Loading indicator component
- * Subtle animation following Sentinel design principles
+ * BaseSpinner - V2 Loading indicator component
+ * Teal accent color with smooth animation
  */
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
+  muted?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   size: 'md',
+  muted: false,
 })
 
 const sizeClasses = computed(() => {
@@ -25,7 +27,7 @@ const sizeClasses = computed(() => {
 <template>
   <Icon
     name="lucide:loader-2"
-    class="animate-spin text-text-muted"
-    :class="sizeClasses"
+    class="animate-spin"
+    :class="[sizeClasses, muted ? 'text-text-muted' : 'text-accent']"
   />
 </template>
