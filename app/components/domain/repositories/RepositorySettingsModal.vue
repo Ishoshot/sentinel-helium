@@ -83,10 +83,10 @@ const providerIcons: Record<string, string> = {
 }
 
 const providerColors: Record<string, { bg: string; text: string; border: string }> = {
-  anthropic: { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-200' },
-  openai: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
-  google: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
-  mistral: { bg: 'bg-violet-50', text: 'text-violet-600', border: 'border-violet-200' },
+  anthropic: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20' },
+  openai: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+  google: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
+  mistral: { bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/20' },
 }
 
 watch(
@@ -221,7 +221,7 @@ function close() {
 }
 
 function getProviderColor(provider: string) {
-  return providerColors[provider] || { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200' }
+  return providerColors[provider] || { bg: 'bg-bg-surface', text: 'text-text-secondary', border: 'border-border-subtle' }
 }
 
 async function handleCreateConfigPr() {
@@ -259,7 +259,7 @@ async function handleCreateConfigPr() {
       >
         <!-- Backdrop -->
         <div
-          class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+          class="absolute inset-0 bg-black/60 backdrop-blur-sm"
           @click="close"
         />
 
@@ -274,30 +274,30 @@ async function handleCreateConfigPr() {
         >
           <div
             v-if="modelValue"
-            class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            class="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-bg-elevated shadow-2xl"
           >
             <!-- Header -->
-            <div class="relative border-b border-slate-100 px-6 py-5">
+            <div class="relative border-b border-border-subtle px-6 py-5">
               <div class="flex items-center gap-4">
-                <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 shadow-lg">
+                <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-teal-600 shadow-lg">
                   <Icon
                     name="lucide:folder-git-2"
                     class="size-6 text-white"
                   />
                 </div>
                 <div class="flex-1">
-                  <h2 class="text-lg font-semibold text-slate-900">
+                  <h2 class="text-lg font-semibold text-text-primary">
                     Repository Settings
                   </h2>
                   <p
                     v-if="repository"
-                    class="mt-0.5 text-sm text-slate-500"
+                    class="mt-0.5 text-sm text-text-muted"
                   >
                     {{ repository.full_name }}
                   </p>
                 </div>
                 <button
-                  class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                  class="flex size-9 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-hover hover:text-text-secondary"
                   @click="close"
                 >
                   <Icon
@@ -314,24 +314,24 @@ async function handleCreateConfigPr() {
               class="max-h-[65vh] space-y-6 overflow-y-auto p-6"
             >
               <!-- Auto-review Section -->
-              <div class="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-5">
+              <div class="rounded-xl border border-border-subtle bg-gradient-to-b from-bg-elevated to-bg-surface/50 p-5">
                 <div class="flex items-center justify-between gap-4">
                   <div class="flex items-center gap-4">
                     <div
                       class="flex size-11 items-center justify-center rounded-xl"
-                      :class="autoReviewEnabled ? 'bg-emerald-100' : 'bg-slate-100'"
+                      :class="autoReviewEnabled ? 'bg-emerald-500/10' : 'bg-bg-surface'"
                     >
                       <Icon
                         :name="autoReviewEnabled ? 'lucide:zap' : 'lucide:zap-off'"
                         class="size-5"
-                        :class="autoReviewEnabled ? 'text-emerald-600' : 'text-slate-400'"
+                        :class="autoReviewEnabled ? 'text-emerald-400' : 'text-text-muted'"
                       />
                     </div>
                     <div>
-                      <p class="font-semibold text-slate-900">
+                      <p class="font-semibold text-text-primary">
                         Automatic Reviews
                       </p>
-                      <p class="mt-0.5 text-sm text-slate-500">
+                      <p class="mt-0.5 text-sm text-text-muted">
                         Review PRs automatically when opened
                       </p>
                     </div>
@@ -342,8 +342,8 @@ async function handleCreateConfigPr() {
                     type="button"
                     role="switch"
                     :aria-checked="autoReviewEnabled"
-                    class="relative h-7 w-12 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-                    :class="autoReviewEnabled ? 'bg-emerald-500' : 'bg-slate-200'"
+                    class="relative h-7 w-12 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated"
+                    :class="autoReviewEnabled ? 'bg-accent' : 'bg-bg-surface'"
                     @click="autoReviewEnabled = !autoReviewEnabled"
                   >
                     <span
@@ -358,17 +358,17 @@ async function handleCreateConfigPr() {
               <div class="space-y-4 py-2">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="flex size-9 items-center justify-center rounded-lg bg-amber-100">
+                    <div class="flex size-9 items-center justify-center rounded-lg bg-amber-500/10">
                       <Icon
                         name="lucide:key"
-                        class="size-4 text-amber-600"
+                        class="size-4 text-amber-400"
                       />
                     </div>
                     <div>
-                      <p class="font-semibold text-slate-900">
+                      <p class="font-semibold text-text-primary">
                         API Keys
                       </p>
-                      <p class="text-xs text-slate-500">
+                      <p class="text-xs text-text-muted">
                         Bring your own provider keys
                       </p>
                     </div>
@@ -376,7 +376,7 @@ async function handleCreateConfigPr() {
                   <button
                     v-if="canManage && !showAddKeyForm"
                     type="button"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-xs font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3.5 py-2 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98]"
                     @click="showAddKeyForm = true"
                   >
                     <Icon
@@ -398,20 +398,20 @@ async function handleCreateConfigPr() {
                 >
                   <div
                     v-if="showAddKeyForm"
-                    class="overflow-hidden rounded-xl border border-slate-200 bg-white"
+                    class="overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated"
                   >
-                    <div class="border-b border-slate-100 px-4 py-3">
+                    <div class="border-b border-border-subtle px-4 py-3">
                       <div class="flex items-center justify-between">
-                        <h5 class="flex items-center gap-2 text-sm font-medium text-slate-900">
+                        <h5 class="flex items-center gap-2 text-sm font-medium text-text-primary">
                           <Icon
                             name="lucide:plus-circle"
-                            class="size-4 text-slate-500"
+                            class="size-4 text-text-muted"
                           />
                           New API Key
                         </h5>
                         <button
                           type="button"
-                          class="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          class="rounded-md p-1 text-text-muted transition-colors hover:bg-bg-hover hover:text-text-secondary"
                           @click="showAddKeyForm = false"
                         >
                           <Icon
@@ -422,14 +422,14 @@ async function handleCreateConfigPr() {
                       </div>
                     </div>
 
-                    <div class="space-y-4 bg-slate-50 p-4">
+                    <div class="space-y-4 bg-bg-surface p-4">
                       <div class="grid gap-4 sm:grid-cols-2">
                         <div>
-                          <label class="mb-1.5 block text-xs font-medium text-slate-700">Provider</label>
+                          <label class="mb-1.5 block text-xs font-medium text-text-secondary">Provider</label>
                           <div class="relative">
                             <select
                               v-model="newKeyProvider"
-                              class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                              class="h-11 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 text-sm text-text-primary transition-all duration-200 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                             >
                               <option
                                 value=""
@@ -447,23 +447,23 @@ async function handleCreateConfigPr() {
                             </select>
                             <Icon
                               name="lucide:chevron-down"
-                              class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                              class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label class="mb-1.5 block text-xs font-medium text-slate-700">API Key</label>
+                          <label class="mb-1.5 block text-xs font-medium text-text-secondary">API Key</label>
                           <div class="relative">
                             <input
                               v-model="newKeyValue"
                               :type="showKeyInput ? 'text' : 'password'"
-                              class="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 pr-10 font-mono text-sm text-slate-900 transition-all duration-200 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                              class="h-11 w-full rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 font-mono text-sm text-text-primary transition-all duration-200 placeholder:text-text-muted focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                               placeholder="sk-..."
                             >
                             <button
                               type="button"
-                              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                              class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-colors hover:text-text-secondary"
                               @click="showKeyInput = !showKeyInput"
                             >
                               <Icon
@@ -477,11 +477,11 @@ async function handleCreateConfigPr() {
 
                       <!-- Model Selection -->
                       <div v-if="newKeyProvider && aiOptions.length > 0">
-                        <label class="mb-1.5 block text-xs font-medium text-slate-700">AI Model</label>
+                        <label class="mb-1.5 block text-xs font-medium text-text-secondary">AI Model</label>
                         <div class="relative">
                           <select
                             v-model="newKeyModelId"
-                            class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                            class="h-11 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 text-sm text-text-primary transition-all duration-200 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                             :disabled="isLoadingOptions"
                           >
                             <option
@@ -495,27 +495,27 @@ async function handleCreateConfigPr() {
                           <Icon
                             v-if="isLoadingOptions"
                             name="lucide:loader-2"
-                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-slate-400"
+                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-text-muted"
                           />
                           <Icon
                             v-else
                             name="lucide:chevron-down"
-                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                            class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
                           />
                         </div>
                       </div>
 
-                      <div class="flex items-center gap-2 text-xs text-slate-500">
+                      <div class="flex items-center gap-2 text-xs text-text-muted">
                         <Icon
                           name="lucide:shield-check"
-                          class="size-3.5 text-emerald-500"
+                          class="size-3.5 text-emerald-400"
                         />
                         <span>Encrypted at rest. Never displayed again.</span>
                       </div>
 
                       <div
                         v-if="hasSelectedProviderKey"
-                        class="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-xs text-amber-700"
+                        class="flex items-start gap-2 rounded-lg bg-amber-500/10 p-3 text-xs text-amber-400"
                       >
                         <Icon
                           name="lucide:alert-triangle"
@@ -524,17 +524,17 @@ async function handleCreateConfigPr() {
                         <span>This will replace your existing {{ AI_PROVIDERS.find(p => p.value === newKeyProvider)?.label }} key.</span>
                       </div>
 
-                      <div class="flex justify-end gap-2 border-t border-slate-200 pt-4">
+                      <div class="flex justify-end gap-2 border-t border-border-subtle pt-4">
                         <button
                           type="button"
-                          class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
+                          class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
                           @click="showAddKeyForm = false"
                         >
                           Cancel
                         </button>
                         <button
                           type="button"
-                          class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                          class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                           :disabled="!newKeyProvider || !newKeyValue || isSubmittingKey"
                           @click="handleAddKey"
                         >
@@ -557,7 +557,7 @@ async function handleCreateConfigPr() {
                 >
                   <Icon
                     name="lucide:loader-2"
-                    class="size-6 animate-spin text-slate-400"
+                    class="size-6 animate-spin text-text-muted"
                   />
                 </div>
 
@@ -569,7 +569,7 @@ async function handleCreateConfigPr() {
                     v-for="key in providerKeys"
                     :key="key.id"
                     class="group overflow-hidden rounded-xl border transition-all duration-200"
-                    :class="keyToEdit?.id === key.id ? 'border-slate-300 bg-slate-50' : 'border-slate-200 bg-white hover:border-slate-300'"
+                    :class="keyToEdit?.id === key.id ? 'border-border-muted bg-bg-surface' : 'border-border-subtle bg-bg-elevated hover:border-border-muted'"
                   >
                     <!-- Edit Mode -->
                     <div
@@ -588,10 +588,10 @@ async function handleCreateConfigPr() {
                           />
                         </div>
                         <div>
-                          <p class="text-sm font-semibold text-slate-900">
+                          <p class="text-sm font-semibold text-text-primary">
                             {{ key.provider_label }}
                           </p>
-                          <p class="text-xs text-slate-500">
+                          <p class="text-xs text-text-muted">
                             Select AI model
                           </p>
                         </div>
@@ -600,7 +600,7 @@ async function handleCreateConfigPr() {
                       <div class="relative mb-4">
                         <select
                           v-model="editModelId"
-                          class="h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 pr-10 text-sm text-slate-900 transition-all duration-200 focus:border-slate-900 focus:outline-none focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]"
+                          class="h-11 w-full appearance-none rounded-lg border border-border-subtle bg-bg-elevated px-3 pr-10 text-sm text-text-primary transition-all duration-200 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
                           :disabled="isLoadingOptions"
                         >
                           <option
@@ -614,26 +614,26 @@ async function handleCreateConfigPr() {
                         <Icon
                           v-if="isLoadingOptions"
                           name="lucide:loader-2"
-                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-slate-400"
+                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-text-muted"
                         />
                         <Icon
                           v-else
                           name="lucide:chevron-down"
-                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400"
+                          class="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
                         />
                       </div>
 
                       <div class="flex justify-end gap-2">
                         <button
                           type="button"
-                          class="rounded-lg px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                          class="rounded-lg px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
                           @click="handleCancelEdit"
                         >
                           Cancel
                         </button>
                         <button
                           type="button"
-                          class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                          class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                           :disabled="isSubmittingKey"
                           @click="handleSaveEdit"
                         >
@@ -664,10 +664,10 @@ async function handleCreateConfigPr() {
                           />
                         </div>
                         <div>
-                          <p class="text-sm font-semibold text-slate-900">
+                          <p class="text-sm font-semibold text-text-primary">
                             {{ key.provider_label }}
                           </p>
-                          <div class="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500">
+                          <div class="mt-0.5 flex items-center gap-1.5 text-xs text-text-muted">
                             <span class="flex size-1.5 rounded-full bg-emerald-500" />
                             <span class="font-mono">{{ key.ai_model?.name || 'Default model' }}</span>
                           </div>
@@ -679,7 +679,7 @@ async function handleCreateConfigPr() {
                       >
                         <button
                           type="button"
-                          class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                          class="rounded-lg p-2 text-text-muted transition-colors hover:bg-bg-hover hover:text-text-secondary"
                           title="Edit"
                           @click="handleStartEdit(key)"
                         >
@@ -690,7 +690,7 @@ async function handleCreateConfigPr() {
                         </button>
                         <button
                           type="button"
-                          class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                          class="rounded-lg p-2 text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-400"
                           title="Delete"
                           @click="keyToDelete = key.id"
                         >
@@ -707,18 +707,18 @@ async function handleCreateConfigPr() {
                 <!-- Empty State -->
                 <div
                   v-else-if="!showAddKeyForm"
-                  class="rounded-xl border-2 border-dashed border-slate-200 p-8 text-center"
+                  class="rounded-xl border-2 border-dashed border-border-subtle p-8 text-center"
                 >
-                  <div class="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-slate-100">
+                  <div class="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-bg-surface">
                     <Icon
                       name="lucide:key"
-                      class="size-5 text-slate-400"
+                      class="size-5 text-text-muted"
                     />
                   </div>
-                  <p class="text-sm font-medium text-slate-900">
+                  <p class="text-sm font-medium text-text-primary">
                     No API keys configured
                   </p>
-                  <p class="mt-1 text-xs text-slate-500">
+                  <p class="mt-1 text-xs text-text-muted">
                     Add your own key to enable reviews
                   </p>
                 </div>
@@ -727,17 +727,17 @@ async function handleCreateConfigPr() {
               <!-- Configuration Section -->
               <div class="space-y-4 py-2">
                 <div class="flex items-center gap-3">
-                  <div class="flex size-9 items-center justify-center rounded-lg bg-violet-100">
+                  <div class="flex size-9 items-center justify-center rounded-lg bg-violet-500/10">
                     <Icon
                       name="lucide:file-code"
-                      class="size-4 text-violet-600"
+                      class="size-4 text-violet-400"
                     />
                   </div>
                   <div>
-                    <p class="font-semibold text-slate-900">
+                    <p class="font-semibold text-text-primary">
                       Configuration
                     </p>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs text-text-muted">
                       .sentinel/config.yaml
                     </p>
                   </div>
@@ -746,23 +746,23 @@ async function handleCreateConfigPr() {
                 <!-- Config Error -->
                 <div
                   v-if="hasError"
-                  class="rounded-xl border border-red-200 bg-red-50 p-4"
+                  class="rounded-xl border border-red-500/20 bg-red-500/10 p-4"
                 >
                   <div class="flex items-start gap-3">
-                    <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-red-100">
+                    <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-red-500/20">
                       <Icon
                         name="lucide:alert-circle"
-                        class="size-4 text-red-600"
+                        class="size-4 text-red-400"
                       />
                     </div>
                     <div class="flex-1">
-                      <p class="text-sm font-medium text-red-800">
+                      <p class="text-sm font-medium text-red-400">
                         Configuration Error
                       </p>
-                      <p class="mt-1 whitespace-pre-line text-xs text-red-600">
+                      <p class="mt-1 whitespace-pre-line text-xs text-red-400/80">
                         {{ configError }}
                       </p>
-                      <p class="mt-2 text-xs text-red-500">
+                      <p class="mt-2 text-xs text-red-400/60">
                         Last sync: {{ syncedAtLabel }}
                       </p>
                     </div>
@@ -772,21 +772,21 @@ async function handleCreateConfigPr() {
                 <!-- Config Active -->
                 <div
                   v-else-if="hasConfig"
-                  class="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-4"
+                  class="rounded-xl border border-border-subtle bg-gradient-to-b from-bg-elevated to-bg-surface/50 p-4"
                 >
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3">
-                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
                         <Icon
                           name="lucide:check"
-                          class="size-4 text-emerald-600"
+                          class="size-4 text-emerald-400"
                         />
                       </div>
                       <div>
-                        <p class="text-sm font-medium text-slate-900">
+                        <p class="text-sm font-medium text-text-primary">
                           Configuration Active
                         </p>
-                        <p class="text-xs text-slate-500">
+                        <p class="text-xs text-text-muted">
                           Synced {{ syncedAtLabel }}
                         </p>
 
@@ -796,7 +796,7 @@ async function handleCreateConfigPr() {
                         >
                           <span
                             v-if="config.provider.preferred"
-                            class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600"
+                            class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-xs text-text-secondary"
                           >
                             <Icon
                               name="lucide:bot"
@@ -806,7 +806,7 @@ async function handleCreateConfigPr() {
                           </span>
                           <span
                             v-if="config.provider.model"
-                            class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600"
+                            class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 font-mono text-xs text-text-secondary"
                           >
                             {{ config.provider.model }}
                           </span>
@@ -815,7 +815,7 @@ async function handleCreateConfigPr() {
                     </div>
                     <button
                       type="button"
-                      class="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                      class="shrink-0 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
                       @click="showConfigViewer = true"
                     >
                       View
@@ -826,29 +826,29 @@ async function handleCreateConfigPr() {
                 <!-- No Config -->
                 <div
                   v-else
-                  class="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                  class="rounded-xl border border-border-subtle bg-bg-surface p-4"
                 >
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3">
-                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-200">
+                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-hover">
                         <Icon
                           name="lucide:file-question"
-                          class="size-4 text-slate-500"
+                          class="size-4 text-text-muted"
                         />
                       </div>
                       <div>
-                        <p class="text-sm text-slate-600">
+                        <p class="text-sm text-text-secondary">
                           Using default settings
                         </p>
-                        <p class="mt-1 text-xs text-slate-500">
-                          Create <code class="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[10px]">.sentinel/config.yaml</code> to customize
+                        <p class="mt-1 text-xs text-text-muted">
+                          Create <code class="rounded bg-bg-hover px-1.5 py-0.5 font-mono text-[10px]">.sentinel/config.yaml</code> to customize
                         </p>
                       </div>
                     </div>
                     <button
                       v-if="canManage"
                       type="button"
-                      class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-indigo-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                       :disabled="isCreatingConfigPr"
                       @click="handleCreateConfigPr"
                     >
@@ -870,10 +870,10 @@ async function handleCreateConfigPr() {
             </div>
 
             <!-- Footer -->
-            <div class="flex items-center justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-4">
+            <div class="flex items-center justify-between gap-4 border-t border-border-subtle bg-bg-surface px-6 py-4">
               <p
                 v-if="!canManage"
-                class="text-xs text-slate-500"
+                class="text-xs text-text-muted"
               >
                 Admin permissions required
               </p>
@@ -884,14 +884,14 @@ async function handleCreateConfigPr() {
               <div class="flex items-center gap-3">
                 <button
                   type="button"
-                  class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200"
+                  class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
                   @click="close"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   :disabled="!hasChanges || !canManage || isUpdating"
                   @click="handleSave"
                 >
@@ -924,17 +924,17 @@ async function handleCreateConfigPr() {
   >
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-xl bg-violet-100">
+        <div class="flex size-10 items-center justify-center rounded-xl bg-violet-500/10">
           <Icon
             name="lucide:file-code"
-            class="size-5 text-violet-600"
+            class="size-5 text-violet-400"
           />
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-slate-900">
+          <h2 class="text-lg font-semibold text-text-primary">
             .sentinel/config.yaml
           </h2>
-          <p class="text-xs text-slate-500">
+          <p class="text-xs text-text-muted">
             Last synced: {{ syncedAtLabel }}
           </p>
         </div>
@@ -943,7 +943,7 @@ async function handleCreateConfigPr() {
 
     <div
       v-if="configJson"
-      class="max-h-[60vh] overflow-auto rounded-xl border border-slate-200"
+      class="max-h-[60vh] overflow-auto rounded-xl border border-border-subtle"
     >
       <BaseCodeBlock
         :code="configJson"
@@ -958,9 +958,9 @@ async function handleCreateConfigPr() {
     >
       <Icon
         name="lucide:file-x"
-        class="mb-3 size-8 text-slate-400"
+        class="mb-3 size-8 text-text-muted"
       />
-      <p class="text-sm text-slate-500">
+      <p class="text-sm text-text-muted">
         No configuration found
       </p>
     </div>
@@ -969,7 +969,7 @@ async function handleCreateConfigPr() {
       <div class="flex justify-end">
         <button
           type="button"
-          class="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100"
+          class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
           @click="showConfigViewer = false"
         >
           Close
@@ -991,3 +991,9 @@ async function handleCreateConfigPr() {
     @cancel="keyToDelete = null"
   />
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

@@ -41,7 +41,7 @@ const languageColors: Record<string, string> = {
   Ruby: 'bg-red-600',
   'C#': 'bg-green-600',
   'C++': 'bg-pink-500',
-  C: 'bg-gray-600',
+  C: 'bg-zinc-500',
   Swift: 'bg-orange-500',
   Kotlin: 'bg-purple-400',
   Vue: 'bg-emerald-500',
@@ -50,7 +50,7 @@ const languageColors: Record<string, string> = {
 }
 
 const languageColor = computed(
-  () => languageColors[props.repository.language ?? ''] ?? 'bg-gray-400'
+  () => languageColors[props.repository.language ?? ''] ?? 'bg-zinc-400'
 )
 
 const githubUrl = computed(
@@ -59,21 +59,21 @@ const githubUrl = computed(
 </script>
 
 <template>
-  <div class="group flex h-full flex-col rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300">
+  <div class="group flex h-full flex-col rounded-lg border border-border-subtle bg-bg-elevated transition-colors hover:border-border-muted">
     <!-- Header -->
     <div class="flex items-start justify-between gap-3 p-4">
       <div class="flex items-center gap-3 min-w-0 flex-1">
-        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-bg-surface">
           <Icon
             :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
-            class="size-5 text-gray-500"
+            class="size-5 text-text-muted"
           />
         </div>
         <div class="min-w-0 flex-1">
-          <h3 class="truncate text-sm font-semibold text-gray-900">
+          <h3 class="truncate text-sm font-semibold text-text-primary">
             {{ repository.name }}
           </h3>
-          <p class="truncate text-xs text-gray-500">
+          <p class="truncate text-xs text-text-muted">
             {{ repository.owner }}
           </p>
         </div>
@@ -84,20 +84,20 @@ const githubUrl = computed(
         <span
           class="rounded px-1.5 py-0.5 text-[10px] font-medium"
           :class="repository.auto_review_enabled
-            ? 'bg-emerald-50 text-emerald-700'
-            : 'bg-gray-100 text-gray-500'"
+            ? 'bg-emerald-500/10 text-emerald-400'
+            : 'bg-bg-surface text-text-muted'"
         >
           {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
         </span>
         <span
           v-if="configStatus === 'active'"
-          class="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700"
+          class="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-400"
         >
           Config
         </span>
         <span
           v-else-if="configStatus === 'error'"
-          class="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700"
+          class="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-400"
         >
           Error
         </span>
@@ -108,20 +108,20 @@ const githubUrl = computed(
     <div class="flex-1 px-4">
       <p
         v-if="repository.description"
-        class="line-clamp-2 text-sm text-gray-500"
+        class="line-clamp-2 text-sm text-text-muted"
       >
         {{ repository.description }}
       </p>
       <p
         v-else
-        class="text-sm italic text-gray-400"
+        class="text-sm italic text-text-muted"
       >
         No description
       </p>
     </div>
 
     <!-- Meta -->
-    <div class="flex items-center gap-4 px-4 py-3 text-xs text-gray-400">
+    <div class="flex items-center gap-4 px-4 py-3 text-xs text-text-muted">
       <span
         v-if="repository.language"
         class="flex items-center gap-1.5"
@@ -142,12 +142,12 @@ const githubUrl = computed(
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between border-t border-gray-100 p-3">
+    <div class="flex items-center justify-between border-t border-border-subtle p-3">
       <a
         :href="githubUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600"
+        class="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-secondary"
       >
         <Icon
           name="lucide:external-link"
@@ -159,7 +159,7 @@ const githubUrl = computed(
       <div class="flex items-center gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
         <NuxtLink
           :to="runsUrl"
-          class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          class="rounded p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
           title="View runs"
         >
           <Icon
@@ -172,8 +172,8 @@ const githubUrl = computed(
           <button
             class="rounded p-1.5 transition-colors"
             :class="repository.auto_review_enabled
-              ? 'text-emerald-500 hover:bg-emerald-50'
-              : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
+              ? 'text-emerald-400 hover:bg-emerald-500/10'
+              : 'text-text-muted hover:bg-bg-hover hover:text-text-secondary'"
             :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
             @click="$emit('toggleAutoReview', repository.id)"
           >
@@ -183,7 +183,7 @@ const githubUrl = computed(
             />
           </button>
           <button
-            class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            class="rounded p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
             title="Settings"
             @click="$emit('openSettings', repository.id)"
           >
