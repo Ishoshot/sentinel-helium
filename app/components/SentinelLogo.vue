@@ -7,9 +7,11 @@
 const props = withDefaults(defineProps<{
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   inverted?: boolean
+  showText?: boolean
 }>(), {
   size: 'md',
   inverted: false,
+  showText: true,
 })
 
 const sizeClasses: Record<string, string> = {
@@ -23,8 +25,14 @@ const sizeClasses: Record<string, string> = {
 
 <template>
   <img
-    src="~/assets/images/sentinel-logo-wordmark.svg"
+    src="~/assets/images/sentinel-logo-icon.svg"
     alt="Sentinel"
     :class="[sizeClasses[props.size], props.inverted ? 'brightness-0 invert' : '']"
   >
+  <h1
+    v-if="props.showText"
+    class="text-xl font-bold text-text-primary px-2"
+  >
+    Sentinel
+  </h1>
 </template>

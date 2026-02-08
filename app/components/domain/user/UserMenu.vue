@@ -76,7 +76,6 @@ function handleLogout() {
           :src="user.avatar_url"
           :name="user.name"
           size="sm"
-          class="ring-2 ring-transparent group-hover:ring-accent/20 transition-all duration-200"
         />
         <!-- Online indicator -->
         <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />

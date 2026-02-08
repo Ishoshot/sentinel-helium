@@ -98,7 +98,7 @@ function getNotificationIcon(type: string): string {
     <!-- Trigger Button -->
     <button
       type="button"
-      class="relative flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+      class="relative flex size-9 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-hover hover:text-text-secondary"
       aria-label="Notifications"
       @click="isOpen = !isOpen"
     >

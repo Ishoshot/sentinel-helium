@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
+import SentinelLogo from './components/SentinelLogo.vue';
 
 /**
  * Global error page - handles all unhandled errors
@@ -245,10 +246,7 @@ function handleSecondaryAction() {
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div class="flex items-center gap-2 text-text-muted/50">
           <div class="w-5 h-5 bg-text-muted/20 rounded flex items-center justify-center">
-            <Icon
-              name="lucide:shield-check"
-              class="w-3 h-3"
-            />
+            <SentinelLogo size="sm" :show-text="false" />
           </div>
           <span class="text-xs font-medium tracking-wide">SENTINEL</span>
         </div>
