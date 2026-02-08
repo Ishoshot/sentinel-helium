@@ -246,7 +246,10 @@ function handleSecondaryAction() {
       <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div class="flex items-center gap-2 text-text-muted/50">
           <div class="w-5 h-5 bg-text-muted/20 rounded flex items-center justify-center">
-            <SentinelLogo size="sm" :show-text="false" />
+            <SentinelLogo
+              size="sm"
+              :show-text="false"
+            />
           </div>
           <span class="text-xs font-medium tracking-wide">SENTINEL</span>
         </div>

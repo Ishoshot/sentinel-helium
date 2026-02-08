@@ -88,7 +88,6 @@ function handleScroll() {
 
     <!-- Hero Section -->
     <section class="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
-      
       <!-- Subtle grid pattern -->
       <div
         class="absolute inset-0 opacity-[0.03]"

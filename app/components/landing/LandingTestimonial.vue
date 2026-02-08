@@ -30,7 +30,6 @@ const testimonials = [
 
 <template>
   <section class="py-24 lg:py-32 bg-[#0f0f12] relative overflow-hidden">
-
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center mb-16">

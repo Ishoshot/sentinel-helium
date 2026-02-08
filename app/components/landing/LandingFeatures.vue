@@ -35,7 +35,6 @@ const simpleFeatures = [
     id="product"
     class="py-32 lg:py-48 bg-[#09090b] relative overflow-hidden"
   >
-
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Section header -->
       <div class="max-w-3xl mb-16">
@@ -98,7 +97,6 @@ const simpleFeatures = [
 
   <!-- Second features section -->
   <section class="py-24 lg:py-32 bg-[#09090b] relative overflow-hidden">
-
     <div class="relative max-w-7xl mx-auto px-6">
       <div class="grid lg:grid-cols-2 gap-16 items-start">
         <!-- Left: Content -->

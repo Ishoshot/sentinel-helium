@@ -80,7 +80,6 @@ function tripleArray(arr: Language[]): Language[] {
 
 <template>
   <section class="py-24 lg:py-32 bg-[#09090b] relative overflow-hidden">
-
     <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center mb-16">

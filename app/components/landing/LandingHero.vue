@@ -33,14 +33,20 @@ defineProps<{
         class="group w-full sm:w-auto landing-btn-primary inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-xl"
       >
         Get started
-        <Icon name="ph:arrow-right-bold" class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+        <Icon
+          name="ph:arrow-right-bold"
+          class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
+        />
       </NuxtLink>
       <a
         href="mailto:hello@usesentinel.ai"
         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-xl group bg-zinc-900 text-zinc-100 border border-zinc-800 hover:bg-zinc-800 hover:border-zinc-700 transition-all duration-200"
       >
         <span>Contact sales</span>
-        <Icon name="ph:arrow-right-bold" class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+        <Icon
+          name="ph:arrow-right-bold"
+          class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
+        />
       </a>
     </div>
   </div>
