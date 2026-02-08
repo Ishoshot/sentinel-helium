@@ -8,7 +8,33 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Sentinel",
-      meta: [{ name: "theme-color", content: "#3b82f6" }],
+      htmlAttrs: { lang: "en" },
+      meta: [
+        { name: "theme-color", content: "#3b82f6" },
+        {
+          name: "description",
+          content:
+            "AI-powered code reviews with instant PR analysis, custom guidelines, and BYOK AI providers.",
+        },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "Sentinel" },
+        {
+          property: "og:image",
+          content: "https://usesentinel.ai/og-image.png",
+        },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        {
+          property: "og:image:alt",
+          content: "Sentinel - AI-Powered Code Reviews",
+        },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@SentinelAIHQ" },
+        {
+          name: "twitter:image",
+          content: "https://usesentinel.ai/og-image.png",
+        },
+      ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         {
@@ -37,6 +63,9 @@ export default defineNuxtConfig({
     // Public pages - SSR for SEO and social sharing
     "/": { ssr: true },
     "/login": { ssr: true },
+    "/pricing": { ssr: true },
+    "/privacy": { ssr: true },
+    "/terms": { ssr: true },
 
     // Dashboard routes - SPA mode (no hydration issues, no SSR needed)
     "/:workspace/**": { ssr: false },
@@ -44,6 +73,7 @@ export default defineNuxtConfig({
     // Auth flows - SPA (client-only, no SEO value)
     "/auth/**": { ssr: false },
     "/invitations/**": { ssr: false },
+    "/billing/**": { ssr: false },
   },
 
   // Nitro configuration for Railway deployment
@@ -58,11 +88,33 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
     "@nuxt/eslint",
+    "@nuxtjs/sitemap",
     "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
     "@primevue/nuxt-module",
     "@vueuse/nuxt",
   ],
+
+  site: {
+    url: "https://usesentinel.ai",
+  },
+
+  sitemap: {
+    urls: [
+      { loc: "/", priority: 1.0, changefreq: "weekly" },
+      { loc: "/pricing", priority: 0.8, changefreq: "monthly" },
+      { loc: "/login", priority: 0.5, changefreq: "yearly" },
+      { loc: "/privacy", priority: 0.3, changefreq: "yearly" },
+      { loc: "/terms", priority: 0.3, changefreq: "yearly" },
+    ],
+    exclude: [
+      "/:workspace/**",
+      "/auth/**",
+      "/invitations/**",
+      "/billing/**",
+      "/briefings/**",
+    ],
+  },
 
   runtimeConfig: {
     public: {
