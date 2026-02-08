@@ -39,15 +39,15 @@ const iconMap: Record<string, string> = {
 };
 
 const colorMap: Record<string, { bg: string; icon: string; accent: string }> = {
-  standup: { bg: "bg-amber-100", icon: "text-amber-600", accent: "from-amber-500/10" },
-  "standup-update": { bg: "bg-amber-100", icon: "text-amber-600", accent: "from-amber-500/10" },
-  "weekly-team-summary": { bg: "bg-blue-100", icon: "text-blue-600", accent: "from-blue-500/10" },
-  "delivery-velocity": { bg: "bg-rose-100", icon: "text-rose-600", accent: "from-rose-500/10" },
-  "engineer-spotlight": { bg: "bg-violet-100", icon: "text-violet-600", accent: "from-violet-500/10" },
-  "company-update": { bg: "bg-emerald-100", icon: "text-emerald-600", accent: "from-emerald-500/10" },
-  "sprint-retrospective": { bg: "bg-cyan-100", icon: "text-cyan-600", accent: "from-cyan-500/10" },
-  "code-health": { bg: "bg-pink-100", icon: "text-pink-600", accent: "from-pink-500/10" },
-  default: { bg: "bg-slate-100", icon: "text-slate-600", accent: "from-slate-500/10" },
+  standup: { bg: "bg-amber-500/10", icon: "text-amber-400", accent: "from-amber-500/10" },
+  "standup-update": { bg: "bg-amber-500/10", icon: "text-amber-400", accent: "from-amber-500/10" },
+  "weekly-team-summary": { bg: "bg-blue-500/10", icon: "text-blue-400", accent: "from-blue-500/10" },
+  "delivery-velocity": { bg: "bg-rose-500/10", icon: "text-rose-400", accent: "from-rose-500/10" },
+  "engineer-spotlight": { bg: "bg-violet-500/10", icon: "text-violet-400", accent: "from-violet-500/10" },
+  "company-update": { bg: "bg-emerald-500/10", icon: "text-emerald-400", accent: "from-emerald-500/10" },
+  "sprint-retrospective": { bg: "bg-cyan-500/10", icon: "text-cyan-400", accent: "from-cyan-500/10" },
+  "code-health": { bg: "bg-pink-500/10", icon: "text-pink-400", accent: "from-pink-500/10" },
+  default: { bg: "bg-bg-surface", icon: "text-text-secondary", accent: "from-bg-hover/50" },
 };
 
 const briefingIcon = computed(() => {
@@ -105,7 +105,7 @@ function handleManage() {
 
 <template>
   <article
-    class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm transition-all duration-200 hover:border-slate-300 hover:shadow-md"
+    class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated transition-all duration-200 hover:border-border-muted"
     :class="[!isEligible && 'opacity-60']"
   >
     <!-- Subtle gradient accent on hover -->
@@ -131,13 +131,13 @@ function handleManage() {
       <!-- Active indicator -->
       <div
         v-if="hasSubscription"
-        class="flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 ring-1 ring-emerald-100"
+        class="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-1 ring-1 ring-emerald-500/20"
       >
         <span class="relative flex size-1.5">
           <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-          <span class="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+          <span class="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
         </span>
-        <span class="text-[11px] font-medium text-emerald-700">Active</span>
+        <span class="text-[11px] font-medium text-emerald-400">Active</span>
       </div>
     </div>
 
@@ -149,18 +149,18 @@ function handleManage() {
         class="text-left"
         @click="handleTitleClick"
       >
-        <h3 class="text-[15px] font-semibold text-slate-900 transition-colors group-hover:text-slate-700">
+        <h3 class="text-[15px] font-semibold text-text-primary transition-colors group-hover:text-text-secondary">
           {{ briefing.title }}
         </h3>
       </button>
 
       <!-- Audience -->
-      <p class="mt-1 text-xs text-slate-500">
+      <p class="mt-1 text-xs text-text-muted">
         {{ audienceDisplay }}
       </p>
 
       <!-- Description -->
-      <p class="mt-2.5 line-clamp-2 flex-1 text-[13px] leading-relaxed text-slate-600">
+      <p class="mt-2.5 line-clamp-2 flex-1 text-[13px] leading-relaxed text-text-secondary">
         {{ briefing.description }}
       </p>
 
@@ -168,7 +168,7 @@ function handleManage() {
       <div class="mt-3 flex flex-wrap items-center gap-1.5">
         <span
           v-if="briefing.requires_ai"
-          class="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 ring-1 ring-indigo-100"
+          class="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 px-2 py-0.5 text-[11px] font-medium text-indigo-400 ring-1 ring-indigo-500/20"
         >
           <Icon
             name="lucide:sparkles"
@@ -178,7 +178,7 @@ function handleManage() {
         </span>
         <span
           v-if="briefing.is_schedulable"
-          class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200"
+          class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-secondary ring-1 ring-border-subtle"
         >
           <Icon
             name="lucide:calendar"
@@ -191,7 +191,7 @@ function handleManage() {
       <!-- Next delivery -->
       <p
         v-if="hasSubscription && nextDelivery"
-        class="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500"
+        class="mt-2.5 flex items-center gap-1.5 text-xs text-text-muted"
       >
         <Icon
           name="lucide:clock"
@@ -204,11 +204,11 @@ function handleManage() {
     <!-- Actions -->
     <div
       v-if="showActions"
-      class="relative flex items-center gap-2 border-t border-slate-100 p-3"
+      class="relative flex items-center gap-2 border-t border-border-subtle p-3"
     >
       <button
         type="button"
-        class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-[13px] font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-white/80"
+        class="flex-1 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3 py-2 text-[13px] font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!isEligible"
         @click="handleGenerate"
       >
@@ -218,7 +218,7 @@ function handleManage() {
       <button
         v-if="briefing.is_schedulable"
         type="button"
-        class="flex size-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-300"
+        class="flex size-9 items-center justify-center rounded-lg border border-border-subtle text-text-muted transition-all hover:border-border-muted hover:bg-bg-hover hover:text-text-secondary disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!isEligible"
         :title="hasSubscription ? 'Manage subscription' : 'Subscribe'"
         @click="hasSubscription ? handleManage() : handleSubscribe()"
@@ -231,3 +231,9 @@ function handleManage() {
     </div>
   </article>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

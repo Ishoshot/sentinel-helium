@@ -37,15 +37,15 @@ const iconMap: Record<string, string> = {
 }
 
 const colorMap: Record<string, { bg: string; icon: string; gradient: string }> = {
-  standup: { bg: 'bg-amber-100', icon: 'text-amber-600', gradient: 'from-amber-500 to-orange-500' },
-  'standup-update': { bg: 'bg-amber-100', icon: 'text-amber-600', gradient: 'from-amber-500 to-orange-500' },
-  'weekly-team-summary': { bg: 'bg-blue-100', icon: 'text-blue-600', gradient: 'from-blue-500 to-indigo-500' },
-  'delivery-velocity': { bg: 'bg-rose-100', icon: 'text-rose-600', gradient: 'from-rose-500 to-pink-500' },
-  'engineer-spotlight': { bg: 'bg-violet-100', icon: 'text-violet-600', gradient: 'from-violet-500 to-purple-500' },
-  'company-update': { bg: 'bg-emerald-100', icon: 'text-emerald-600', gradient: 'from-emerald-500 to-teal-500' },
-  'sprint-retrospective': { bg: 'bg-cyan-100', icon: 'text-cyan-600', gradient: 'from-cyan-500 to-blue-500' },
-  'code-health': { bg: 'bg-pink-100', icon: 'text-pink-600', gradient: 'from-pink-500 to-rose-500' },
-  default: { bg: 'bg-slate-100', icon: 'text-slate-600', gradient: 'from-slate-500 to-slate-600' },
+  standup: { bg: 'bg-amber-500/10', icon: 'text-amber-400', gradient: 'from-amber-500 to-orange-500' },
+  'standup-update': { bg: 'bg-amber-500/10', icon: 'text-amber-400', gradient: 'from-amber-500 to-orange-500' },
+  'weekly-team-summary': { bg: 'bg-blue-500/10', icon: 'text-blue-400', gradient: 'from-blue-500 to-indigo-500' },
+  'delivery-velocity': { bg: 'bg-rose-500/10', icon: 'text-rose-400', gradient: 'from-rose-500 to-pink-500' },
+  'engineer-spotlight': { bg: 'bg-violet-500/10', icon: 'text-violet-400', gradient: 'from-violet-500 to-purple-500' },
+  'company-update': { bg: 'bg-emerald-500/10', icon: 'text-emerald-400', gradient: 'from-emerald-500 to-teal-500' },
+  'sprint-retrospective': { bg: 'bg-cyan-500/10', icon: 'text-cyan-400', gradient: 'from-cyan-500 to-blue-500' },
+  'code-health': { bg: 'bg-pink-500/10', icon: 'text-pink-400', gradient: 'from-pink-500 to-rose-500' },
+  default: { bg: 'bg-bg-surface', icon: 'text-text-secondary', gradient: 'from-bg-hover to-bg-surface' },
 }
 
 const briefingIcon = computed((): string => {
@@ -127,8 +127,8 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
     <template #header>
       <div class="flex items-center gap-4">
         <div
-          class="flex size-14 items-center justify-center rounded-2xl ring-1"
-          :class="[briefingColors.bg, `ring-${briefingColors.bg.replace('bg-', '').replace('-100', '-200')}`]"
+          class="flex size-14 items-center justify-center rounded-2xl ring-1 ring-border-subtle"
+          :class="[briefingColors.bg]"
         >
           <Icon
             :name="briefingIcon"
@@ -137,10 +137,10 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
           />
         </div>
         <div class="min-w-0 flex-1">
-          <h2 class="text-xl font-semibold text-slate-900">
+          <h2 class="text-xl font-semibold text-text-primary">
             {{ briefing.title }}
           </h2>
-          <p class="mt-0.5 text-sm text-slate-500">
+          <p class="mt-0.5 text-sm text-text-muted">
             For {{ audienceDisplay }}
           </p>
         </div>
@@ -153,7 +153,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <!-- AI Badge -->
         <span
           v-if="briefing.requires_ai"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-indigo-100"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-400 ring-1 ring-indigo-500/20"
         >
           <Icon
             name="lucide:sparkles"
@@ -165,7 +165,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <!-- Schedulable badge -->
         <span
           v-if="briefing.is_schedulable"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20"
         >
           <Icon
             name="lucide:calendar"
@@ -177,7 +177,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <!-- Subscription badge -->
         <span
           v-if="hasSubscription"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-100"
+          class="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-400 ring-1 ring-amber-500/20"
         >
           <Icon
             name="lucide:bell"
@@ -190,58 +190,58 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <span
           v-for="format in outputFormats"
           :key="format"
-          class="inline-flex items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200"
+          class="inline-flex items-center rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary ring-1 ring-border-subtle"
         >
           {{ format.toUpperCase() }}
         </span>
       </div>
 
       <!-- Description -->
-      <div class="rounded-xl bg-slate-50 p-5 ring-1 ring-slate-100">
-        <h3 class="mb-2 text-sm font-semibold text-slate-900">
+      <div class="rounded-xl bg-bg-surface p-5 ring-1 ring-border-subtle">
+        <h3 class="mb-2 text-sm font-semibold text-text-primary">
           About this briefing
         </h3>
-        <p class="text-sm leading-relaxed text-slate-600">
+        <p class="text-sm leading-relaxed text-text-secondary">
           {{ briefing.description }}
         </p>
       </div>
 
       <!-- Parameters section -->
       <div v-if="hasParameters">
-        <h3 class="mb-3 text-sm font-semibold text-slate-900">
+        <h3 class="mb-3 text-sm font-semibold text-text-primary">
           Configuration Options
         </h3>
         <div class="space-y-2">
           <div
             v-for="{ key, property, required } in parameterEntries"
             :key="key"
-            class="flex items-start gap-3 rounded-xl bg-white p-4 ring-1 ring-slate-200"
+            class="flex items-start gap-3 rounded-xl bg-bg-elevated p-4 ring-1 ring-border-subtle"
           >
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-bg-surface">
               <Icon
                 :name="property.type === 'array' ? 'lucide:list' : property.type === 'boolean' ? 'lucide:toggle-left' : property.format === 'date' ? 'lucide:calendar' : 'lucide:type'"
-                class="size-4 text-slate-500"
+                class="size-4 text-text-muted"
               />
             </div>
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-slate-900">
+                <span class="text-sm font-medium text-text-primary">
                   {{ key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
                 </span>
                 <span
                   v-if="required"
-                  class="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-600"
+                  class="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-400"
                 >
                   Required
                 </span>
               </div>
               <p
                 v-if="property.description"
-                class="mt-1 text-xs text-slate-500"
+                class="mt-1 text-xs text-text-muted"
               >
                 {{ property.description }}
               </p>
-              <p class="mt-1.5 font-mono text-[11px] text-slate-400">
+              <p class="mt-1.5 font-mono text-[11px] text-text-muted">
                 {{ formatPropertyType(property) }}
               </p>
             </div>
@@ -252,19 +252,19 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
       <!-- No parameters -->
       <div
         v-else
-        class="flex items-center gap-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 p-5 ring-1 ring-emerald-100"
+        class="flex items-center gap-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 p-5 ring-1 ring-emerald-500/20"
       >
-        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 ring-1 ring-emerald-200">
+        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
           <Icon
             name="lucide:zap"
-            class="size-6 text-emerald-600"
+            class="size-6 text-emerald-400"
           />
         </div>
         <div>
-          <p class="font-medium text-slate-900">
+          <p class="font-medium text-text-primary">
             No configuration needed
           </p>
-          <p class="mt-0.5 text-sm text-slate-600">
+          <p class="mt-0.5 text-sm text-text-secondary">
             This briefing generates with optimal settings automatically.
           </p>
         </div>
@@ -273,7 +273,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
 
     <template #footer>
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 text-xs text-slate-500">
+        <div class="flex items-center gap-2 text-xs text-text-muted">
           <Icon
             :name="briefing.is_system ? 'lucide:shield-check' : 'lucide:user'"
             class="size-3.5"
@@ -284,7 +284,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
           <button
             v-if="briefing.is_schedulable && !hasSubscription"
             type="button"
-            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+            class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2.5 text-sm font-medium text-text-secondary transition-all hover:border-border-muted hover:bg-bg-hover"
             @click="$emit('subscribe', briefing)"
           >
             <Icon
@@ -295,7 +295,7 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
           </button>
           <button
             type="button"
-            class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.98]"
+            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-glow active:scale-[0.98]"
             @click="$emit('view', briefing)"
           >
             <Icon
@@ -309,3 +309,9 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
     </template>
   </BaseModal>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

@@ -63,33 +63,33 @@ const availableFormats = computed(() => {
 const statusConfig = computed(() => {
   if (isComplete.value) {
     return {
-      bg: 'bg-emerald-100',
-      text: 'text-emerald-700',
-      ring: 'ring-emerald-200',
+      bg: 'bg-emerald-500/10',
+      text: 'text-emerald-400',
+      ring: 'ring-emerald-500/20',
       icon: 'lucide:check',
     };
   }
   if (isProcessing.value || isPending.value) {
     return {
-      bg: 'bg-blue-100',
-      text: 'text-blue-700',
-      ring: 'ring-blue-200',
+      bg: 'bg-blue-500/10',
+      text: 'text-blue-400',
+      ring: 'ring-blue-500/20',
       icon: 'lucide:loader-2',
       animate: true,
     };
   }
   if (isFailed.value) {
     return {
-      bg: 'bg-red-100',
-      text: 'text-red-700',
-      ring: 'ring-red-200',
+      bg: 'bg-red-500/10',
+      text: 'text-red-400',
+      ring: 'ring-red-500/20',
       icon: 'lucide:x',
     };
   }
   return {
-    bg: 'bg-slate-100',
-    text: 'text-slate-600',
-    ring: 'ring-slate-200',
+    bg: 'bg-bg-surface',
+    text: 'text-text-muted',
+    ring: 'ring-border-subtle',
     icon: 'lucide:help-circle',
   };
 });
@@ -111,7 +111,7 @@ function handleShare() {
   <!-- Compact variant -->
   <div
     v-if="compact"
-    class="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200/60 bg-white p-4 shadow-sm transition-all hover:border-slate-300 hover:shadow-md"
+    class="group flex cursor-pointer items-center gap-4 rounded-xl border border-border-subtle bg-bg-elevated p-4 transition-all hover:border-border-muted"
     @click="handleView"
   >
     <!-- Status indicator -->
@@ -129,7 +129,7 @@ function handleShare() {
     <!-- Content -->
     <div class="min-w-0 flex-1">
       <div class="flex items-center gap-2">
-        <h3 class="truncate text-sm font-medium text-slate-900">
+        <h3 class="truncate text-sm font-medium text-text-primary">
           {{ generation.briefing?.title ?? 'Briefing' }}
         </h3>
         <span
@@ -139,7 +139,7 @@ function handleShare() {
           {{ statusLabel }}
         </span>
       </div>
-      <p class="mt-0.5 text-xs text-slate-500">
+      <p class="mt-0.5 text-xs text-text-muted">
         {{ timeAgo }}
         <template v-if="achievementsCount > 0">
           · {{ achievementsCount }} achievement{{ achievementsCount !== 1 ? 's' : '' }}
@@ -152,21 +152,21 @@ function handleShare() {
       <template v-if="isProcessing || isPending">
         <div class="w-24">
           <div class="mb-1.5 flex items-center justify-between">
-            <span class="text-xs font-medium text-slate-700">{{ Math.round(progress) }}%</span>
+            <span class="text-xs font-medium text-text-secondary">{{ Math.round(progress) }}%</span>
           </div>
-          <div class="h-1.5 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+          <div class="h-1.5 overflow-hidden rounded-full bg-bg-surface ring-1 ring-border-subtle">
             <div
-              class="h-full rounded-full bg-blue-500 transition-all duration-500"
+              class="h-full rounded-full bg-accent transition-all duration-500"
               :style="{ width: `${progress}%` }"
             />
           </div>
         </div>
       </template>
       <template v-else>
-        <div class="flex size-8 items-center justify-center rounded-lg transition-colors group-hover:bg-slate-100">
+        <div class="flex size-8 items-center justify-center rounded-lg transition-colors group-hover:bg-bg-hover">
           <Icon
             name="lucide:chevron-right"
-            class="size-5 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-600"
+            class="size-5 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-text-secondary"
           />
         </div>
       </template>
@@ -176,10 +176,10 @@ function handleShare() {
   <!-- Full card variant -->
   <div
     v-else
-    class="overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm"
+    class="overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-slate-100 p-5">
+    <div class="flex items-center justify-between border-b border-border-subtle p-5">
       <div class="flex items-center gap-3">
         <div
           class="flex size-11 items-center justify-center rounded-xl ring-1"
@@ -192,10 +192,10 @@ function handleShare() {
           />
         </div>
         <div>
-          <h3 class="font-medium text-slate-900">
+          <h3 class="font-medium text-text-primary">
             {{ generation.briefing?.title ?? 'Briefing' }}
           </h3>
-          <p class="text-sm text-slate-500">
+          <p class="text-sm text-text-muted">
             {{ timeAgo }}
           </p>
         </div>
@@ -215,14 +215,14 @@ function handleShare() {
       class="p-5"
     >
       <div class="mb-2 flex items-center justify-between">
-        <span class="text-sm text-slate-600">
+        <span class="text-sm text-text-secondary">
           {{ generation.progress_message ?? 'Generating...' }}
         </span>
-        <span class="text-sm font-semibold tabular-nums text-slate-900">{{ Math.round(progress) }}%</span>
+        <span class="text-sm font-semibold tabular-nums text-text-primary">{{ Math.round(progress) }}%</span>
       </div>
-      <div class="h-2 overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200">
+      <div class="h-2 overflow-hidden rounded-full bg-bg-surface ring-1 ring-border-subtle">
         <div
-          class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
+          class="h-full rounded-full bg-gradient-to-r from-accent to-teal-600 transition-all duration-500"
           :style="{ width: `${progress}%` }"
         />
       </div>
@@ -235,22 +235,22 @@ function handleShare() {
     >
       <p
         v-if="generation.narrative"
-        class="line-clamp-3 text-sm leading-relaxed text-slate-600"
+        class="line-clamp-3 text-sm leading-relaxed text-text-secondary"
       >
         {{ generation.narrative.slice(0, 200) }}{{ generation.narrative.length > 200 ? '...' : '' }}
       </p>
 
       <p
         v-if="achievementsCount > 0"
-        class="mt-4 flex items-center gap-2 text-sm text-slate-600"
+        class="mt-4 flex items-center gap-2 text-sm text-text-secondary"
       >
-        <span class="flex size-6 items-center justify-center rounded-md bg-amber-100 ring-1 ring-amber-200">
+        <span class="flex size-6 items-center justify-center rounded-md bg-amber-500/10 ring-1 ring-amber-500/20">
           <Icon
             name="lucide:trophy"
-            class="size-3.5 text-amber-600"
+            class="size-3.5 text-amber-400"
           />
         </span>
-        <span class="font-medium text-slate-900">{{ achievementsCount }}</span>
+        <span class="font-medium text-text-primary">{{ achievementsCount }}</span>
         achievement{{ achievementsCount !== 1 ? 's' : '' }}
       </p>
 
@@ -261,7 +261,7 @@ function handleShare() {
         >
           <button
             type="button"
-            class="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
+            class="w-full rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:shadow-glow active:scale-[0.98]"
           >
             View Briefing
           </button>
@@ -277,7 +277,7 @@ function handleShare() {
           <template #trigger>
             <button
               type="button"
-              class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+              class="flex size-10 items-center justify-center rounded-lg border border-border-subtle text-text-muted transition-all hover:border-border-muted hover:bg-bg-hover hover:text-text-secondary"
             >
               <Icon
                 name="lucide:download"
@@ -289,7 +289,7 @@ function handleShare() {
 
         <button
           type="button"
-          class="flex size-10 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+          class="flex size-10 items-center justify-center rounded-lg border border-border-subtle text-text-muted transition-all hover:border-border-muted hover:bg-bg-hover hover:text-text-secondary"
           @click="handleShare"
         >
           <Icon
@@ -305,18 +305,18 @@ function handleShare() {
       v-else-if="isFailed"
       class="p-5"
     >
-      <div class="flex items-start gap-3 rounded-lg bg-red-50 p-4 ring-1 ring-red-100">
+      <div class="flex items-start gap-3 rounded-lg bg-red-500/10 p-4 ring-1 ring-red-500/20">
         <Icon
           name="lucide:alert-circle"
-          class="mt-0.5 size-5 shrink-0 text-red-500"
+          class="mt-0.5 size-5 shrink-0 text-red-400"
         />
         <div>
-          <p class="font-medium text-red-800">
+          <p class="font-medium text-red-400">
             Generation failed
           </p>
           <p
             v-if="generation.error_message"
-            class="mt-1 text-sm text-red-700"
+            class="mt-1 text-sm text-red-400/80"
           >
             {{ generation.error_message }}
           </p>
@@ -327,9 +327,9 @@ function handleShare() {
     <!-- Generator info -->
     <div
       v-if="generation.generated_by"
-      class="border-t border-slate-100 px-5 py-3"
+      class="border-t border-border-subtle px-5 py-3"
     >
-      <div class="flex items-center gap-2 text-xs text-slate-500">
+      <div class="flex items-center gap-2 text-xs text-text-muted">
         <BaseAvatar
           :src="generation.generated_by.avatar_url"
           :name="generation.generated_by.name"
@@ -340,3 +340,9 @@ function handleShare() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>
