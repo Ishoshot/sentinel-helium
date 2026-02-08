@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * Landing page features section 
- * Light background with headline + description left, UI mockups right
+ * Landing page features section
+ * Dark theme with teal accents
  */
 
 const mainFeatures = [
@@ -33,15 +33,16 @@ const simpleFeatures = [
 <template>
   <section
     id="product"
-    class="py-32 lg:py-48 bg-white"
+    class="py-32 lg:py-48 bg-[#09090b] relative overflow-hidden"
   >
-    <div class="max-w-7xl mx-auto px-6">
+
+    <div class="relative max-w-7xl mx-auto px-6">
       <!-- Section header -->
       <div class="max-w-3xl mb-16">
-        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-slate-900">
+        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Speed, simplicity, and quality without the headaches
         </h2>
-        <p class="mt-4 text-lg text-slate-600 leading-relaxed">
+        <p class="mt-4 text-lg text-zinc-400 leading-relaxed">
           Built specifically for engineering teams, Sentinel eliminates configuration hassles and review inconsistency. So you can focus on building, not reviewing.
         </p>
       </div>
@@ -55,17 +56,17 @@ const simpleFeatures = [
           class="landing-feature-card p-6"
         >
           <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
               <Icon
                 :name="feature.icon"
-                class="w-5 h-5 text-blue-600"
+                class="w-5 h-5 text-teal-400"
               />
             </div>
-            <h3 class="text-lg font-semibold text-slate-900">
+            <h3 class="text-lg font-semibold text-white">
               {{ feature.title }}
             </h3>
           </div>
-          <p class="text-slate-600 leading-relaxed">
+          <p class="text-zinc-400 leading-relaxed">
             {{ feature.description }}
           </p>
         </div>
@@ -76,17 +77,17 @@ const simpleFeatures = [
         <div
           v-for="feature in simpleFeatures"
           :key="feature.title"
-          class="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100"
+          class="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-colors"
         >
           <Icon
             :name="feature.icon"
-            class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+            class="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5"
           />
           <div>
-            <h4 class="text-base font-semibold text-slate-900">
+            <h4 class="text-base font-semibold text-white">
               {{ feature.title }}
             </h4>
-            <p class="text-sm text-slate-600 my-2">
+            <p class="text-sm text-zinc-500 my-2">
               {{ feature.description }}
             </p>
           </div>
@@ -95,16 +96,17 @@ const simpleFeatures = [
     </div>
   </section>
 
-  <!-- Second features section - Light background -->
-  <section class="py-24 lg:py-32 bg-slate-50">
-    <div class="max-w-7xl mx-auto px-6">
+  <!-- Second features section -->
+  <section class="py-24 lg:py-32 bg-[#09090b] relative overflow-hidden">
+
+    <div class="relative max-w-7xl mx-auto px-6">
       <div class="grid lg:grid-cols-2 gap-16 items-start">
         <!-- Left: Content -->
         <div>
-          <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-slate-900">
+          <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
             Security and quality, automatically configured
           </h2>
-          <p class="mt-4 text-lg text-slate-600 leading-relaxed">
+          <p class="mt-4 text-lg text-zinc-400 leading-relaxed">
             Sentinel provides intelligent code analysis out of the box. No need to configure complex rule sets or spend hours tuning - it's all done for you.
           </p>
 
@@ -113,13 +115,13 @@ const simpleFeatures = [
             <div class="flex items-start gap-3">
               <Icon
                 name="ph:shield-check-bold"
-                class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
+                class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">
+                <div class="text-base font-medium text-white">
                   Security scanning
                 </div>
-                <div class="text-sm text-slate-500 mt-0.5">
+                <div class="text-sm text-zinc-500 mt-0.5">
                   Vulnerabilities detected automatically
                 </div>
               </div>
@@ -127,13 +129,13 @@ const simpleFeatures = [
             <div class="flex items-start gap-3">
               <Icon
                 name="ph:code-bold"
-                class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
+                class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">
+                <div class="text-base font-medium text-white">
                   Code quality
                 </div>
-                <div class="text-sm text-slate-500 mt-0.5">
+                <div class="text-sm text-zinc-500 mt-0.5">
                   Best practices enforced consistently
                 </div>
               </div>
@@ -141,13 +143,13 @@ const simpleFeatures = [
             <div class="flex items-start gap-3">
               <Icon
                 name="ph:certificate-bold"
-                class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
+                class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">
+                <div class="text-base font-medium text-white">
                   Policy compliance
                 </div>
-                <div class="text-sm text-slate-500 mt-0.5">
+                <div class="text-sm text-zinc-500 mt-0.5">
                   Custom rules for your team
                 </div>
               </div>
@@ -155,13 +157,13 @@ const simpleFeatures = [
             <div class="flex items-start gap-3">
               <Icon
                 name="ph:lightning-bold"
-                class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-1"
+                class="w-5 h-5 text-emerald-400 flex-shrink-0 mt-1"
               />
               <div>
-                <div class="text-base font-medium text-slate-900">
+                <div class="text-base font-medium text-white">
                   Fast reviews
                 </div>
-                <div class="text-sm text-slate-500 mt-0.5">
+                <div class="text-sm text-zinc-500 mt-0.5">
                   Results in seconds, not minutes
                 </div>
               </div>
@@ -169,16 +171,16 @@ const simpleFeatures = [
           </div>
         </div>
 
-        <!-- Right: GitHub PR Comment Mockup -->
+        <!-- Right: GitHub PR Comment Mockup (already dark themed) -->
         <div class="relative">
-          <div class="rounded-xl overflow-hidden bg-[#0d1117] border border-[#30363d] shadow-xl text-[13px]">
+          <div class="rounded-xl overflow-hidden bg-[#0d1117] border border-[#30363d] shadow-xl shadow-black/40 text-[13px]">
             <!-- Comment header -->
             <div class="px-4 py-3 border-b border-[#30363d] flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
                   <span class="text-white text-xs font-bold">S</span>
                 </div>
-                <span class="font-semibold text-[#e6edf3]">sentinel-ai</span>
+                <span class="font-semibold text-[#e6edf3]">sentinelai</span>
                 <span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full border border-[#30363d] text-[#8b949e]">bot</span>
                 <span class="text-[#8b949e] text-xs">2 days ago</span>
               </div>
@@ -310,8 +312,8 @@ const simpleFeatures = [
             </div>
           </div>
 
-          <!-- Subtle shadow effect -->
-          <div class="absolute -inset-4 bg-blue-500 rounded-3xl blur-[60px] opacity-5 -z-10" />
+          <!-- Glow effect -->
+          <div class="absolute -inset-4 bg-teal-500 rounded-3xl blur-[60px] opacity-5 -z-10" />
         </div>
       </div>
     </div>

@@ -65,7 +65,7 @@ const ctaText = computed(() => {
   <header
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     :class="props.scrolled
-      ? 'bg-[var(--landing-bg-surface)]/80 backdrop-blur-xl border-b border-[var(--landing-border-subtle)]'
+      ? 'bg-[#0a0a0c]/90 backdrop-blur-xl border-b border-zinc-800/50'
       : 'bg-transparent'"
   >
     <div class="max-w-6xl mx-auto px-6 py-2">
@@ -75,7 +75,7 @@ const ctaText = computed(() => {
           :to="isAuthenticated ? dashboardUrl : '/'"
           class="flex items-center group"
         >
-          <SentinelLogo size="lg" />
+          <SentinelLogo size="md" />
         </NuxtLink>
 
         <!-- Nav Links (Desktop) -->
@@ -84,16 +84,10 @@ const ctaText = computed(() => {
             v-for="link in navLinks"
             :key="link.href"
             :href="link.href"
-            class="text-sm transition-colors duration-200"
-            :class="props.scrolled
-              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
-              : 'text-gray-600 hover:text-gray-900'"
+            class="text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
           >{{ link.label }}</a>
-          <a 
-            class="text-sm transition-colors duration-200"
-            :class="props.scrolled
-              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
-              : 'text-gray-600 hover:text-gray-900'"
+          <a
+            class="text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
             href="https://dev.usesentinel.ai/privacy"
           >Privacy Policy</a>
         </nav>
@@ -101,10 +95,7 @@ const ctaText = computed(() => {
         <!-- CTA -->
         <div class="flex items-center gap-3">
           <button
-            class="md:hidden p-2 transition-colors"
-            :class="props.scrolled
-              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
-              : 'text-gray-600 hover:text-gray-900'"
+            class="md:hidden p-2 transition-colors text-zinc-400 hover:text-white"
             aria-label="Toggle navigation menu"
             @click="toggleMenu"
           >
@@ -116,10 +107,7 @@ const ctaText = computed(() => {
           <NuxtLink
             v-if="!isAuthenticated"
             to="/login"
-            class="hidden sm:block px-3 py-2 text-sm transition-colors duration-200"
-            :class="props.scrolled
-              ? 'text-[var(--landing-text-secondary)] hover:text-[var(--landing-text-primary)]'
-              : 'text-gray-600 hover:text-gray-900'"
+            class="hidden sm:block px-3 py-2 text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
           >
             Sign in
           </NuxtLink>
@@ -144,14 +132,14 @@ const ctaText = computed(() => {
     >
       <div
         v-if="isMenuOpen"
-        class="md:hidden border-t border-[var(--landing-border-subtle)] bg-[var(--landing-bg-surface)]/95 backdrop-blur-xl"
+        class="md:hidden border-t border-zinc-800/50 bg-[#0a0a0c]/95 backdrop-blur-xl"
       >
-        <nav class="px-6 py-4 flex flex-col gap-3 text-sm text-[var(--landing-text-secondary)]">
+        <nav class="px-6 py-4 flex flex-col gap-3 text-sm text-zinc-400">
           <a
             v-for="link in navLinks"
             :key="link.href"
             :href="link.href"
-            class="hover:text-[var(--landing-text-primary)] transition-colors py-2"
+            class="hover:text-white transition-colors py-2"
             @click="closeMenu"
           >{{ link.label }}</a>
         </nav>
