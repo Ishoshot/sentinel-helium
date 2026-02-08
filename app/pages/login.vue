@@ -11,6 +11,12 @@ definePageMeta({
   middleware: 'guest',
 })
 
+usePageSeo({
+  title: 'Sign In',
+  description: 'Sign in to Sentinel to start reviewing code with AI. Connect with GitHub or Google for instant access.',
+  path: '/login',
+})
+
 const { login } = useAuth()
 
 const loadingProvider = ref<OAuthProvider | null>(null)
@@ -120,15 +126,19 @@ const providers = [
     <!-- Terms notice -->
     <p class="text-xs text-text-muted text-center leading-relaxed">
       By signing in, you agree to our
-      <a
-        href="#"
+      <NuxtLink
+        to="/terms"
         class="text-text-secondary hover:text-text-primary transition-colors"
-      >Terms of Service</a>
+      >
+        Terms of Service
+      </NuxtLink>
       and
-      <a
-        href="#"
+      <NuxtLink
+        to="/privacy"
         class="text-text-secondary hover:text-text-primary transition-colors"
-      >Privacy Policy</a>.
+      >
+        Privacy Policy
+      </NuxtLink>.
     </p>
 
     <!-- Back to home -->

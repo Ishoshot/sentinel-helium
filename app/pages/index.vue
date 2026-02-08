@@ -11,6 +11,12 @@ definePageMeta({
   layout: false,
 })
 
+usePageSeo({
+  title: 'Sentinel',
+  description: 'The fastest way to ship quality code with confidence. AI-powered code reviews with instant PR analysis, custom guidelines, and BYOK AI providers.',
+  path: '/',
+})
+
 useHead({
   htmlAttrs: {
     class: 'scroll-smooth',
@@ -18,6 +24,43 @@ useHead({
   bodyAttrs: {
     class: 'bg-[#09090b]',
   },
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        'name': 'Sentinel',
+        'url': 'https://usesentinel.ai',
+        'logo': 'https://usesentinel.ai/apple-touch-icon.png',
+        'sameAs': [
+          'https://x.com/SentinelAIHQ',
+          'https://github.com/ishoshot',
+        ],
+        'contactPoint': {
+          '@type': 'ContactPoint',
+          'email': 'hello@usesentinel.ai',
+          'contactType': 'customer support',
+        },
+      }),
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        'name': 'Sentinel',
+        'applicationCategory': 'DeveloperApplication',
+        'operatingSystem': 'Web',
+        'offers': [
+          { '@type': 'Offer', 'name': 'Foundation', 'price': '0', 'priceCurrency': 'USD' },
+          { '@type': 'Offer', 'name': 'Illuminate', 'price': '20', 'priceCurrency': 'USD' },
+          { '@type': 'Offer', 'name': 'Orchestrate', 'price': '50', 'priceCurrency': 'USD' },
+          { '@type': 'Offer', 'name': 'Sanctum', 'price': '200', 'priceCurrency': 'USD' },
+        ],
+      }),
+    },
+  ],
 })
 
 const router = useRouter()

@@ -19,8 +19,7 @@ const navLinks = [
   { label: 'Product', href: '/#product' },
   { label: 'Workflow', href: '/#workflow' },
   { label: 'Pricing', href: '/#plans' },
-  // { label: 'Privacy Policy', href: '/privacy' },
-  // { label: 'FAQ', href: '/#faq' },
+  { label: 'Privacy Policy', href: '/privacy' },
 ] satisfies ReadonlyArray<{ label: string; href: string }>
 
 function toggleMenu() {
@@ -86,10 +85,6 @@ const ctaText = computed(() => {
             :href="link.href"
             class="text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
           >{{ link.label }}</a>
-          <a
-            class="text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
-            href="https://dev.usesentinel.ai/privacy"
-          >Privacy Policy</a>
         </nav>
 
         <!-- CTA -->
