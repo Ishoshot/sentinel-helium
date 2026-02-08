@@ -154,18 +154,9 @@ function toggleSidebar() {
           class="flex items-center justify-center"
         >
           <SentinelLogo
-            v-if="!isSidebarCollapsed"
-            size="md"
+            :size="isSidebarCollapsed ? 'sm' : 'md'"
+            :show-text="!isSidebarCollapsed"
           />
-          <div
-            v-else
-            class="flex size-9 items-center justify-center rounded-xl bg-accent"
-          >
-            <Icon
-              name="lucide:shield-check"
-              class="size-5 text-white"
-            />
-          </div>
         </NuxtLink>
       </div>
 
