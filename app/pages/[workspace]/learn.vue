@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { planConfigs } from '~/config/plans'
+import { usePlans } from '~/composables/billing/usePlans'
 
 /**
  * Help Center / Learn page
@@ -12,6 +12,13 @@ definePageMeta({
 
 useHead({
   title: 'Learn Sentinel',
+})
+
+const { plans, fetchPlans } = usePlans()
+
+// Fetch plans on mount
+onMounted(() => {
+  fetchPlans()
 })
 
 const activeCategory = ref('getting-started')
@@ -147,35 +154,35 @@ const integrationsContent = [
   },
 ]
 
-// Use shared plan configs as single source of truth
-const billingContent = planConfigs.map(plan => ({
-  plan: plan.name,
-  price: plan.price === 0 ? 'Free' : `$${plan.price}/mo`,
+// Use plans from API as single source of truth
+const billingContent = computed(() => plans.value.map(plan => ({
+  plan: plan.name ?? plan.tier,
+  price: plan.price_monthly_cents === 0 || plan.price_monthly_cents === null ? 'Free' : `$${(plan.price_monthly_cents ?? 0) / 100}/mo`,
   description: plan.description,
-  features: plan.features,
-  color: plan.color,
-  popular: plan.highlighted,
-}))
+  features: plan.feature_list ?? [],
+  color: plan.color ?? 'slate',
+  popular: plan.highlighted ?? false,
+})))
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
+  <div class="min-h-screen bg-bg-app">
     <!-- Hero section -->
-    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <div class="bg-gradient-to-br from-bg-elevated via-bg-surface to-bg-elevated">
       <div class="max-w-6xl mx-auto px-6 py-16">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
             <Icon
               name="ph:book-open-bold"
-              class="w-5 h-5 text-blue-400"
+              class="w-5 h-5 text-accent"
             />
           </div>
-          <span class="text-sm font-medium text-blue-400">Learn Sentinel</span>
+          <span class="text-sm font-medium text-accent">Learn Sentinel</span>
         </div>
-        <h1 class="text-3xl lg:text-4xl font-semibold tracking-tight mb-4">
+        <h1 class="text-3xl lg:text-4xl font-semibold tracking-tight mb-4 text-text-primary">
           Everything you need to know
         </h1>
-        <p class="text-lg text-slate-300 max-w-2xl">
+        <p class="text-lg text-text-secondary max-w-2xl">
           Understand how Sentinel works, learn the terminology, and get the most out of your code reviews.
         </p>
       </div>
@@ -192,14 +199,14 @@ const billingContent = planConfigs.map(plan => ({
               :key="category.id"
               class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200"
               :class="activeCategory === category.id
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-600 hover:bg-white/50 hover:text-slate-900'"
+                ? 'bg-bg-elevated text-text-primary shadow-sm'
+                : 'text-text-muted hover:bg-bg-surface hover:text-text-primary'"
               @click="activeCategory = category.id"
             >
               <Icon
                 :name="category.icon"
                 class="w-5 h-5"
-                :class="activeCategory === category.id ? 'text-blue-600' : 'text-slate-400'"
+                :class="activeCategory === category.id ? 'text-accent' : 'text-text-muted'"
               />
               {{ category.label }}
             </button>
@@ -216,20 +223,20 @@ const billingContent = planConfigs.map(plan => ({
             <div
               v-for="item in gettingStartedContent"
               :key="item.title"
-              class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-shadow"
+              class="bg-bg-elevated rounded-2xl border border-border-subtle p-6 hover:border-border-muted transition-all"
             >
               <div class="flex items-start gap-4">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                   <Icon
                     :name="item.icon"
-                    class="w-6 h-6 text-blue-600"
+                    class="w-6 h-6 text-accent"
                   />
                 </div>
                 <div>
-                  <h3 class="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 class="text-lg font-semibold text-text-primary mb-2">
                     {{ item.title }}
                   </h3>
-                  <p class="text-slate-600 leading-relaxed">
+                  <p class="text-text-secondary leading-relaxed">
                     {{ item.description }}
                   </p>
                 </div>
@@ -237,19 +244,19 @@ const billingContent = planConfigs.map(plan => ({
             </div>
 
             <!-- Quick tip -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6">
+            <div class="bg-gradient-to-r from-accent/10 to-teal-600/10 rounded-2xl border border-accent/20 p-6">
               <div class="flex items-start gap-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-accent to-teal-600 flex items-center justify-center shrink-0">
                   <Icon
                     name="ph:lightbulb-filament-bold"
                     class="w-5 h-5 text-white"
                   />
                 </div>
                 <div>
-                  <h4 class="font-semibold text-slate-900 mb-1">
+                  <h4 class="font-semibold text-text-primary mb-1">
                     Quick Tip
                   </h4>
-                  <p class="text-slate-600 text-sm">
+                  <p class="text-text-secondary text-sm">
                     Start by connecting your GitHub account and selecting a repository. Sentinel will automatically review your next pull request!
                   </p>
                 </div>
@@ -265,15 +272,15 @@ const billingContent = planConfigs.map(plan => ({
             <div
               v-for="concept in coreConceptsContent"
               :key="concept.term"
-              class="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow"
+              class="bg-bg-elevated rounded-2xl border border-border-subtle overflow-hidden hover:border-border-muted transition-all"
             >
               <div
-                class="px-6 py-4 border-b border-slate-100"
+                class="px-6 py-4 border-b border-border-subtle"
                 :class="{
-                  'bg-blue-50': concept.color === 'blue',
-                  'bg-purple-50': concept.color === 'purple',
-                  'bg-emerald-50': concept.color === 'emerald',
-                  'bg-amber-50': concept.color === 'amber',
+                  'bg-blue-500/10': concept.color === 'blue',
+                  'bg-purple-500/10': concept.color === 'purple',
+                  'bg-emerald-500/10': concept.color === 'emerald',
+                  'bg-amber-500/10': concept.color === 'amber',
                 }"
               >
                 <div class="flex items-center gap-3">
@@ -281,27 +288,27 @@ const billingContent = planConfigs.map(plan => ({
                     :name="concept.icon"
                     class="w-5 h-5"
                     :class="{
-                      'text-blue-600': concept.color === 'blue',
-                      'text-purple-600': concept.color === 'purple',
-                      'text-emerald-600': concept.color === 'emerald',
-                      'text-amber-600': concept.color === 'amber',
+                      'text-blue-400': concept.color === 'blue',
+                      'text-purple-400': concept.color === 'purple',
+                      'text-emerald-400': concept.color === 'emerald',
+                      'text-amber-400': concept.color === 'amber',
                     }"
                   />
-                  <h3 class="text-lg font-semibold text-slate-900">
+                  <h3 class="text-lg font-semibold text-text-primary">
                     {{ concept.term }}
                   </h3>
                 </div>
               </div>
               <div class="p-6 space-y-4">
-                <p class="text-slate-600 leading-relaxed">
+                <p class="text-text-secondary leading-relaxed">
                   {{ concept.definition }}
                 </p>
                 <div class="flex items-start gap-2 text-sm">
                   <Icon
                     name="ph:arrow-bend-down-right"
-                    class="w-4 h-4 text-slate-400 mt-0.5 shrink-0"
+                    class="w-4 h-4 text-text-muted mt-0.5 shrink-0"
                   />
-                  <p class="text-slate-500 italic">
+                  <p class="text-text-muted italic">
                     {{ concept.example }}
                   </p>
                 </div>
@@ -317,15 +324,15 @@ const billingContent = planConfigs.map(plan => ({
             <div
               v-for="item in reviewsContent"
               :key="item.term"
-              class="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow"
+              class="bg-bg-elevated rounded-2xl border border-border-subtle overflow-hidden hover:border-border-muted transition-all"
             >
               <div
-                class="px-6 py-4 border-b border-slate-100"
+                class="px-6 py-4 border-b border-border-subtle"
                 :class="{
-                  'bg-blue-50': item.color === 'blue',
-                  'bg-purple-50': item.color === 'purple',
-                  'bg-emerald-50': item.color === 'emerald',
-                  'bg-amber-50': item.color === 'amber',
+                  'bg-blue-500/10': item.color === 'blue',
+                  'bg-purple-500/10': item.color === 'purple',
+                  'bg-emerald-500/10': item.color === 'emerald',
+                  'bg-amber-500/10': item.color === 'amber',
                 }"
               >
                 <div class="flex items-center gap-3">
@@ -333,30 +340,30 @@ const billingContent = planConfigs.map(plan => ({
                     :name="item.icon"
                     class="w-5 h-5"
                     :class="{
-                      'text-blue-600': item.color === 'blue',
-                      'text-purple-600': item.color === 'purple',
-                      'text-emerald-600': item.color === 'emerald',
-                      'text-amber-600': item.color === 'amber',
+                      'text-blue-400': item.color === 'blue',
+                      'text-purple-400': item.color === 'purple',
+                      'text-emerald-400': item.color === 'emerald',
+                      'text-amber-400': item.color === 'amber',
                     }"
                   />
-                  <h3 class="text-lg font-semibold text-slate-900">
+                  <h3 class="text-lg font-semibold text-text-primary">
                     {{ item.term }}
                   </h3>
                 </div>
               </div>
               <div class="p-6 space-y-4">
-                <p class="text-slate-600 leading-relaxed">
+                <p class="text-text-secondary leading-relaxed">
                   {{ item.definition }}
                 </p>
                 <ul class="space-y-2">
                   <li
                     v-for="detail in item.details"
                     :key="detail"
-                    class="flex items-center gap-2 text-sm text-slate-500"
+                    class="flex items-center gap-2 text-sm text-text-muted"
                   >
                     <Icon
                       name="ph:check-bold"
-                      class="w-4 h-4 text-emerald-500 shrink-0"
+                      class="w-4 h-4 text-emerald-400 shrink-0"
                     />
                     {{ detail }}
                   </li>
@@ -374,49 +381,49 @@ const billingContent = planConfigs.map(plan => ({
               <div
                 v-for="item in integrationsContent"
                 :key="item.term"
-                class="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-shadow"
+                class="bg-bg-elevated rounded-2xl border border-border-subtle p-6 hover:border-border-muted transition-all"
               >
-                <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-4">
+                <div class="w-10 h-10 rounded-xl bg-bg-surface flex items-center justify-center mb-4">
                   <Icon
                     :name="item.icon"
-                    class="w-5 h-5 text-slate-600"
+                    class="w-5 h-5 text-text-secondary"
                   />
                 </div>
-                <h3 class="font-semibold text-slate-900 mb-2">
+                <h3 class="font-semibold text-text-primary mb-2">
                   {{ item.term }}
                 </h3>
-                <p class="text-sm text-slate-600 leading-relaxed">
+                <p class="text-sm text-text-secondary leading-relaxed">
                   {{ item.definition }}
                 </p>
               </div>
             </div>
 
             <!-- GitHub setup guide -->
-            <div class="bg-slate-900 rounded-2xl p-6 text-white">
+            <div class="bg-bg-surface rounded-2xl p-6 border border-border-subtle">
               <div class="flex items-center gap-3 mb-4">
                 <Icon
                   name="ph:github-logo-bold"
-                  class="w-6 h-6"
+                  class="w-6 h-6 text-text-primary"
                 />
-                <h3 class="font-semibold">
+                <h3 class="font-semibold text-text-primary">
                   Setting up GitHub
                 </h3>
               </div>
-              <ol class="space-y-3 text-slate-300 text-sm">
+              <ol class="space-y-3 text-text-secondary text-sm">
                 <li class="flex items-start gap-3">
-                  <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium shrink-0">1</span>
+                  <span class="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center text-xs font-medium shrink-0 text-text-secondary">1</span>
                   <span>Go to Integrations in your workspace settings</span>
                 </li>
                 <li class="flex items-start gap-3">
-                  <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium shrink-0">2</span>
+                  <span class="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center text-xs font-medium shrink-0 text-text-secondary">2</span>
                   <span>Click "Connect GitHub" to install the Sentinel app</span>
                 </li>
                 <li class="flex items-start gap-3">
-                  <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium shrink-0">3</span>
+                  <span class="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center text-xs font-medium shrink-0 text-text-secondary">3</span>
                   <span>Select which repositories Sentinel should access</span>
                 </li>
                 <li class="flex items-start gap-3">
-                  <span class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-medium shrink-0">4</span>
+                  <span class="w-6 h-6 rounded-full bg-bg-hover flex items-center justify-center text-xs font-medium shrink-0 text-text-secondary">4</span>
                   <span>Enable reviews for your repositories and you're done!</span>
                 </li>
               </ol>
@@ -432,41 +439,41 @@ const billingContent = planConfigs.map(plan => ({
               <div
                 v-for="plan in billingContent"
                 :key="plan.plan"
-                class="relative bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-shadow"
-                :class="{ 'ring-2 ring-blue-500': plan.popular }"
+                class="relative bg-bg-elevated rounded-2xl border border-border-subtle p-6 hover:border-border-muted transition-all"
+                :class="{ 'ring-2 ring-accent': plan.popular }"
               >
                 <div
                   v-if="plan.popular"
-                  class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full"
+                  class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-accent to-teal-600 text-white text-xs font-medium rounded-full"
                 >
                   Popular
                 </div>
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-semibold text-slate-900">
+                  <h3 class="font-semibold text-text-primary">
                     {{ plan.plan }}
                   </h3>
                   <span
                     class="text-lg font-bold"
                     :class="{
-                      'text-slate-600': plan.color === 'slate',
-                      'text-blue-600': plan.color === 'blue',
-                      'text-purple-600': plan.color === 'purple',
-                      'text-amber-600': plan.color === 'amber',
+                      'text-text-secondary': plan.color === 'slate',
+                      'text-blue-400': plan.color === 'blue',
+                      'text-purple-400': plan.color === 'purple',
+                      'text-amber-400': plan.color === 'amber',
                     }"
                   >{{ plan.price }}</span>
                 </div>
-                <p class="text-sm text-slate-500 mb-4">
+                <p class="text-sm text-text-muted mb-4">
                   {{ plan.description }}
                 </p>
                 <ul class="space-y-2">
                   <li
                     v-for="feature in plan.features"
                     :key="feature"
-                    class="flex items-center gap-2 text-sm text-slate-600"
+                    class="flex items-center gap-2 text-sm text-text-secondary"
                   >
                     <Icon
                       name="ph:check-bold"
-                      class="w-4 h-4 text-emerald-500 shrink-0"
+                      class="w-4 h-4 text-emerald-400 shrink-0"
                     />
                     {{ feature }}
                   </li>
@@ -475,7 +482,7 @@ const billingContent = planConfigs.map(plan => ({
             </div>
 
             <!-- BYOK explanation -->
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100 p-6">
+            <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl border border-amber-500/20 p-6">
               <div class="flex items-start gap-4">
                 <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center shrink-0">
                   <Icon
@@ -484,10 +491,10 @@ const billingContent = planConfigs.map(plan => ({
                   />
                 </div>
                 <div>
-                  <h4 class="font-semibold text-slate-900 mb-1">
+                  <h4 class="font-semibold text-text-primary mb-1">
                     About BYOK (Bring Your Own Key)
                   </h4>
-                  <p class="text-slate-600 text-sm leading-relaxed">
+                  <p class="text-text-secondary text-sm leading-relaxed">
                     All plans use a BYOK model for AI providers. You provide your own API keys for OpenAI, Anthropic, or other providers. This means you have complete control over your AI costs and full transparency into usage. Sentinel never charges you for AI tokens - you pay your provider directly.
                   </p>
                 </div>
@@ -499,17 +506,17 @@ const billingContent = planConfigs.map(plan => ({
     </div>
 
     <!-- Help CTA -->
-    <div class="bg-white border-t border-slate-200">
+    <div class="bg-bg-elevated border-t border-border-subtle">
       <div class="max-w-6xl mx-auto px-6 py-12 text-center">
-        <h2 class="text-xl font-semibold text-slate-900 mb-2">
+        <h2 class="text-xl font-semibold text-text-primary mb-2">
           Still have questions?
         </h2>
-        <p class="text-slate-600 mb-6">
+        <p class="text-text-secondary mb-6">
           We're here to help you get the most out of Sentinel.
         </p>
         <a
           href="mailto:hello@usesentinel.ai"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-teal-600 text-white text-sm font-medium rounded-xl hover:shadow-glow transition-all"
         >
           <Icon
             name="ph:envelope-bold"
@@ -521,3 +528,9 @@ const billingContent = planConfigs.map(plan => ({
     </div>
   </div>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

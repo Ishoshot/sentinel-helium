@@ -208,25 +208,28 @@ const teamMembers = computed(() => {
 <template>
   <BaseContainer>
     <!-- Page header -->
-    <div class="mb-8">
+    <div class="mb-8 animate-fade-in-up">
       <h1 class="text-2xl font-semibold text-text-primary">
         Overview
       </h1>
-      <p class="mt-1 text-text-secondary">
-        Welcome to {{ workspace?.name }}
-      </p>
     </div>
 
-    <!-- Analytics Overview - full width, breathable cards -->
-    <DomainAnalyticsAnalyticsOverview
-      :metrics="overviewMetrics"
-      :is-loading="isLoadingOverview"
-    />
+    <!-- Analytics Overview - full width, staggered animation -->
+    <div
+      class="animate-fade-in-up"
+      style="animation-delay: 75ms"
+    >
+      <DomainAnalyticsAnalyticsOverview
+        :metrics="overviewMetrics"
+        :is-loading="isLoadingOverview"
+      />
+    </div>
 
     <!-- Getting Started Card -->
     <DomainWorkspaceGettingStartedCard
       v-if="showGettingStarted"
-      class="mt-8"
+      class="mt-8 animate-fade-in-up"
+      style="animation-delay: 150ms"
       :workspace-slug="workspaceSlug"
       :is-git-hub-connected="isGitHubConnected"
       :members-count="members.length"
@@ -237,16 +240,14 @@ const teamMembers = computed(() => {
     />
 
     <!-- Analytics Charts Section -->
-    <div class="mt-8 space-y-6">
+    <div
+      class="mt-8 space-y-6 animate-fade-in-up"
+      style="animation-delay: 225ms"
+    >
       <!-- Section Header -->
-      <div>
-        <h2 class="text-lg font-semibold text-text-primary">
-          Analytics
-        </h2>
-        <p class="mt-1 text-sm text-text-muted">
-          Insights and metrics from your code reviews
-        </p>
-      </div>
+      <h2 class="text-sm font-medium text-text-muted uppercase tracking-wide">
+        Analytics
+      </h2>
 
       <!-- Charts Grid -->
       <div class="grid gap-6 lg:grid-cols-2">
@@ -322,25 +323,43 @@ const teamMembers = computed(() => {
     </div>
 
     <!-- Two Column Layout - responsive grid -->
-    <div class="mt-8 grid gap-6 xl:grid-cols-3">
+    <div
+      class="mt-8 grid gap-6 xl:grid-cols-3 animate-fade-in-up"
+      style="animation-delay: 300ms"
+    >
       <!-- Left Column - Recent Activity (takes more space) -->
       <div class="xl:col-span-2">
         <BaseCard class="h-full">
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-base font-semibold text-text-primary">
-              Recent Activity
-            </h2>
+          <!-- Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-border-subtle">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
+                <Icon
+                  name="lucide:activity"
+                  class="w-4.5 h-4.5 text-accent"
+                />
+              </div>
+              <div>
+                <h2 class="text-sm font-semibold text-text-primary">
+                  Recent Activity
+                </h2>
+                <p class="text-xs text-text-muted mt-0.5">
+                  Latest updates from your workspace
+                </p>
+              </div>
+            </div>
             <span
               v-if="activityCount > 0"
-              class="text-sm text-text-muted"
+              class="px-2.5 py-1 rounded-full bg-bg-surface text-xs font-medium text-text-secondary tabular-nums"
             >
               {{ activityCount }} {{ activityCount === 1 ? 'event' : 'events' }}
             </span>
           </div>
 
+          <!-- Activity Feed -->
           <div
             v-if="recentActivity.length > 0"
-            class="mt-4"
+            class="mt-5"
           >
             <DomainWorkspaceActivityItem
               v-for="(activity, index) in recentActivity"
@@ -357,21 +376,26 @@ const teamMembers = computed(() => {
               :is-last="index === recentActivity.length - 1"
             />
           </div>
+
+          <!-- Empty State -->
           <div
             v-else
-            class="py-12 text-center"
+            class="py-16 text-center"
           >
-            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-bg-surface flex items-center justify-center">
-              <Icon
-                name="lucide:activity"
-                class="w-6 h-6 text-text-muted"
-              />
+            <div class="relative w-16 h-16 mx-auto mb-4">
+              <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/10 to-transparent" />
+              <div class="absolute inset-0 flex items-center justify-center">
+                <Icon
+                  name="lucide:sparkles"
+                  class="w-7 h-7 text-accent/60"
+                />
+              </div>
             </div>
-            <p class="text-sm text-text-muted">
-              No recent activity
+            <p class="text-sm font-medium text-text-primary">
+              No activity yet
             </p>
-            <p class="text-xs text-text-muted mt-1">
-              Activity will appear here as your team uses Sentinel
+            <p class="text-sm text-text-muted mt-1.5 max-w-[240px] mx-auto">
+              Activity will appear here as your team starts using Sentinel
             </p>
           </div>
         </BaseCard>
@@ -380,13 +404,13 @@ const teamMembers = computed(() => {
       <!-- Right Column - Team Members -->
       <div>
         <BaseCard class="h-full">
-          <div class="flex items-center justify-between mb-5">
-            <h2 class="text-base font-semibold text-text-primary">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-medium text-text-primary">
               Team
             </h2>
             <NuxtLink
               :to="`/${workspace?.slug}/members`"
-              class="text-sm text-accent hover:text-accent-hover transition-default"
+              class="text-sm text-accent hover:text-accent-bright transition-colors"
             >
               View all
             </NuxtLink>
@@ -406,15 +430,15 @@ const teamMembers = computed(() => {
 
           <div
             v-if="teamMembers.length === 1"
-            class="mt-5 pt-5 border-t border-border-subtle"
+            class="mt-4 pt-4 border-t border-border-subtle"
           >
             <NuxtLink
               :to="`/${workspace?.slug}/members`"
-              class="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-medium text-accent bg-accent/5 hover:bg-accent/10 rounded-xl transition-default"
+              class="flex items-center justify-center gap-2 w-full px-3 py-2.5 text-[13px] font-medium text-accent bg-accent/10 hover:bg-accent/15 rounded-lg transition-colors"
             >
               <Icon
                 name="lucide:user-plus"
-                class="w-4 h-4"
+                class="size-4"
               />
               Invite team members
             </NuxtLink>
