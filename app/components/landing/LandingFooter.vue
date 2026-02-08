@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Landing page footer 
+ * Landing page footer - Dark theme
  * Links, copyright, and large brand wordmark
  */
 
@@ -30,7 +30,7 @@ const socialLinks = [
 </script>
 
 <template>
-  <footer class="relative bg-slate-50 border-t border-slate-200 overflow-hidden">
+  <footer class="relative bg-[#0f0f12] border-t border-zinc-800/50 overflow-hidden">
     <!-- Main footer content -->
     <div class="relative z-10 py-16 lg:py-20">
       <div class="max-w-7xl mx-auto px-6">
@@ -40,7 +40,7 @@ const socialLinks = [
             <div class="mb-4">
               <SentinelLogo size="lg" />
             </div>
-            <p class="text-sm text-slate-500 leading-relaxed">
+            <p class="text-sm text-zinc-500 leading-relaxed">
               Intelligent code reviews for teams who ship with confidence.
             </p>
 
@@ -50,12 +50,12 @@ const socialLinks = [
                 v-for="social in socialLinks"
                 :key="social.label"
                 :href="social.href"
-                class="w-9 h-9 rounded-lg bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 transition-colors"
+                class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 hover:border-zinc-700 transition-colors"
                 :aria-label="social.label"
               >
                 <Icon
                   :name="social.icon"
-                  class="w-4 h-4 text-slate-500"
+                  class="w-4 h-4 text-zinc-400"
                 />
               </a>
             </div>
@@ -63,7 +63,7 @@ const socialLinks = [
 
           <!-- Product links -->
           <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Product
             </h4>
             <ul class="space-y-3">
@@ -73,7 +73,7 @@ const socialLinks = [
               >
                 <a
                   :href="link.href"
-                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  class="text-sm text-zinc-400 hover:text-white transition-colors"
                 >{{ link.label }}</a>
               </li>
             </ul>
@@ -81,7 +81,7 @@ const socialLinks = [
 
           <!-- Company links -->
           <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Company
             </h4>
             <ul class="space-y-3">
@@ -91,7 +91,7 @@ const socialLinks = [
               >
                 <a
                   :href="link.href"
-                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  class="text-sm text-zinc-400 hover:text-white transition-colors"
                 >{{ link.label }}</a>
               </li>
             </ul>
@@ -99,7 +99,7 @@ const socialLinks = [
 
           <!-- Legal links -->
           <div>
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Legal
             </h4>
             <ul class="space-y-3">
@@ -109,14 +109,14 @@ const socialLinks = [
               >
                 <NuxtLink
                   :to="link.href"
-                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  class="text-sm text-zinc-400 hover:text-white transition-colors"
                 >
                   {{ link.label }}
                 </NuxtLink>
               </li>
-              <li> 
+              <li>
                 <a
-                  class="text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                  class="text-sm text-zinc-400 hover:text-white transition-colors"
                   href="https://dev.usesentinel.ai/privacy"
                 >Privacy Policy</a>
               </li>
@@ -125,11 +125,11 @@ const socialLinks = [
         </div>
 
         <!-- Bottom bar -->
-        <div class="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-sm text-slate-400">
+        <div class="mt-12 pt-8 border-t border-zinc-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-zinc-600">
             &copy; {{ currentYear }} Sentinel. All rights reserved.
           </div>
-          <div class="text-sm text-slate-400">
+          <div class="text-sm text-zinc-600">
             Built for developers who care about quality.
           </div>
         </div>
@@ -139,7 +139,7 @@ const socialLinks = [
     <!-- Large brand wordmark -->
     <div class="relative h-24 lg:h-36 overflow-hidden pointer-events-none select-none">
       <!-- Top fade gradient -->
-      <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-slate-50 to-transparent z-10" />
+      <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0f0f12] to-transparent z-10" />
 
       <!-- SVG Wordmark -->
       <div class="absolute inset-x-0 bottom-0 flex justify-center translate-y-[35%]">
@@ -155,7 +155,7 @@ const socialLinks = [
             font-size="90"
             font-weight="700"
             fill="currentColor"
-            class="text-slate-900"
+            class="text-white"
             text-anchor="middle"
           >
             SENTINEL
