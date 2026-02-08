@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { hasToken } from '~/services/core/api'
+import { usePageSeo } from '~/composables/seo/usePageSeo'
 
 /**
  * Terms of Service Page
@@ -36,10 +37,12 @@ onMounted(async () => {
   isCheckingAuth.value = false
 
   window.addEventListener('scroll', handleScroll)
+  initScrollSpy()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  sectionObserver.value?.disconnect()
 })
 
 function handleScroll() {
@@ -66,12 +69,33 @@ const sections = [
 ]
 
 const activeSection = ref('acceptance')
+const sectionObserver = ref<IntersectionObserver | null>(null)
 
 function scrollToSection(id: string) {
   const element = document.getElementById(id)
   if (element) {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     activeSection.value = id
+  }
+}
+
+function initScrollSpy() {
+  sectionObserver.value = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          activeSection.value = entry.target.id
+        }
+      }
+    },
+    { rootMargin: '-20% 0px -60% 0px', threshold: 0 },
+  )
+
+  for (const section of sections) {
+    const element = document.getElementById(section.id)
+    if (element) {
+      sectionObserver.value.observe(element)
+    }
   }
 }
 </script>
@@ -91,7 +115,7 @@ function scrollToSection(id: string) {
   <!-- Terms of Service page -->
   <div
     v-else
-    class="landing-dark min-h-screen overflow-x-hidden antialiased"
+    class="landing-dark min-h-screen overflow-x-clip antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -573,6 +597,9 @@ function scrollToSection(id: string) {
         </div>
       </div>
     </section>
+
+    <!-- Final CTA Section -->
+    <LandingCta />
 
     <!-- Footer -->
     <LandingFooter />
