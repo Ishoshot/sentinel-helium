@@ -63,12 +63,12 @@ function goToPage(page: number) {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4">
+  <div class="flex items-center justify-between gap-4 rounded-xl border border-border-subtle bg-bg-elevated p-4">
     <!-- Results Info -->
-    <div class="text-sm text-slate-500">
-      Showing <span class="font-medium text-slate-900">{{ displayFrom }}</span> to
-      <span class="font-medium text-slate-900">{{ displayTo }}</span> of
-      <span class="font-medium text-slate-900">{{ total }}</span> results
+    <div class="text-sm text-text-muted">
+      Showing <span class="font-medium text-text-primary">{{ displayFrom }}</span> to
+      <span class="font-medium text-text-primary">{{ displayTo }}</span> of
+      <span class="font-medium text-text-primary">{{ total }}</span> results
     </div>
 
     <!-- Page Controls -->
@@ -83,8 +83,8 @@ function goToPage(page: number) {
         class="flex size-9 items-center justify-center rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           currentPage === 1
-            ? 'text-slate-300'
-            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+            ? 'text-text-muted'
+            : 'text-text-muted hover:bg-bg-hover hover:text-text-secondary'
         "
         @click="goToPage(currentPage - 1)"
       >
@@ -105,8 +105,8 @@ function goToPage(page: number) {
           class="flex size-9 items-center justify-center rounded-lg text-sm font-medium transition-all"
           :class="
             page === currentPage
-              ? 'bg-slate-900 text-white'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              ? 'bg-gradient-to-r from-accent to-teal-600 text-white'
+              : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
           "
           @click="goToPage(page)"
         >
@@ -114,7 +114,7 @@ function goToPage(page: number) {
         </button>
         <span
           v-else
-          class="flex size-9 items-center justify-center text-slate-400"
+          class="flex size-9 items-center justify-center text-text-muted"
         >
           ...
         </span>
@@ -127,8 +127,8 @@ function goToPage(page: number) {
         class="flex size-9 items-center justify-center rounded-lg transition-all disabled:cursor-not-allowed disabled:opacity-40"
         :class="
           currentPage === lastPage
-            ? 'text-slate-300'
-            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+            ? 'text-text-muted'
+            : 'text-text-muted hover:bg-bg-hover hover:text-text-secondary'
         "
         @click="goToPage(currentPage + 1)"
       >

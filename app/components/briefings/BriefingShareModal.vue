@@ -212,7 +212,7 @@ const shareUrl = computed(() => {
             <div class="mt-4 flex flex-wrap gap-2">
               <span
                 v-if="createdShare.is_password_protected"
-                class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200"
+                class="inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-400 ring-1 ring-amber-500/20"
               >
                 <Icon
                   name="lucide:lock"
@@ -222,7 +222,7 @@ const shareUrl = computed(() => {
               </span>
               <span
                 v-if="createdShare.max_accesses"
-                class="inline-flex items-center gap-1.5 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-200"
+                class="inline-flex items-center gap-1.5 rounded-md bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-blue-500/20"
               >
                 <Icon
                   name="lucide:users"
@@ -230,7 +230,7 @@ const shareUrl = computed(() => {
                 />
                 {{ createdShare.max_accesses }} max views
               </span>
-              <span class="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">
+              <span class="inline-flex items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary ring-1 ring-border-subtle">
                 <Icon
                   name="lucide:calendar"
                   class="size-3"
