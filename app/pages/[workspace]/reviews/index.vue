@@ -173,10 +173,10 @@ const inProgressCount = computed(() => runs.value.filter(r => r.status === 'in_p
     <!-- Header -->
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">
+        <h1 class="text-2xl font-semibold text-text-primary">
           Code Reviews
         </h1>
-        <p class="mt-1 text-sm text-gray-500">
+        <p class="mt-1 text-sm text-text-muted">
           {{ pagination.total }} {{ pagination.total === 1 ? 'review' : 'reviews' }}
           <template v-if="completedCount > 0">
             · {{ completedCount }} completed
@@ -189,7 +189,7 @@ const inProgressCount = computed(() => runs.value.filter(r => r.status === 'in_p
 
       <button
         type="button"
-        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm font-medium text-text-secondary hover:bg-bg-hover disabled:opacity-50"
         :disabled="isLoading"
         @click="fetchData(queryParams, true)"
       >
@@ -228,7 +228,7 @@ const inProgressCount = computed(() => runs.value.filter(r => r.status === 'in_p
       <div
         v-for="i in 4"
         :key="i"
-        class="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4"
+        class="flex items-center gap-4 rounded-lg border border-border-subtle bg-bg-elevated p-4"
       >
         <BaseSkeleton class="size-10 rounded-lg" />
         <div class="flex-1 space-y-2">

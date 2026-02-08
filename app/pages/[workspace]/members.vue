@@ -187,10 +187,10 @@ async function handleResendInvitation(invitationId: number) {
     <!-- Header -->
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">
+        <h1 class="text-2xl font-semibold text-text-primary">
           Members
         </h1>
-        <p class="mt-1 text-sm text-gray-500">
+        <p class="mt-1 text-sm text-text-muted">
           {{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}
           <template v-if="pendingCount > 0">
             · {{ pendingCount }} pending
@@ -200,7 +200,7 @@ async function handleResendInvitation(invitationId: number) {
 
       <button
         v-if="canManage"
-        class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+        class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:shadow-glow"
         @click="showInviteModal = true"
       >
         <Icon
@@ -215,17 +215,17 @@ async function handleResendInvitation(invitationId: number) {
     <div class="relative max-w-sm">
       <Icon
         name="lucide:search"
-        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
       />
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search members..."
-        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
+        class="w-full rounded-xl border border-border-muted bg-bg-elevated py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-faint focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15)]"
       >
       <button
         v-if="searchQuery"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
         @click="searchQuery = ''"
       >
         <Icon
@@ -243,12 +243,12 @@ async function handleResendInvitation(invitationId: number) {
       <div
         v-for="i in 4"
         :key="i"
-        class="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4"
+        class="flex items-center gap-4 rounded-lg border border-border-subtle bg-bg-elevated p-4"
       >
-        <BaseSkeleton class="size-10 rounded-full" />
+        <div class="size-10 rounded-full bg-bg-hover skeleton" />
         <div class="flex-1 space-y-2">
-          <BaseSkeleton class="h-4 w-32" />
-          <BaseSkeleton class="h-3 w-48" />
+          <div class="h-4 w-32 bg-bg-hover rounded skeleton" />
+          <div class="h-3 w-48 bg-bg-hover rounded skeleton" />
         </div>
       </div>
     </div>
@@ -260,11 +260,11 @@ async function handleResendInvitation(invitationId: number) {
         v-if="searchQuery && !hasFilteredResults && filteredInvitations.length === 0"
         class="py-12 text-center"
       >
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-text-muted">
           No members match "{{ searchQuery }}"
         </p>
         <button
-          class="mt-2 text-sm text-gray-900 underline underline-offset-2"
+          class="mt-2 text-sm text-text-primary underline underline-offset-2"
           @click="searchQuery = ''"
         >
           Clear search
@@ -273,32 +273,32 @@ async function handleResendInvitation(invitationId: number) {
 
       <template v-else>
         <!-- Members Table -->
-        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <div class="overflow-hidden rounded-lg border border-border-subtle bg-bg-elevated">
           <table class="w-full">
             <thead>
-              <tr class="border-b border-gray-100 bg-gray-50/50">
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+              <tr class="border-b border-border-subtle bg-bg-surface/50">
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
                   Member
                 </th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
                   Role
                 </th>
-                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
                   Joined
                 </th>
                 <th
                   v-if="canManage"
-                  class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500"
+                  class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-text-muted"
                 >
                   <span class="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-border-subtle">
               <!-- Owner -->
               <tr
                 v-if="groupedMembers.owner"
-                class="group"
+                class="group hover:bg-bg-hover transition-colors"
               >
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
@@ -309,24 +309,24 @@ async function handleResendInvitation(invitationId: number) {
                     />
                     <div class="min-w-0">
                       <div class="flex items-center gap-2">
-                        <span class="truncate text-sm font-medium text-gray-900">
+                        <span class="truncate text-sm font-medium text-text-primary">
                           {{ groupedMembers.owner.user.name }}
                         </span>
                         <span
                           v-if="groupedMembers.owner.user_id === userStore.user?.id"
-                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                          class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
                         >
                           you
                         </span>
                       </div>
-                      <p class="truncate text-sm text-gray-500">
+                      <p class="truncate text-sm text-text-muted">
                         {{ groupedMembers.owner.user.email }}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
-                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-text-secondary">
                     <Icon
                       name="lucide:crown"
                       class="size-3.5 text-amber-500"
@@ -334,7 +334,7 @@ async function handleResendInvitation(invitationId: number) {
                     Owner
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500">
+                <td class="px-4 py-3 text-sm text-text-muted">
                   {{ new Date(groupedMembers.owner.joined_at || groupedMembers.owner.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
                 </td>
                 <td
@@ -347,7 +347,7 @@ async function handleResendInvitation(invitationId: number) {
               <tr
                 v-for="member in groupedMembers.admins"
                 :key="member.id"
-                class="group"
+                class="group hover:bg-bg-hover transition-colors"
               >
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
@@ -358,32 +358,32 @@ async function handleResendInvitation(invitationId: number) {
                     />
                     <div class="min-w-0">
                       <div class="flex items-center gap-2">
-                        <span class="truncate text-sm font-medium text-gray-900">
+                        <span class="truncate text-sm font-medium text-text-primary">
                           {{ member.user.name }}
                         </span>
                         <span
                           v-if="member.user_id === userStore.user?.id"
-                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                          class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
                         >
                           you
                         </span>
                       </div>
-                      <p class="truncate text-sm text-gray-500">
+                      <p class="truncate text-sm text-text-muted">
                         {{ member.user.email }}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
-                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-text-secondary">
                     <Icon
                       name="lucide:shield"
-                      class="size-3.5 text-blue-500"
+                      class="size-3.5 text-accent"
                     />
                     Admin
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500">
+                <td class="px-4 py-3 text-sm text-text-muted">
                   {{ new Date(member.joined_at || member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
                 </td>
                 <td
@@ -395,7 +395,7 @@ async function handleResendInvitation(invitationId: number) {
                     class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
                   >
                     <button
-                      class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      class="rounded p-1.5 text-text-muted hover:bg-bg-surface hover:text-text-primary"
                       title="Change role"
                       @click="handleRoleChange(member.id, MemberRole.Member)"
                     >
@@ -405,7 +405,7 @@ async function handleResendInvitation(invitationId: number) {
                       />
                     </button>
                     <button
-                      class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      class="rounded p-1.5 text-text-muted hover:bg-error/10 hover:text-error"
                       title="Remove"
                       @click="handleRemoveMember(member.id)"
                     >
@@ -422,7 +422,7 @@ async function handleResendInvitation(invitationId: number) {
               <tr
                 v-for="member in groupedMembers.members"
                 :key="member.id"
-                class="group"
+                class="group hover:bg-bg-hover transition-colors"
               >
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
@@ -433,28 +433,28 @@ async function handleResendInvitation(invitationId: number) {
                     />
                     <div class="min-w-0">
                       <div class="flex items-center gap-2">
-                        <span class="truncate text-sm font-medium text-gray-900">
+                        <span class="truncate text-sm font-medium text-text-primary">
                           {{ member.user.name }}
                         </span>
                         <span
                           v-if="member.user_id === userStore.user?.id"
-                          class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                          class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
                         >
                           you
                         </span>
                       </div>
-                      <p class="truncate text-sm text-gray-500">
+                      <p class="truncate text-sm text-text-muted">
                         {{ member.user.email }}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3">
-                  <span class="text-sm text-gray-500">
+                  <span class="text-sm text-text-muted">
                     Member
                   </span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-500">
+                <td class="px-4 py-3 text-sm text-text-muted">
                   {{ new Date(member.joined_at || member.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}
                 </td>
                 <td
@@ -466,7 +466,7 @@ async function handleResendInvitation(invitationId: number) {
                     class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100"
                   >
                     <button
-                      class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      class="rounded p-1.5 text-text-muted hover:bg-bg-surface hover:text-text-primary"
                       title="Promote to admin"
                       @click="handleRoleChange(member.id, MemberRole.Admin)"
                     >
@@ -476,7 +476,7 @@ async function handleResendInvitation(invitationId: number) {
                       />
                     </button>
                     <button
-                      class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      class="rounded p-1.5 text-text-muted hover:bg-error/10 hover:text-error"
                       title="Remove"
                       @click="handleRemoveMember(member.id)"
                     >
@@ -493,7 +493,7 @@ async function handleResendInvitation(invitationId: number) {
               <tr v-if="!groupedMembers.owner && groupedMembers.admins.length === 0 && groupedMembers.members.length === 0">
                 <td
                   :colspan="canManage ? 4 : 3"
-                  class="px-4 py-8 text-center text-sm text-gray-500"
+                  class="px-4 py-8 text-center text-sm text-text-muted"
                 >
                   No members found
                 </td>
@@ -507,45 +507,45 @@ async function handleResendInvitation(invitationId: number) {
           v-if="filteredInvitations.length > 0"
           class="space-y-4"
         >
-          <h2 class="text-sm font-medium text-gray-700">
+          <h2 class="text-sm font-medium text-text-secondary">
             Pending invitations
           </h2>
 
-          <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+          <div class="overflow-hidden rounded-lg border border-border-subtle bg-bg-elevated">
             <table class="w-full">
-              <tbody class="divide-y divide-gray-100">
+              <tbody class="divide-y divide-border-subtle">
                 <tr
                   v-for="invitation in filteredInvitations"
                   :key="invitation.id"
-                  class="group"
+                  class="group hover:bg-bg-hover transition-colors"
                 >
                   <td class="px-4 py-3">
                     <div class="flex items-center gap-3">
-                      <div class="flex size-8 items-center justify-center rounded-full bg-gray-100">
+                      <div class="flex size-8 items-center justify-center rounded-full bg-bg-surface">
                         <Icon
                           name="lucide:mail"
-                          class="size-4 text-gray-400"
+                          class="size-4 text-text-muted"
                         />
                       </div>
                       <div class="min-w-0">
-                        <p class="truncate text-sm font-medium text-gray-900">
+                        <p class="truncate text-sm font-medium text-text-primary">
                           {{ invitation.email }}
                         </p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-xs text-text-muted">
                           Invited by {{ invitation.invited_by.name }}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td class="px-4 py-3">
-                    <span class="text-sm text-gray-500">
+                    <span class="text-sm text-text-muted">
                       {{ invitation.role === MemberRole.Admin ? 'Admin' : 'Member' }}
                     </span>
                   </td>
                   <td class="px-4 py-3">
                     <span
                       class="text-sm"
-                      :class="invitation.is_expired ? 'text-amber-600' : 'text-gray-500'"
+                      :class="invitation.is_expired ? 'text-warning' : 'text-text-muted'"
                     >
                       {{ invitation.is_expired ? 'Expired' : `Expires ${new Date(invitation.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` }}
                     </span>
@@ -556,7 +556,7 @@ async function handleResendInvitation(invitationId: number) {
                   >
                     <div class="flex items-center justify-end gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
                       <button
-                        class="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 disabled:opacity-50"
+                        class="rounded p-1.5 text-text-muted hover:bg-bg-surface hover:text-text-primary disabled:opacity-50"
                         title="Resend"
                         :disabled="resendingInvitationId === invitation.id"
                         @click="handleResendInvitation(invitation.id)"
@@ -568,7 +568,7 @@ async function handleResendInvitation(invitationId: number) {
                         />
                       </button>
                       <button
-                        class="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        class="rounded p-1.5 text-text-muted hover:bg-error/10 hover:text-error"
                         title="Cancel"
                         @click="handleCancelInvitation(invitation.id)"
                       >
@@ -588,13 +588,13 @@ async function handleResendInvitation(invitationId: number) {
         <!-- Empty team prompt -->
         <div
           v-if="members.length === 1 && invitations.length === 0 && canManage && !searchQuery"
-          class="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
+          class="rounded-lg border border-border-subtle bg-bg-surface p-6 text-center"
         >
-          <p class="text-sm text-gray-600">
+          <p class="text-sm text-text-secondary">
             You're the only member in this workspace.
           </p>
           <button
-            class="mt-3 text-sm font-medium text-gray-900 underline underline-offset-2"
+            class="mt-3 text-sm font-medium text-accent underline underline-offset-2"
             @click="showInviteModal = true"
           >
             Invite your team
@@ -620,7 +620,7 @@ async function handleResendInvitation(invitationId: number) {
       <div class="space-y-4">
         <div
           v-if="pendingMember"
-          class="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
+          class="flex items-center gap-3 rounded-lg bg-bg-surface p-3"
         >
           <BaseAvatar
             :src="pendingMember.user.avatar_url"
@@ -628,16 +628,16 @@ async function handleResendInvitation(invitationId: number) {
             size="sm"
           />
           <div>
-            <p class="text-sm font-medium text-gray-900">
+            <p class="text-sm font-medium text-text-primary">
               {{ pendingMember.user.name }}
             </p>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-text-muted">
               {{ pendingMember.user.email }}
             </p>
           </div>
         </div>
 
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-text-secondary">
           This person will immediately lose access to the workspace.
         </p>
       </div>
@@ -645,13 +645,13 @@ async function handleResendInvitation(invitationId: number) {
       <template #footer>
         <div class="flex gap-3">
           <button
-            class="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            class="flex-1 rounded-xl border border-border-muted bg-bg-surface px-4 py-2.5 text-sm font-medium text-text-primary hover:bg-bg-hover transition-colors"
             @click="showRemoveMemberModal = false"
           >
             Cancel
           </button>
           <button
-            class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-error px-4 py-2.5 text-sm font-medium text-white hover:bg-error/90 disabled:opacity-50 transition-colors"
             :disabled="isProcessing"
             @click="confirmRemoveMember"
           >
@@ -675,25 +675,25 @@ async function handleResendInvitation(invitationId: number) {
       <div class="space-y-4">
         <div
           v-if="pendingInvitation"
-          class="flex items-center gap-3 rounded-lg bg-gray-50 p-3"
+          class="flex items-center gap-3 rounded-lg bg-bg-surface p-3"
         >
-          <div class="flex size-8 items-center justify-center rounded-full bg-gray-200">
+          <div class="flex size-8 items-center justify-center rounded-full bg-bg-hover">
             <Icon
               name="lucide:mail"
-              class="size-4 text-gray-500"
+              class="size-4 text-text-muted"
             />
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-900">
+            <p class="text-sm font-medium text-text-primary">
               {{ pendingInvitation.email }}
             </p>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-text-muted">
               Invited as {{ pendingInvitation.role_label }}
             </p>
           </div>
         </div>
 
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-text-secondary">
           The invitation link will no longer work.
         </p>
       </div>
@@ -701,13 +701,13 @@ async function handleResendInvitation(invitationId: number) {
       <template #footer>
         <div class="flex gap-3">
           <button
-            class="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            class="flex-1 rounded-xl border border-border-muted bg-bg-surface px-4 py-2.5 text-sm font-medium text-text-primary hover:bg-bg-hover transition-colors"
             @click="showCancelInvitationModal = false"
           >
             Keep
           </button>
           <button
-            class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-error px-4 py-2.5 text-sm font-medium text-white hover:bg-error/90 disabled:opacity-50 transition-colors"
             :disabled="isProcessing"
             @click="confirmCancelInvitation"
           >
@@ -723,3 +723,9 @@ async function handleResendInvitation(invitationId: number) {
     </BaseModal>
   </BaseContainer>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

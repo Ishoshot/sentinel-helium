@@ -198,10 +198,10 @@ function goToIntegrations() {
     <!-- Header -->
     <div class="flex items-start justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">
+        <h1 class="text-2xl font-semibold text-text-primary">
           Repositories
         </h1>
-        <p class="mt-1 text-sm text-gray-500">
+        <p class="mt-1 text-sm text-text-muted">
           {{ pagination.total }} {{ pagination.total === 1 ? 'repository' : 'repositories' }}
           <template v-if="activeCount > 0">
             · {{ activeCount }} with auto-review
@@ -216,7 +216,7 @@ function goToIntegrations() {
         <button
           v-if="canManage"
           type="button"
-          class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm font-medium text-text-secondary hover:bg-bg-hover disabled:opacity-50"
           :disabled="isSyncing"
           @click="handleSync"
         >
@@ -231,7 +231,7 @@ function goToIntegrations() {
         <button
           v-if="canManage"
           type="button"
-          class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white hover:shadow-glow disabled:opacity-50"
           :disabled="isConnecting"
           @click="connect"
         >
@@ -255,20 +255,20 @@ function goToIntegrations() {
       v-if="!isConnected && !isLoading && !isInitializing"
       class="py-16 text-center"
     >
-      <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-gray-100">
+      <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-bg-surface">
         <Icon
           name="lucide:github"
-          class="size-8 text-gray-400"
+          class="size-8 text-text-muted"
         />
       </div>
-      <h3 class="text-lg font-semibold text-gray-900">
+      <h3 class="text-lg font-semibold text-text-primary">
         GitHub not connected
       </h3>
-      <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500">
+      <p class="mx-auto mt-2 max-w-sm text-sm text-text-muted">
         Connect your GitHub account to sync repositories and enable automated code reviews.
       </p>
       <button
-        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white hover:shadow-glow"
         @click="goToIntegrations"
       >
         <Icon
@@ -287,7 +287,7 @@ function goToIntegrations() {
       <div
         v-for="i in 4"
         :key="i"
-        class="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-4"
+        class="flex items-center gap-4 rounded-lg border border-border-subtle bg-bg-elevated p-4"
       >
         <BaseSkeleton class="size-10 rounded-lg" />
         <div class="flex-1 space-y-2">
@@ -302,22 +302,22 @@ function goToIntegrations() {
       v-else-if="!hasRepositories"
       class="py-16 text-center"
     >
-      <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-gray-100">
+      <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-2xl bg-bg-surface">
         <Icon
           name="lucide:folder-git-2"
-          class="size-8 text-gray-400"
+          class="size-8 text-text-muted"
         />
       </div>
-      <h3 class="text-lg font-semibold text-gray-900">
+      <h3 class="text-lg font-semibold text-text-primary">
         No repositories
       </h3>
-      <p class="mx-auto mt-2 max-w-sm text-sm text-gray-500">
+      <p class="mx-auto mt-2 max-w-sm text-sm text-text-muted">
         Grant Sentinel access to repositories when installing the GitHub App.
       </p>
       <button
         v-if="canManage"
         type="button"
-        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white hover:shadow-glow disabled:opacity-50"
         :disabled="isSyncing"
         @click="handleSync"
       >
@@ -338,17 +338,17 @@ function goToIntegrations() {
         <div class="relative max-w-sm flex-1">
           <Icon
             name="lucide:search"
-            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+            class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
           />
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Search repositories..."
-            class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
+            class="w-full rounded-lg border border-border-subtle bg-bg-elevated py-2 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
           >
           <button
             v-if="searchQuery"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
             @click="searchQuery = ''"
           >
             <Icon
@@ -359,12 +359,12 @@ function goToIntegrations() {
         </div>
 
         <!-- View toggle -->
-        <div class="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1">
+        <div class="flex items-center gap-1 rounded-lg border border-border-subtle bg-bg-elevated p-1">
           <button
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="viewMode === 'list'
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-500 hover:text-gray-700'"
+              ? 'bg-accent text-white'
+              : 'text-text-muted hover:text-text-secondary'"
             @click="viewMode = 'list'"
           >
             <Icon
@@ -375,8 +375,8 @@ function goToIntegrations() {
           <button
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="viewMode === 'grid'
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-500 hover:text-gray-700'"
+              ? 'bg-accent text-white'
+              : 'text-text-muted hover:text-text-secondary'"
             @click="viewMode = 'grid'"
           >
             <Icon
@@ -392,11 +392,11 @@ function goToIntegrations() {
         v-if="searchQuery && filteredRepositories.length === 0"
         class="py-12 text-center"
       >
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-text-muted">
           No repositories match "{{ searchQuery }}"
         </p>
         <button
-          class="mt-2 text-sm text-gray-900 underline underline-offset-2"
+          class="mt-2 text-sm text-accent underline underline-offset-2"
           @click="searchQuery = ''"
         >
           Clear search
@@ -443,3 +443,9 @@ function goToIntegrations() {
     />
   </BaseContainer>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>
