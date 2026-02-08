@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * BaseBadge - Status/role badge component
- * Follows Sentinel design system with semantic colors
+ * BaseBadge - V2 Status/role badge component
+ * Dark theme with semantic colors and subtle glow backgrounds
  */
 
 interface Props {
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'error'
+  variant?: 'default' | 'accent' | 'success' | 'warning' | 'error' | 'info'
   size?: 'sm' | 'md'
 }
 
@@ -18,11 +18,12 @@ const badgeClasses = computed(() => {
   const base = 'inline-flex items-center font-medium rounded-full'
 
   const variants = {
-    default: 'bg-bg-surface text-text-secondary',
-    primary: 'bg-accent-light text-accent',
+    default: 'bg-bg-hover text-text-secondary',
+    accent: 'bg-accent-glow text-accent',
     success: 'bg-success-light text-success',
     warning: 'bg-warning-light text-warning',
     error: 'bg-error-light text-error',
+    info: 'bg-info-light text-info',
   }
 
   const sizes = {

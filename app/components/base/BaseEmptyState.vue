@@ -2,8 +2,8 @@
 import { EmptyStateVariant } from '~/types'
 
 /**
- * BaseEmptyState - Versatile component for empty, error, and loading states
- * Provides consistent visual treatment across the application
+ * BaseEmptyState - V2 Versatile component for empty, error, and loading states
+ * Dark theme with subtle icon backgrounds and semantic colors
  */
 
 interface Props {
@@ -20,7 +20,6 @@ const props = withDefaults(defineProps<Props>(), {
   compact: false,
 })
 
-// Variant-based styling
 const variantConfig = computed(() => {
   const configs: Record<EmptyStateVariant, {
     defaultIcon: string
@@ -29,8 +28,8 @@ const variantConfig = computed(() => {
   }> = {
     [EmptyStateVariant.Empty]: {
       defaultIcon: 'lucide:inbox',
-      iconBg: 'bg-bg-surface',
-      iconColor: 'text-text-muted',
+      iconBg: 'bg-bg-hover',
+      iconColor: 'text-text-faint',
     },
     [EmptyStateVariant.Error]: {
       defaultIcon: 'lucide:alert-circle',
@@ -49,13 +48,13 @@ const variantConfig = computed(() => {
     },
     [EmptyStateVariant.Info]: {
       defaultIcon: 'lucide:info',
-      iconBg: 'bg-accent-light',
+      iconBg: 'bg-accent-glow',
       iconColor: 'text-accent',
     },
     [EmptyStateVariant.Offline]: {
       defaultIcon: 'lucide:wifi-off',
-      iconBg: 'bg-bg-surface',
-      iconColor: 'text-text-muted',
+      iconBg: 'bg-bg-hover',
+      iconColor: 'text-text-faint',
     },
   }
 
@@ -72,7 +71,7 @@ const iconName = computed(() => props.icon || variantConfig.value.defaultIcon)
   >
     <!-- Icon -->
     <div
-      class="rounded-full flex items-center justify-center mb-4"
+      class="rounded-xl flex items-center justify-center mb-4"
       :class="[
         variantConfig.iconBg,
         compact ? 'w-12 h-12' : 'w-16 h-16',
@@ -89,7 +88,7 @@ const iconName = computed(() => props.icon || variantConfig.value.defaultIcon)
 
     <!-- Title -->
     <h3
-      class="font-medium text-text-primary"
+      class="font-medium text-text-secondary"
       :class="compact ? 'text-base mb-1' : 'text-lg mb-2'"
     >
       {{ title }}
@@ -98,7 +97,7 @@ const iconName = computed(() => props.icon || variantConfig.value.defaultIcon)
     <!-- Description -->
     <p
       v-if="description"
-      class="text-text-secondary max-w-sm"
+      class="text-text-muted max-w-sm"
       :class="compact ? 'text-sm' : 'text-sm'"
     >
       {{ description }}

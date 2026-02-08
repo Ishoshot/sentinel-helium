@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * BaseButton - Primary action button component
- * Follows Sentinel design system with grayscale-first approach
+ * BaseButton - V2 Primary action button component
+ * Dark theme with gradient primary, glow effects, and micro-interactions
  */
 
 interface Props {
@@ -24,21 +24,20 @@ const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
-// Compute button classes based on variant and size
 const buttonClasses = computed(() => {
-  const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-default focus-ring disabled:opacity-50 disabled:cursor-not-allowed'
+  const base = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2 focus:ring-offset-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
 
   const variants = {
-    primary: 'bg-accent text-white hover:bg-accent-hover',
-    secondary: 'bg-bg-surface text-text-primary border border-border-muted hover:bg-bg-app',
-    ghost: 'text-text-secondary hover:text-text-primary hover:bg-bg-surface',
-    danger: 'bg-error text-white hover:bg-red-700',
+    primary: 'btn-v2-primary text-white hover:-translate-y-0.5 active:scale-[0.98]',
+    secondary: 'bg-transparent text-text-secondary border border-border-muted hover:bg-bg-hover hover:border-border-subtle hover:text-text-primary',
+    ghost: 'text-text-secondary hover:text-text-primary hover:bg-bg-hover',
+    danger: 'bg-error text-white hover:bg-rose-600 shadow-[0_0_20px_-5px_rgba(244,63,94,0.3)] hover:shadow-[0_0_30px_-5px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:scale-[0.98]',
   }
 
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base',
+    md: 'px-4 py-2.5 text-sm',
+    lg: 'px-5 py-3 text-base',
   }
 
   return [base, variants[props.variant], sizes[props.size]]
@@ -68,3 +67,14 @@ function handleClick(event: MouseEvent) {
     <slot />
   </button>
 </template>
+
+<style scoped>
+.btn-v2-primary {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.3);
+}
+
+.btn-v2-primary:hover:not(:disabled) {
+  box-shadow: 0 0 30px -5px rgba(20, 184, 166, 0.5);
+}
+</style>
