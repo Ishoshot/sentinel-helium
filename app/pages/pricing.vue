@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { hasToken } from '~/services/core/api'
-import { planConfigs, comparisonFeatures } from '~/config/plans'
+import { usePlans } from '~/composables/billing/usePlans'
 
 /**
  * Full pricing comparison with all features
- * Uses shared plan configs as single source of truth
+ * Fetches plans from API for up-to-date pricing
  */
 
 definePageMeta({
@@ -21,6 +21,8 @@ useHead({
   },
 })
 
+const { plans, fetchPlans, comparisonFeatures } = usePlans()
+
 const isCheckingAuth = ref(true)
 const isAuthenticated = ref(false)
 const scrolled = ref(false)
@@ -30,6 +32,9 @@ onMounted(async () => {
     isAuthenticated.value = true
   }
   isCheckingAuth.value = false
+
+  // Fetch plans from API
+  await fetchPlans()
 
   window.addEventListener('scroll', handleScroll)
 })
@@ -42,17 +47,17 @@ function handleScroll() {
   scrolled.value = window.scrollY > 20
 }
 
-// Transform plan configs to the format expected by the template
-const tiers = planConfigs.map(plan => ({
-  name: plan.name,
-  price: plan.priceLabel,
-  period: plan.period,
+// Transform plans to the format expected by the template
+const tiers = computed(() => plans.value.map(plan => ({
+  name: plan.name ?? plan.tier,
+  price: plan.price_label ?? `$${plan.price_monthly_cents ? plan.price_monthly_cents / 100 : 0}`,
+  period: plan.period ?? (plan.price_monthly_cents === 0 ? 'Free forever' : 'per month'),
   description: plan.description,
-  features: plan.features,
-  cta: plan.cta,
-  href: plan.ctaLink,
-  highlighted: plan.highlighted,
-}))
+  features: plan.feature_list ?? [],
+  cta: plan.cta ?? 'Get started',
+  href: plan.cta_link ?? '/login',
+  highlighted: plan.highlighted ?? false,
+})))
 
 const faqs = [
   {

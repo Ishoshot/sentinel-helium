@@ -4,6 +4,7 @@ import { useWorkspaces } from '~/composables/workspace/useWorkspaces'
 
 /**
  * Landing page with hero section and floating UI mockups
+ * Premium dark theme with teal accents
  */
 
 definePageMeta({
@@ -15,7 +16,7 @@ useHead({
     class: 'scroll-smooth',
   },
   bodyAttrs: {
-    class: 'bg-[#fffff]',
+    class: 'bg-[#09090b]',
   },
 })
 
@@ -66,18 +67,18 @@ function handleScroll() {
   <!-- Loading state -->
   <div
     v-if="isCheckingAuth"
-    class="landing-light min-h-screen flex items-center justify-center"
+    class="landing-dark min-h-screen flex items-center justify-center"
   >
     <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
-      <span class="text-gray-500 text-sm">Loading...</span>
+      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
+      <span class="text-zinc-500 text-sm">Loading...</span>
     </div>
   </div>
 
   <!-- Landing page -->
   <div
     v-else
-    class="landing-light min-h-screen overflow-x-hidden antialiased"
+    class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -86,14 +87,15 @@ function handleScroll() {
     />
 
     <!-- Hero Section -->
-    <section class="relative pt-24 lg:pt-32 pb-16 lg:pb-24 bg-white overflow-hidden">
+    <section class="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
+      
       <!-- Subtle grid pattern -->
       <div
-        class="absolute inset-0 opacity-[0.6]"
-        style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;"
+        class="absolute inset-0 opacity-[0.03]"
+        style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 60px 60px;"
       />
 
-      <div class="relative max-w-7xl mx-auto px-6 my-10">
+      <div class="relative max-w-8xl mx-auto px-6 my-10">
         <LandingHero :visible="heroVisible" />
 
         <!-- Floating UI Mockups -->
@@ -106,7 +108,7 @@ function handleScroll() {
     <!-- Logos Section -->
     <LandingLogos />
 
-    <!-- Features Section (Light Background) -->
+    <!-- Features Section -->
     <LandingFeatures />
 
     <!-- Architecture Section -->
