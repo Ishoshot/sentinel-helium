@@ -204,11 +204,11 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
   <BaseContainer>
     <div class="min-h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
       <!-- Header -->
-      <div class="px-4 sm:px-6 lg:px-8 py-6 border-b border-gray-200 bg-white shrink-0">
+      <div class="px-4 sm:px-6 lg:px-8 py-6 border-b border-border-subtle bg-bg-elevated shrink-0">
         <div class="flex items-center gap-4">
           <button
             type="button"
-            class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all duration-200"
+            class="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-bg-hover transition-all duration-200"
             @click="handleGoBack"
           >
             <Icon
@@ -224,13 +224,13 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
             />
             <h1
               v-else
-              class="text-xl font-semibold text-gray-900 truncate"
+              class="text-xl font-semibold text-text-primary truncate"
             >
               {{ briefing?.title ?? 'Briefing' }}
             </h1>
             <p
               v-if="briefing?.description"
-              class="text-sm text-gray-500 truncate mt-1"
+              class="text-sm text-text-muted truncate mt-1"
             >
               {{ briefing.description }}
             </p>
@@ -239,7 +239,7 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           <!-- AI Badge -->
           <div
             v-if="briefing?.requires_ai"
-            class="shrink-0 hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-md"
+            class="shrink-0 hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 bg-blue-500/10 rounded-md"
           >
             <Icon
               name="lucide:sparkles"
@@ -257,13 +257,13 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           v-if="isInitializing"
           class="text-center"
         >
-          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gray-100 flex items-center justify-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-bg-surface flex items-center justify-center">
             <Icon
               name="lucide:loader-2"
-              class="w-8 h-8 text-gray-400 animate-spin"
+              class="w-8 h-8 text-text-muted animate-spin"
             />
           </div>
-          <p class="text-sm text-gray-500">
+          <p class="text-sm text-text-muted">
             Loading briefing...
           </p>
         </div>
@@ -273,16 +273,16 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           v-else-if="!briefing && !isLoadingBriefings"
           class="text-center"
         >
-          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-red-50 flex items-center justify-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-red-500/10 flex items-center justify-center">
             <Icon
               name="lucide:file-question"
-              class="w-8 h-8 text-red-500"
+              class="w-8 h-8 text-red-400"
             />
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          <h3 class="text-lg font-semibold text-text-primary mb-2">
             Briefing not found
           </h3>
-          <p class="text-sm text-gray-500 mb-6">
+          <p class="text-sm text-text-muted mb-6">
             This briefing doesn't exist or you don't have access to it.
           </p>
           <BaseButton
@@ -303,24 +303,24 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           class="text-center max-w-lg"
         >
           <!-- Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-gray-100 flex items-center justify-center">
+          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-bg-surface flex items-center justify-center">
             <Icon
               :name="briefing?.icon ?? 'lucide:file-text'"
-              class="w-10 h-10 text-gray-600"
+              class="w-10 h-10 text-text-secondary"
             />
           </div>
 
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
+          <h2 class="text-2xl font-bold text-text-primary mb-3">
             Ready to generate?
           </h2>
-          <p class="text-gray-600 mb-8 leading-relaxed">
+          <p class="text-text-secondary mb-8 leading-relaxed">
             {{ briefing?.description }}
           </p>
 
           <!-- Configuration hint -->
           <div
             v-if="hasParameters"
-            class="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm text-gray-600 bg-gray-100 rounded-lg"
+            class="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm text-text-secondary bg-bg-surface rounded-lg"
           >
             <Icon
               name="lucide:sliders"
@@ -358,7 +358,7 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
 
             <button
               type="button"
-              class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
               @click="handleGoBack"
             >
               Cancel
@@ -385,17 +385,17 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           class="text-center max-w-lg"
         >
           <!-- Success Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-emerald-50 flex items-center justify-center">
+          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
             <Icon
               name="lucide:check"
-              class="w-10 h-10 text-emerald-500"
+              class="w-10 h-10 text-emerald-400"
             />
           </div>
 
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
+          <h2 class="text-2xl font-bold text-text-primary mb-3">
             Your briefing is ready!
           </h2>
-          <p class="text-gray-600 mb-8">
+          <p class="text-text-secondary mb-8">
             {{ briefing?.title }} has been generated successfully.
             View the full narrative and share it with your team.
           </p>
@@ -427,7 +427,7 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
 
             <button
               type="button"
-              class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
               @click="handleGoBack"
             >
               Back to Briefings
@@ -441,25 +441,25 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
           class="text-center max-w-lg"
         >
           <!-- Error Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-red-50 flex items-center justify-center">
+          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-red-500/10 flex items-center justify-center">
             <Icon
               name="lucide:alert-circle"
-              class="w-10 h-10 text-red-500"
+              class="w-10 h-10 text-red-400"
             />
           </div>
 
-          <h2 class="text-2xl font-bold text-gray-900 mb-3">
+          <h2 class="text-2xl font-bold text-text-primary mb-3">
             Generation failed
           </h2>
-          <p class="text-gray-600 mb-4">
+          <p class="text-text-secondary mb-4">
             Something went wrong while generating your briefing.
           </p>
 
           <div
             v-if="trackedGeneration?.error_message"
-            class="mb-8 p-4 rounded-xl bg-red-50 border border-red-100 text-left"
+            class="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-left"
           >
-            <p class="text-sm text-red-600">
+            <p class="text-sm text-red-400">
               {{ trackedGeneration.error_message }}
             </p>
           </div>
@@ -479,7 +479,7 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
 
             <button
               type="button"
-              class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
               @click="handleGoBack"
             >
               Back to Briefings

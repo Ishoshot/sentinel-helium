@@ -193,69 +193,69 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
 
 <template>
   <BaseContainer>
-    <div class="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div class="min-h-screen">
       <div class="relative mx-auto">
         <!-- Page Header -->
         <header class="mb-12">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1">
+              <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1">
                 <span class="relative flex size-2">
-                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-blue-400 opacity-75" />
-                  <span class="relative inline-flex size-2 rounded-full bg-blue-500" />
+                  <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-75" />
+                  <span class="relative inline-flex size-2 rounded-full bg-accent" />
                 </span>
-                <span class="text-xs font-medium text-blue-700">AI-Powered</span>
+                <span class="text-xs font-medium text-accent">AI-Powered</span>
               </div>
-              <h1 class="text-3xl font-bold tracking-tight text-slate-900 lg:text-4xl">
+              <h1 class="text-3xl font-bold tracking-tight text-text-primary lg:text-4xl">
                 Briefings
               </h1>
-              <p class="mt-2 max-w-2xl text-base text-slate-600">
+              <p class="mt-2 max-w-2xl text-base text-text-secondary">
                 Transform your development data into compelling narratives. Celebrate achievements, track progress, and keep your team aligned.
               </p>
             </div>
 
             <!-- Quick Stats -->
-            <div class="flex items-center gap-6 rounded-2xl border border-slate-200/60 bg-white/80 px-6 py-4 shadow-sm backdrop-blur-sm">
+            <div class="flex items-center gap-6 rounded-2xl border border-border-subtle bg-bg-elevated px-6 py-4 shadow-sm backdrop-blur-sm">
               <template v-if="isInitializing">
                 <div class="text-center">
-                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
-                  <div class="mt-1 h-3 w-16 animate-pulse rounded bg-slate-100" />
+                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-bg-surface" />
+                  <div class="mt-1 h-3 w-16 animate-pulse rounded bg-bg-surface" />
                 </div>
-                <div class="h-8 w-px bg-slate-200" />
+                <div class="h-8 w-px bg-border-subtle" />
                 <div class="text-center">
-                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
-                  <div class="mt-1 h-3 w-12 animate-pulse rounded bg-slate-100" />
+                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-bg-surface" />
+                  <div class="mt-1 h-3 w-12 animate-pulse rounded bg-bg-surface" />
                 </div>
-                <div class="h-8 w-px bg-slate-200" />
+                <div class="h-8 w-px bg-border-subtle" />
                 <div class="text-center">
-                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-slate-200" />
-                  <div class="mt-1 h-3 w-16 animate-pulse rounded bg-slate-100" />
+                  <div class="mx-auto h-7 w-8 animate-pulse rounded bg-bg-surface" />
+                  <div class="mt-1 h-3 w-16 animate-pulse rounded bg-bg-surface" />
                 </div>
               </template>
               <template v-else>
                 <div class="text-center">
-                  <p class="text-2xl font-bold tabular-nums text-slate-900">
+                  <p class="text-2xl font-bold tabular-nums text-text-primary">
                     {{ totalGenerations }}
                   </p>
-                  <p class="text-xs text-slate-500">
+                  <p class="text-xs text-text-muted">
                     Generated
                   </p>
                 </div>
-                <div class="h-8 w-px bg-slate-200" />
+                <div class="h-8 w-px bg-border-subtle" />
                 <div class="text-center">
-                  <p class="text-2xl font-bold tabular-nums text-slate-900">
+                  <p class="text-2xl font-bold tabular-nums text-text-primary">
                     {{ activeSubscriptions }}
                   </p>
-                  <p class="text-xs text-slate-500">
+                  <p class="text-xs text-text-muted">
                     Active
                   </p>
                 </div>
-                <div class="h-8 w-px bg-slate-200" />
+                <div class="h-8 w-px bg-border-subtle" />
                 <div class="text-center">
-                  <p class="text-2xl font-bold tabular-nums text-slate-900">
+                  <p class="text-2xl font-bold tabular-nums text-text-primary">
                     {{ briefings.length }}
                   </p>
-                  <p class="text-xs text-slate-500">
+                  <p class="text-xs text-text-muted">
                     Templates
                   </p>
                 </div>
@@ -266,17 +266,17 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
 
         <div
           v-if="!isLoadingWorkspaceEligibility && !isWorkspaceEligible"
-          class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900"
+          class="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-amber-400"
         >
           <Icon
             name="lucide:info"
-            class="mt-0.5 size-4 text-amber-600"
+            class="mt-0.5 size-4 text-amber-400"
           />
           <div class="space-y-0.5">
             <p class="text-sm font-medium">
               Briefing generation is currently unavailable.
             </p>
-            <p class="text-xs text-amber-800">
+            <p class="text-xs text-amber-400/80">
               {{ workspaceRestrictionReason || "Your workspace does not meet the current requirements." }}
             </p>
           </div>
@@ -291,19 +291,19 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
               v-if="isInitializing && activeTab === 'templates'"
               class="transition-all duration-700 delay-100"
             >
-              <div class="overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-6 lg:p-8">
+              <div class="overflow-hidden rounded-2xl border border-border-subtle bg-gradient-to-br from-bg-elevated to-bg-surface/50 p-6 lg:p-8">
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
-                  <div class="size-16 animate-pulse rounded-2xl bg-slate-200 lg:size-20" />
+                  <div class="size-16 animate-pulse rounded-2xl bg-bg-surface lg:size-20" />
                   <div class="flex-1 space-y-3">
-                    <div class="h-5 w-20 animate-pulse rounded-md bg-slate-200" />
-                    <div class="h-7 w-48 animate-pulse rounded bg-slate-200" />
+                    <div class="h-5 w-20 animate-pulse rounded-md bg-bg-surface" />
+                    <div class="h-7 w-48 animate-pulse rounded bg-bg-surface" />
                     <div class="space-y-2">
-                      <div class="h-4 w-full animate-pulse rounded bg-slate-100" />
-                      <div class="h-4 w-2/3 animate-pulse rounded bg-slate-100" />
+                      <div class="h-4 w-full animate-pulse rounded bg-bg-surface" />
+                      <div class="h-4 w-2/3 animate-pulse rounded bg-bg-surface" />
                     </div>
                     <div class="flex gap-3 pt-2">
-                      <div class="h-10 w-32 animate-pulse rounded-lg bg-slate-200" />
-                      <div class="h-10 w-28 animate-pulse rounded-lg bg-slate-100" />
+                      <div class="h-10 w-32 animate-pulse rounded-lg bg-bg-surface" />
+                      <div class="h-10 w-28 animate-pulse rounded-lg bg-bg-surface" />
                     </div>
                   </div>
                 </div>
@@ -316,10 +316,10 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
               class="transition-all duration-700 delay-100"
               :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             >
-              <div class="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-white to-slate-50/50 p-6 shadow-sm transition-all hover:shadow-sm lg:p-8">
+              <div class="group relative overflow-hidden rounded-2xl border border-border-subtle bg-gradient-to-br from-bg-elevated to-bg-surface/50 p-6 shadow-sm transition-all hover:border-border-muted lg:p-8">
                 <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-8">
                   <!-- Icon -->
-                  <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/25 lg:size-20">
+                  <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-teal-600 shadow-lg shadow-accent/25 lg:size-20">
                     <Icon
                       name="lucide:sparkles"
                       class="size-8 text-white lg:size-10"
@@ -329,23 +329,23 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
                   <!-- Content -->
                   <div class="flex-1">
                     <div class="mb-2 flex items-center gap-2">
-                      <span class="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">Featured</span>
+                      <span class="rounded-md bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">Featured</span>
                       <span
                         v-if="getSubscription(featuredBriefing.id)?.is_active"
-                        class="rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                        class="rounded-md bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400"
                       >Active</span>
                     </div>
-                    <h2 class="text-xl font-semibold text-slate-900 lg:text-2xl">
+                    <h2 class="text-xl font-semibold text-text-primary lg:text-2xl">
                       {{ featuredBriefing.title }}
                     </h2>
-                    <p class="mt-2 text-sm text-slate-600 lg:text-base">
+                    <p class="mt-2 text-sm text-text-secondary lg:text-base">
                       {{ featuredBriefing.description }}
                     </p>
 
                     <div class="mt-4 flex flex-wrap items-center gap-3">
                       <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-white/80"
+                        class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                         :disabled="!isWorkspaceEligible"
                         @click="handleGenerate(featuredBriefing)"
                       >
@@ -357,7 +357,7 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
                       </button>
                       <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2.5 text-sm font-medium text-text-secondary transition-all hover:border-border-muted hover:bg-bg-hover"
                         @click="handleInfo(featuredBriefing)"
                       >
                         Learn More
@@ -370,37 +370,37 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
 
             <!-- Tab Navigation -->
             <div
-              class="flex items-center gap-1 border-b border-slate-200 transition-all duration-700 delay-150"
+              class="flex items-center gap-1 border-b border-border-subtle transition-all duration-700 delay-150"
               :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             >
               <button
                 type="button"
                 class="relative px-4 py-3 text-sm font-medium transition-colors"
-                :class="activeTab === 'templates' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+                :class="activeTab === 'templates' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'"
                 @click="activeTab = 'templates'"
               >
                 All Templates
                 <span
                   v-if="activeTab === 'templates'"
-                  class="absolute inset-x-0 -bottom-px h-0.5 bg-slate-900"
+                  class="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
                 />
               </button>
               <button
                 type="button"
                 class="relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors"
-                :class="activeTab === 'history' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'"
+                :class="activeTab === 'history' ? 'text-text-primary' : 'text-text-muted hover:text-text-secondary'"
                 @click="activeTab = 'history'"
               >
                 Generation History
                 <span
                   v-if="totalGenerations > 0"
-                  class="rounded-full bg-slate-100 px-2 py-0.5 text-xs tabular-nums"
+                  class="rounded-full bg-bg-surface px-2 py-0.5 text-xs tabular-nums"
                 >
                   {{ totalGenerations }}
                 </span>
                 <span
                   v-if="activeTab === 'history'"
-                  class="absolute inset-x-0 -bottom-px h-0.5 bg-slate-900"
+                  class="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
                 />
               </button>
             </div>
@@ -415,29 +415,29 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
                 <div
                   v-for="i in 4"
                   :key="i"
-                  class="flex h-full flex-col rounded-xl border border-slate-200/60 bg-white"
+                  class="flex h-full flex-col rounded-xl border border-border-subtle bg-bg-elevated"
                 >
                   <!-- Header skeleton -->
                   <div class="flex items-start justify-between p-4 pb-0">
-                    <div class="size-11 animate-pulse rounded-xl bg-slate-200" />
+                    <div class="size-11 animate-pulse rounded-xl bg-bg-surface" />
                   </div>
                   <!-- Content skeleton -->
                   <div class="flex flex-1 flex-col p-4">
-                    <div class="h-5 w-32 animate-pulse rounded bg-slate-200" />
-                    <div class="mt-2 h-3 w-20 animate-pulse rounded bg-slate-100" />
+                    <div class="h-5 w-32 animate-pulse rounded bg-bg-surface" />
+                    <div class="mt-2 h-3 w-20 animate-pulse rounded bg-bg-surface" />
                     <div class="mt-3 space-y-2">
-                      <div class="h-3 w-full animate-pulse rounded bg-slate-100" />
-                      <div class="h-3 w-3/4 animate-pulse rounded bg-slate-100" />
+                      <div class="h-3 w-full animate-pulse rounded bg-bg-surface" />
+                      <div class="h-3 w-3/4 animate-pulse rounded bg-bg-surface" />
                     </div>
                     <div class="mt-3 flex gap-2">
-                      <div class="h-5 w-12 animate-pulse rounded-md bg-slate-100" />
-                      <div class="h-5 w-20 animate-pulse rounded-md bg-slate-100" />
+                      <div class="h-5 w-12 animate-pulse rounded-md bg-bg-surface" />
+                      <div class="h-5 w-20 animate-pulse rounded-md bg-bg-surface" />
                     </div>
                   </div>
                   <!-- Actions skeleton -->
-                  <div class="flex items-center gap-2 border-t border-slate-100 p-3">
-                    <div class="h-9 flex-1 animate-pulse rounded-lg bg-slate-200" />
-                    <div class="size-9 animate-pulse rounded-lg bg-slate-100" />
+                  <div class="flex items-center gap-2 border-t border-border-subtle p-3">
+                    <div class="h-9 flex-1 animate-pulse rounded-lg bg-bg-surface" />
+                    <div class="size-9 animate-pulse rounded-lg bg-bg-surface" />
                   </div>
                 </div>
               </div>
@@ -445,22 +445,22 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
               <!-- Error -->
               <div
                 v-else-if="error"
-                class="rounded-xl border border-slate-200 bg-white p-10 text-center"
+                class="rounded-xl border border-border-subtle bg-bg-elevated p-10 text-center"
               >
-                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-red-50">
+                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-red-500/10">
                   <Icon
                     name="lucide:alert-circle"
-                    class="size-6 text-red-500"
+                    class="size-6 text-red-400"
                   />
                 </div>
-                <h3 class="mt-4 font-semibold text-slate-900">
+                <h3 class="mt-4 font-semibold text-text-primary">
                   Failed to load briefings
                 </h3>
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-text-muted">
                   {{ error }}
                 </p>
                 <button
-                  class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                  class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white hover:shadow-glow"
                   @click="fetchBriefings()"
                 >
                   Try again
@@ -470,18 +470,18 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
               <!-- Empty -->
               <div
                 v-else-if="!hasTemplates"
-                class="rounded-xl border border-slate-200 bg-white p-10 text-center"
+                class="rounded-xl border border-border-subtle bg-bg-elevated p-10 text-center"
               >
-                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-100">
+                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-bg-surface">
                   <Icon
                     name="lucide:file-text"
-                    class="size-6 text-slate-400"
+                    class="size-6 text-text-muted"
                   />
                 </div>
-                <h3 class="mt-4 font-semibold text-slate-900">
+                <h3 class="mt-4 font-semibold text-text-primary">
                   No templates available
                 </h3>
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-text-muted">
                   Templates will appear once configured.
                 </p>
               </div>
@@ -523,30 +523,30 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
                 <div
                   v-for="i in 5"
                   :key="i"
-                  class="h-16 animate-pulse rounded-xl bg-slate-200/60"
+                  class="h-16 animate-pulse rounded-xl bg-bg-surface"
                 />
               </div>
 
               <!-- Empty -->
               <div
                 v-else-if="!hasHistory"
-                class="mt-6 rounded-xl border border-slate-200 bg-white p-10 text-center"
+                class="mt-6 rounded-xl border border-border-subtle bg-bg-elevated p-10 text-center"
               >
-                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-slate-100">
+                <div class="mx-auto flex size-12 items-center justify-center rounded-full bg-bg-surface">
                   <Icon
                     name="lucide:inbox"
-                    class="size-6 text-slate-400"
+                    class="size-6 text-text-muted"
                   />
                 </div>
-                <h3 class="mt-4 font-semibold text-slate-900">
+                <h3 class="mt-4 font-semibold text-text-primary">
                   {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId ? 'No results found' : 'No briefings generated yet' }}
                 </h3>
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-text-muted">
                   {{ historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId ? 'Try adjusting your filters.' : 'Generate your first briefing to see it here.' }}
                 </p>
                 <button
                   v-if="!(historyFilters.search || historyFilters.status.length > 0 || historyFilters.briefingId)"
-                  class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                  class="mt-4 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white hover:shadow-glow"
                   @click="activeTab = 'templates'"
                 >
                   Browse Templates
@@ -587,33 +587,33 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
             :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
           >
             <!-- Quick Actions -->
-            <div class="rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm">
-              <h3 class="mb-4 text-sm font-semibold text-slate-900">
+            <div class="rounded-xl border border-border-subtle bg-bg-elevated p-5 shadow-sm">
+              <h3 class="mb-4 text-sm font-semibold text-text-primary">
                 Quick Actions
               </h3>
               <div class="space-y-2">
                 <button
                   type="button"
-                  class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100"
+                  class="flex w-full items-center gap-3 rounded-lg border border-border-subtle bg-bg-surface px-4 py-3 text-left text-sm font-medium text-text-secondary transition-all hover:border-border-muted hover:bg-bg-hover"
                   @click="activeTab = 'templates'"
                 >
-                  <div class="flex size-8 items-center justify-center rounded-md bg-blue-100">
+                  <div class="flex size-8 items-center justify-center rounded-md bg-accent/10">
                     <Icon
                       name="lucide:plus"
-                      class="size-4 text-blue-600"
+                      class="size-4 text-accent"
                     />
                   </div>
                   New Briefing
                 </button>
                 <button
                   type="button"
-                  class="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-100"
+                  class="flex w-full items-center gap-3 rounded-lg border border-border-subtle bg-bg-surface px-4 py-3 text-left text-sm font-medium text-text-secondary transition-all hover:border-border-muted hover:bg-bg-hover"
                   @click="activeTab = 'history'"
                 >
-                  <div class="flex size-8 items-center justify-center rounded-md bg-slate-200">
+                  <div class="flex size-8 items-center justify-center rounded-md bg-bg-hover">
                     <Icon
                       name="lucide:history"
-                      class="size-4 text-slate-600"
+                      class="size-4 text-text-secondary"
                     />
                   </div>
                   View History
@@ -624,15 +624,15 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
             <!-- Recent Activity -->
             <div
               v-if="recentGenerations.length > 0"
-              class="rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm"
+              class="rounded-xl border border-border-subtle bg-bg-elevated p-5 shadow-sm"
             >
               <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-slate-900">
+                <h3 class="text-sm font-semibold text-text-primary">
                   Recent
                 </h3>
                 <button
                   type="button"
-                  class="text-xs font-medium text-blue-600 hover:text-blue-700"
+                  class="text-xs font-medium text-accent hover:text-accent/80"
                   @click="activeTab = 'history'"
                 >
                   View all
@@ -643,34 +643,34 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
                   v-for="gen in recentGenerations"
                   :key="gen.id"
                   type="button"
-                  class="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-slate-50"
+                  class="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-bg-hover"
                   @click="handleViewGeneration(gen.id)"
                 >
                   <div
                     class="flex size-8 shrink-0 items-center justify-center rounded-md"
                     :class="{
-                      'bg-emerald-100': gen.status === 'completed',
-                      'bg-blue-100': gen.status === 'processing' || gen.status === 'pending',
-                      'bg-red-100': gen.status === 'failed',
-                      'bg-slate-100': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
+                      'bg-emerald-500/10': gen.status === 'completed',
+                      'bg-blue-500/10': gen.status === 'processing' || gen.status === 'pending',
+                      'bg-red-500/10': gen.status === 'failed',
+                      'bg-bg-surface': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
                     }"
                   >
                     <Icon
                       :name="gen.status === 'completed' ? 'lucide:check' : gen.status === 'failed' ? 'lucide:x' : 'lucide:loader-2'"
                       class="size-4"
                       :class="{
-                        'text-emerald-600': gen.status === 'completed',
-                        'text-blue-600 animate-spin': gen.status === 'processing' || gen.status === 'pending',
-                        'text-red-600': gen.status === 'failed',
-                        'text-slate-500': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
+                        'text-emerald-400': gen.status === 'completed',
+                        'text-blue-400 animate-spin': gen.status === 'processing' || gen.status === 'pending',
+                        'text-red-400': gen.status === 'failed',
+                        'text-text-muted': !['completed', 'processing', 'pending', 'failed'].includes(gen.status),
                       }"
                     />
                   </div>
                   <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium text-slate-900">
+                    <p class="truncate text-sm font-medium text-text-primary">
                       {{ gen.briefing?.title ?? 'Briefing' }}
                     </p>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-xs text-text-muted">
                       {{ new Date(gen.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }}
                     </p>
                   </div>
@@ -679,35 +679,35 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
             </div>
 
             <!-- What are Briefings -->
-            <div class="rounded-xl border border-slate-200/60 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm">
-              <div class="mb-3 flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+            <div class="rounded-xl border border-border-subtle bg-gradient-to-br from-bg-elevated to-bg-surface p-5 shadow-sm">
+              <div class="mb-3 flex size-10 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-teal-600">
                 <Icon
                   name="lucide:lightbulb"
                   class="size-5 text-white"
                 />
               </div>
-              <h3 class="mb-2 text-sm font-semibold text-slate-900">
+              <h3 class="mb-2 text-sm font-semibold text-text-primary">
                 What are Briefings?
               </h3>
-              <p class="text-sm leading-relaxed text-slate-600">
+              <p class="text-sm leading-relaxed text-text-secondary">
                 AI-powered reports that transform your raw development data into meaningful narratives. Perfect for standups, team updates, and celebrating wins.
               </p>
               <div class="mt-4 flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1 rounded-full bg-bg-surface px-2.5 py-1 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:zap"
                     class="size-3"
                   />
                   Automated
                 </span>
-                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1 rounded-full bg-bg-surface px-2.5 py-1 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:clock"
                     class="size-3"
                   />
                   Schedulable
                 </span>
-                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1 rounded-full bg-bg-surface px-2.5 py-1 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:share-2"
                     class="size-3"
@@ -749,35 +749,35 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
       >
         <div
           v-if="isGenerating"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-bg-app/95 backdrop-blur-sm"
         >
           <div class="text-center">
             <div class="relative mx-auto size-20">
-              <div class="absolute inset-0 animate-ping rounded-full bg-blue-100" />
-              <div class="relative flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-xl shadow-blue-500/30">
+              <div class="absolute inset-0 animate-ping rounded-full bg-accent/20" />
+              <div class="relative flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-accent to-teal-600 shadow-xl shadow-accent/30">
                 <Icon
                   name="lucide:sparkles"
                   class="size-8 animate-pulse text-white"
                 />
               </div>
             </div>
-            <h3 class="mt-6 text-lg font-semibold text-slate-900">
+            <h3 class="mt-6 text-lg font-semibold text-text-primary">
               Generating your briefing
             </h3>
-            <p class="mt-1 text-sm text-slate-500">
+            <p class="mt-1 text-sm text-text-muted">
               {{ selectedBriefing?.title }}
             </p>
             <div class="mt-6 flex justify-center gap-1">
               <span
-                class="size-2 animate-bounce rounded-full bg-blue-500"
+                class="size-2 animate-bounce rounded-full bg-accent"
                 style="animation-delay: 0ms;"
               />
               <span
-                class="size-2 animate-bounce rounded-full bg-blue-500"
+                class="size-2 animate-bounce rounded-full bg-accent"
                 style="animation-delay: 150ms;"
               />
               <span
-                class="size-2 animate-bounce rounded-full bg-blue-500"
+                class="size-2 animate-bounce rounded-full bg-accent"
                 style="animation-delay: 300ms;"
               />
             </div>
@@ -787,3 +787,9 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
     </div>
   </BaseContainer>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>
