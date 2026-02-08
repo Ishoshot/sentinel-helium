@@ -583,7 +583,7 @@ watch(showPromotionModal, (isOpen) => {
                 <div class="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-lg transition-all hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 shadow-lg transition-all hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                     :disabled="!canManage || currentPlan.tier === 'foundation' || isPortalLoading"
                     @click="handleOpenPortal"
                   >
@@ -747,7 +747,7 @@ watch(showPromotionModal, (isOpen) => {
               <button
                 type="button"
                 class="relative z-10 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
-                :class="billingInterval === 'monthly' ? 'text-text-primary' : 'text-text-muted'"
+                :class="billingInterval === 'monthly' ? 'text-zinc-900' : 'text-text-muted'"
                 @click="billingInterval = 'monthly'"
               >
                 Monthly
@@ -755,7 +755,7 @@ watch(showPromotionModal, (isOpen) => {
               <button
                 type="button"
                 class="relative z-10 flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
-                :class="billingInterval === 'yearly' ? 'text-text-primary' : 'text-text-muted'"
+                :class="billingInterval === 'yearly' ? 'text-zinc-900' : 'text-text-muted'"
                 @click="billingInterval = 'yearly'"
               >
                 Yearly
@@ -827,7 +827,7 @@ watch(showPromotionModal, (isOpen) => {
           <div
             v-for="(plan, index) in sortedPlans"
             :key="plan.id"
-            class="plan-card group relative flex flex-col rounded-2xl border bg-white transition-all duration-300"
+            class="plan-card group relative flex flex-col rounded-2xl border bg-bg-elevated transition-all duration-300"
             :class="[
               plan.tier === highlightedTier
                 ? 'border-accent shadow-xl shadow-accent/20 ring-1 ring-accent'
@@ -859,7 +859,7 @@ watch(showPromotionModal, (isOpen) => {
                   </span>
                   <span
                     v-else-if="currentPlan?.id === plan.id"
-                    class="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700"
+                    class="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400"
                   >
                     Current
                   </span>
@@ -887,7 +887,7 @@ watch(showPromotionModal, (isOpen) => {
                 </div>
                 <p
                   v-if="plan.yearly_savings_percent > 0 && billingInterval === 'yearly'"
-                  class="mt-1.5 text-xs font-semibold text-emerald-600"
+                  class="mt-1.5 text-xs font-semibold text-emerald-400"
                 >
                   Save {{ plan.yearly_savings_percent }}% vs monthly
                 </p>
@@ -924,12 +924,12 @@ watch(showPromotionModal, (isOpen) => {
                 >
                   <div
                     class="flex size-5 items-center justify-center rounded-full"
-                    :class="enabled ? 'bg-emerald-100' : 'bg-slate-100'"
+                    :class="enabled ? 'bg-emerald-500/10' : 'bg-bg-surface'"
                   >
                     <Icon
                       :name="enabled ? 'lucide:check' : 'lucide:minus'"
                       class="size-3"
-                      :class="enabled ? 'text-emerald-600' : 'text-slate-400'"
+                      :class="enabled ? 'text-emerald-400' : 'text-text-muted'"
                     />
                   </div>
                   <span
@@ -947,10 +947,10 @@ watch(showPromotionModal, (isOpen) => {
                 class="w-full rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-200"
                 :class="[
                   currentPlan?.id === plan.id
-                    ? 'cursor-default bg-emerald-50 text-emerald-700'
+                    ? 'cursor-default bg-emerald-500/10 text-emerald-400'
                     : plan.tier === highlightedTier
-                      ? 'bg-accent text-white shadow-lg shadow-accent/30 hover:bg-accent-hover hover:shadow-xl hover:shadow-accent/40 active:scale-[0.98]'
-                      : 'bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.98]',
+                      ? 'bg-gradient-to-r from-accent to-teal-600 text-white shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/40 active:scale-[0.98]'
+                      : 'bg-text-primary text-bg-app hover:bg-text-secondary active:scale-[0.98]',
                   (!canManage || planActionDisabled(plan)) && currentPlan?.id !== plan.id ? 'cursor-not-allowed opacity-50' : ''
                 ]"
                 :disabled="!canManage || planActionDisabled(plan) || pendingPlanId === plan.id"

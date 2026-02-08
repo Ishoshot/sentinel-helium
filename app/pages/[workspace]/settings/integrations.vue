@@ -231,7 +231,7 @@ function goToRepositories() {
               <span class="text-sm font-medium text-white">{{ activeIntegrationsCount }} Active</span>
             </div>
             <div class="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-sm ring-1 ring-white/10">
-              <span class="flex size-2 rounded-full bg-slate-400" />
+              <span class="flex size-2 rounded-full bg-zinc-400" />
               <span class="text-sm font-medium text-white">{{ comingSoonIntegrations.length }} Coming</span>
             </div>
           </div>
@@ -288,17 +288,17 @@ function goToRepositories() {
       >
         <!-- Section Header -->
         <div class="mb-5 flex items-center gap-3">
-          <div class="flex size-10 items-center justify-center rounded-xl bg-slate-900">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-bg-surface">
             <Icon
               name="lucide:git-branch"
-              class="size-5 text-white"
+              class="size-5 text-text-primary"
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-slate-900">
+            <h2 class="text-base font-semibold text-text-primary">
               Source Control
             </h2>
-            <p class="text-sm text-slate-500">
+            <p class="text-sm text-text-muted">
               Connect repositories for automated code reviews
             </p>
           </div>
@@ -319,42 +319,42 @@ function goToRepositories() {
 
         <!-- Integration Benefits Card -->
         <div
-          class="mt-6 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 transition-all duration-700 delay-300"
+          class="mt-6 rounded-2xl border border-border-subtle bg-gradient-to-br from-bg-surface to-bg-elevated p-6 transition-all duration-700 delay-300"
           :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
         >
           <div class="flex items-start gap-4">
-            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
               <Icon
                 name="lucide:lightbulb"
-                class="size-5 text-amber-600"
+                class="size-5 text-amber-400"
               />
             </div>
             <div>
-              <h3 class="text-sm font-semibold text-slate-900">
+              <h3 class="text-sm font-semibold text-text-primary">
                 Why connect integrations?
               </h3>
-              <p class="mt-1 text-sm text-slate-600">
+              <p class="mt-1 text-sm text-text-secondary">
                 Enable automated code reviews, security scanning, and real-time alerts across your entire workflow.
               </p>
               <div class="mt-4 flex flex-wrap gap-3">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:check"
-                    class="size-3 text-emerald-500"
+                    class="size-3 text-emerald-400"
                   />
                   Instant feedback
                 </span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:check"
-                    class="size-3 text-emerald-500"
+                    class="size-3 text-emerald-400"
                   />
                   Zero setup
                 </span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary">
                   <Icon
                     name="lucide:check"
-                    class="size-3 text-emerald-500"
+                    class="size-3 text-emerald-400"
                   />
                   Secure by default
                 </span>
@@ -378,10 +378,10 @@ function goToRepositories() {
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-slate-900">
+            <h2 class="text-base font-semibold text-text-primary">
               Coming Soon
             </h2>
-            <p class="text-sm text-slate-500">
+            <p class="text-sm text-text-muted">
               More integrations on the roadmap
             </p>
           </div>
@@ -406,23 +406,23 @@ function goToRepositories() {
 
         <!-- Request Integration -->
         <div
-          class="mt-6 rounded-xl border-2 border-dashed border-slate-200 p-5 text-center transition-all duration-700 delay-500"
+          class="mt-6 rounded-xl border-2 border-dashed border-border-subtle p-5 text-center transition-all duration-700 delay-500"
           :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
         >
-          <div class="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-slate-100">
+          <div class="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-bg-surface">
             <Icon
               name="lucide:plus"
-              class="size-5 text-slate-400"
+              class="size-5 text-text-muted"
             />
           </div>
-          <p class="text-sm font-medium text-slate-700">
+          <p class="text-sm font-medium text-text-secondary">
             Need a different integration?
           </p>
-          <p class="mt-1 text-xs text-slate-500">
+          <p class="mt-1 text-xs text-text-muted">
             Let us know what tools you'd like to connect
           </p>
           <button
-            class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-4 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-200"
+            class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-bg-surface px-4 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
           >
             <Icon
               name="lucide:message-circle"

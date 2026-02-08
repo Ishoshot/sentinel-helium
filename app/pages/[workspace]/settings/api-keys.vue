@@ -160,17 +160,13 @@ function getProviderLabel(provider: string | null) {
           style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 20h40v1H0zM20 0v40h1V0z\'/%3E%3C/g%3E%3C/svg%3E');"
         />
 
-        <!-- Glow effects -->
-        <div class="absolute -right-32 -top-32 size-80 rounded-full bg-amber-500/20 blur-3xl" />
-        <div class="absolute -bottom-20 -left-20 size-60 rounded-full bg-violet-500/15 blur-3xl" />
-
         <!-- Content -->
         <div class="relative z-10 p-8 lg:p-10">
           <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <!-- Left: Info -->
             <div class="max-w-xl">
               <div class="mb-5 flex items-center gap-4">
-                <div class="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
+                <div class="flex size-14 items-center justify-center rounded-2xl bg-white/10">
                   <Icon
                     name="lucide:key-round"
                     class="size-7 text-white"
@@ -258,7 +254,7 @@ function getProviderLabel(provider: string | null) {
             <NuxtLink :to="`/${workspaceSlug}/settings/integrations`">
               <button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
+                class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-glow active:scale-[0.98]"
               >
                 <Icon
                   name="lucide:link"
@@ -387,12 +383,12 @@ function getProviderLabel(provider: string | null) {
                   <div
                     class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
                     :class="repo.auto_review_enabled
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-slate-100 text-slate-600'"
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : 'bg-bg-surface text-text-muted'"
                   >
                     <span
                       class="size-1.5 rounded-full"
-                      :class="repo.auto_review_enabled ? 'bg-emerald-500' : 'bg-slate-400'"
+                      :class="repo.auto_review_enabled ? 'bg-emerald-400' : 'bg-text-muted'"
                     />
                     {{ repo.auto_review_enabled ? 'Active' : 'Inactive' }}
                   </div>
@@ -458,7 +454,7 @@ function getProviderLabel(provider: string | null) {
             <NuxtLink :to="`/${workspaceSlug}/repositories`">
               <button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 active:scale-[0.98]"
+                class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-glow active:scale-[0.98]"
               >
                 <Icon
                   name="lucide:folder-sync"
@@ -497,5 +493,9 @@ function getProviderLabel(provider: string | null) {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
 }
 </style>

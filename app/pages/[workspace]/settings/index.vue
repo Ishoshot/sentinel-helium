@@ -98,19 +98,19 @@ const hasChanges = computed(() =>
       :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
     >
       <!-- Left Column - General settings -->
-      <div class="rounded-xl border border-gray-200 bg-white p-6">
+      <div class="rounded-xl border border-border-subtle bg-bg-elevated p-6">
         <div class="flex items-center gap-3 mb-6">
-          <div class="flex size-10 items-center justify-center rounded-xl bg-gray-100">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-bg-surface">
             <Icon
               name="lucide:settings"
-              class="size-5 text-gray-500"
+              class="size-5 text-text-muted"
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-gray-900">
+            <h2 class="text-base font-semibold text-text-primary">
               General
             </h2>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-text-muted">
               Basic workspace configuration
             </p>
           </div>
@@ -140,7 +140,7 @@ const hasChanges = computed(() =>
 
           <p
             v-if="!canEdit"
-            class="mt-4 text-sm text-gray-500"
+            class="mt-4 text-sm text-text-muted"
           >
             Only workspace owners and admins can edit settings.
           </p>
@@ -150,26 +150,26 @@ const hasChanges = computed(() =>
       <!-- Right Column - Danger zone (owner only) -->
       <div
         v-if="isOwner"
-        class="h-fit rounded-xl border border-red-200 bg-white p-6"
+        class="h-fit rounded-xl border border-red-500/20 bg-bg-elevated p-6"
       >
         <div class="flex items-center gap-3 mb-6">
-          <div class="flex size-10 items-center justify-center rounded-xl bg-red-50">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-red-500/10">
             <Icon
               name="lucide:alert-triangle"
-              class="size-5 text-red-600"
+              class="size-5 text-red-400"
             />
           </div>
           <div>
-            <h2 class="text-base font-semibold text-red-700">
+            <h2 class="text-base font-semibold text-red-400">
               Danger Zone
             </h2>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-text-muted">
               Irreversible actions
             </p>
           </div>
         </div>
 
-        <p class="text-sm text-gray-600 mb-5">
+        <p class="text-sm text-text-secondary mb-5">
           Permanently delete this workspace and all of its data including members, integrations, and settings. This action cannot be undone.
         </p>
 
@@ -193,15 +193,15 @@ const hasChanges = computed(() =>
       size="sm"
     >
       <div class="space-y-4">
-        <div class="rounded-lg bg-red-50 p-3">
-          <p class="text-sm text-red-700">
+        <div class="rounded-lg bg-red-500/10 p-3">
+          <p class="text-sm text-red-400">
             This will permanently delete the workspace
             <strong>{{ workspaceStore.currentWorkspace?.name }}</strong>
             and all associated data including members and settings.
           </p>
         </div>
 
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-text-secondary">
           To confirm, type the workspace name below:
         </p>
 
