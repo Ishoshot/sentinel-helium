@@ -92,7 +92,7 @@ export function useBilling(workspaceId: Ref<number | null>) {
   async function changePlan(
     planTier: PlanTier,
     billingInterval: BillingInterval,
-    promoCode?: string | null
+    promoCode?: string | null,
   ): Promise<ChangePlanResult> {
     if (!workspaceId.value) {
       return {
@@ -139,7 +139,7 @@ export function useBilling(workspaceId: Ref<number | null>) {
       let promoCodeError: string | null = null;
       if (e instanceof ApiError && e.errors) {
         if (e.errors.promo_code?.length) {
-          promoCodeError = e.errors.promo_code[0];
+          promoCodeError = e.errors.promo_code[0] ?? null;
           const otherErrors = Object.entries(e.errors)
             .filter(([key]) => key !== "promo_code")
             .flatMap(([, value]) => value);
@@ -147,7 +147,8 @@ export function useBilling(workspaceId: Ref<number | null>) {
             error.value = otherErrors.join(", ");
           }
         } else {
-          error.value = e.allErrors.length > 0 ? e.allErrors.join(", ") : e.message;
+          error.value =
+            e.allErrors.length > 0 ? e.allErrors.join(", ") : e.message;
         }
       } else if (e instanceof ApiError && e.status === 403) {
         error.value = "Only workspace owners can manage subscriptions";

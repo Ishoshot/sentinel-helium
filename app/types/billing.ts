@@ -30,20 +30,43 @@ export interface PlanFeatures {
   audit_logs: boolean;
 }
 
+export type PlanColor = "slate" | "blue" | "purple" | "amber";
+
 export interface Plan {
   id: number;
   tier: PlanTier;
   description: string | null;
+
+  // Limits
   monthly_runs_limit: number | null;
   monthly_commands_limit: number | null;
   team_size_limit: number | null;
-  features: PlanFeatures;
+
+  // Pricing (core fields)
   price_monthly_cents: number | null;
   price_monthly: string | null;
   price_yearly_cents: number | null;
   price_yearly: string | null;
   yearly_savings_percent: number;
   currency: string | null;
+
+  // Features
+  features: PlanFeatures;
+
+  // Extended fields (for landing/pricing pages)
+  name?: string;
+  runs_label?: string;
+  commands_label?: string;
+  team_size_label?: string;
+  price?: number;
+  price_label?: string;
+  period?: string;
+  feature_list?: string[];
+  support?: string;
+  highlighted?: boolean;
+  cta?: string;
+  cta_link?: string;
+  color?: PlanColor;
 }
 
 export interface Subscription {

@@ -1,8 +1,8 @@
 /**
  * Repository and Sentinel Configuration types
  */
-import type { FindingSeverity } from './enums'
-import type { Installation } from './integrations'
+import type { FindingSeverity } from "./enums";
+import type { Installation } from "./integrations";
 
 export type SentinelConfigTone =
   | "strict"
@@ -92,6 +92,8 @@ export interface Repository {
   language: string | null;
   description: string | null;
   auto_review_enabled: boolean;
+  byok_provider: string | null;
+  byok_model: string | null;
   settings: RepositorySettings | null;
   installation?: Installation;
   created_at: string;
@@ -106,7 +108,7 @@ export interface UpdateRepositoryData {
  * Response from preparing a config branch
  */
 export interface CreateConfigPrResponse {
-  status: 'ready' | 'skipped' | 'error';
+  status: "ready" | "skipped" | "error";
   compare_url?: string;
   message?: string;
 }
