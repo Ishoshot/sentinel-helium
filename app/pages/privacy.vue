@@ -1,71 +1,74 @@
 <script setup lang="ts">
-import { hasToken } from "~/services/core/api";
+import { hasToken } from '~/services/core/api'
 
 /**
  * Privacy Policy Page
- *
- * Comprehensive privacy policy explaining data collection,
- * processing, and protection practices for Sentinel.
+ * Premium dark theme with teal accents
  */
 
 definePageMeta({
   layout: false,
-});
+})
+
+usePageSeo({
+  title: 'Privacy Policy',
+  description: 'Learn how Sentinel collects, uses, and protects your data. We are committed to safeguarding your code and personal information.',
+  path: '/privacy',
+})
 
 useHead({
-  title: "Privacy Policy - Sentinel",
   htmlAttrs: {
-    class: "scroll-smooth",
+    class: 'scroll-smooth',
   },
   bodyAttrs: {
-    class: "bg-white",
+    class: 'bg-[#09090b]',
   },
-});
+})
 
-const isCheckingAuth = ref(true);
-const isAuthenticated = ref(false);
-const scrolled = ref(false);
+const isCheckingAuth = ref(true)
+const isAuthenticated = ref(false)
+const scrolled = ref(false)
 
 onMounted(async () => {
   if (hasToken()) {
-    isAuthenticated.value = true;
+    isAuthenticated.value = true
   }
-  isCheckingAuth.value = false;
+  isCheckingAuth.value = false
 
-  window.addEventListener("scroll", handleScroll);
-});
+  window.addEventListener('scroll', handleScroll)
+})
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+  window.removeEventListener('scroll', handleScroll)
+})
 
 function handleScroll() {
-  scrolled.value = window.scrollY > 20;
+  scrolled.value = window.scrollY > 20
 }
 
-const lastUpdated = "January 18, 2026";
-const effectiveDate = "January 18, 2026";
+const lastUpdated = 'January 18, 2026'
+const effectiveDate = 'January 18, 2026'
 
 const sections = [
-  { id: "introduction", label: "Introduction" },
-  { id: "information-we-collect", label: "Information We Collect" },
-  { id: "how-we-use-information", label: "How We Use Information" },
-  { id: "code-and-repository-data", label: "Code & Repository Data" },
-  { id: "ai-and-third-party-processors", label: "AI & Third-Party Processors" },
-  { id: "data-retention", label: "Data Retention" },
-  { id: "security-measures", label: "Security Measures" },
-  { id: "cookies-and-analytics", label: "Cookies & Analytics" },
-  { id: "user-rights", label: "Your Rights" },
-  { id: "contact", label: "Contact Us" },
-];
+  { id: 'introduction', label: 'Introduction' },
+  { id: 'information-we-collect', label: 'Information We Collect' },
+  { id: 'how-we-use-information', label: 'How We Use Information' },
+  { id: 'code-and-repository-data', label: 'Code & Repository Data' },
+  { id: 'ai-and-third-party-processors', label: 'AI & Third-Party Processors' },
+  { id: 'data-retention', label: 'Data Retention' },
+  { id: 'security-measures', label: 'Security Measures' },
+  { id: 'cookies-and-analytics', label: 'Cookies & Analytics' },
+  { id: 'user-rights', label: 'Your Rights' },
+  { id: 'contact', label: 'Contact Us' },
+]
 
-const activeSection = ref("introduction");
+const activeSection = ref('introduction')
 
 function scrollToSection(id: string) {
-  const element = document.getElementById(id);
+  const element = document.getElementById(id)
   if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
-    activeSection.value = id;
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    activeSection.value = id
   }
 }
 </script>
@@ -74,20 +77,18 @@ function scrollToSection(id: string) {
   <!-- Loading state -->
   <div
     v-if="isCheckingAuth"
-    class="landing-light min-h-screen flex items-center justify-center"
+    class="landing-dark min-h-screen flex items-center justify-center"
   >
     <div class="flex flex-col items-center gap-4">
-      <div
-        class="w-8 h-8 border-2 border-[var(--landing-border-subtle)] border-t-[var(--landing-accent)] rounded-full animate-spin"
-      />
-      <span class="text-[var(--landing-text-muted)] text-sm">Loading...</span>
+      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
+      <span class="text-zinc-500 text-sm">Loading...</span>
     </div>
   </div>
 
   <!-- Privacy Policy page -->
   <div
     v-else
-    class="landing-light min-h-screen antialiased"
+    class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -96,22 +97,22 @@ function scrollToSection(id: string) {
     />
 
     <!-- Hero -->
-    <section class="pt-32 lg:pt-40 pb-12 lg:pb-16 bg-slate-50 border-b border-slate-200">
+    <section class="pt-32 lg:pt-40 pb-12 lg:pb-16 bg-[#0f0f12] border-b border-zinc-800/50">
       <div class="max-w-4xl mx-auto px-6 text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600 mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800/50 text-xs font-medium text-zinc-400 mb-6">
           <Icon
             name="lucide:shield-check"
             class="w-3.5 h-3.5"
           />
           Legal
         </div>
-        <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-slate-900">
+        <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
           Privacy Policy
         </h1>
-        <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+        <p class="mt-4 text-lg text-zinc-400 max-w-2xl mx-auto">
           How we collect, use, and protect your information
         </p>
-        <div class="mt-6 flex items-center justify-center gap-6 text-sm text-slate-500">
+        <div class="mt-6 flex items-center justify-center gap-6 text-sm text-zinc-500">
           <span class="flex items-center gap-1.5">
             <Icon
               name="lucide:calendar"
@@ -137,7 +138,7 @@ function scrollToSection(id: string) {
           <!-- Sidebar Navigation -->
           <aside class="hidden lg:block lg:col-span-3">
             <div class="sticky top-28">
-              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-4">
                 On this page
               </h3>
               <nav class="space-y-1">
@@ -147,8 +148,8 @@ function scrollToSection(id: string) {
                   type="button"
                   class="block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors"
                   :class="activeSection === section.id
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+                    ? 'bg-teal-500/10 text-teal-400 font-medium'
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50'"
                   @click="scrollToSection(section.id)"
                 >
                   {{ section.label }}
@@ -158,7 +159,7 @@ function scrollToSection(id: string) {
           </aside>
 
           <!-- Content -->
-          <article class="lg:col-span-9 prose prose-slate max-w-none">
+          <article class="lg:col-span-9 prose prose-invert landing-legal-prose max-w-none">
             <!-- Introduction -->
             <section id="introduction">
               <h2>Introduction</h2>
@@ -243,20 +244,20 @@ function scrollToSection(id: string) {
             <section id="code-and-repository-data">
               <h2>Code & Repository Data</h2>
 
-              <div class="not-prose my-8 p-6 bg-blue-50 border border-blue-100 rounded-xl">
+              <div class="not-prose my-8 p-6 bg-teal-500/10 border border-teal-500/20 rounded-xl">
                 <div class="flex items-start gap-4">
-                  <div class="shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <div class="shrink-0 w-10 h-10 rounded-lg bg-teal-500/20 flex items-center justify-center">
                     <Icon
                       name="lucide:lock"
-                      class="w-5 h-5 text-blue-600"
+                      class="w-5 h-5 text-teal-400"
                     />
                   </div>
                   <div>
-                    <h4 class="font-semibold text-slate-900 mb-2">
+                    <h4 class="font-semibold text-white mb-2">
                       Our Code Privacy Commitment
                     </h4>
-                    <p class="text-slate-700 leading-relaxed">
-                      Sentinel processes source code and repository data solely for the purpose of providing code review and analysis services. <strong>Customer code is not used to train public machine learning models.</strong>
+                    <p class="text-zinc-300 leading-relaxed">
+                      Sentinel processes source code and repository data solely for the purpose of providing code review and analysis services. <strong class="text-white">Customer code is not used to train public machine learning models.</strong>
                     </p>
                   </div>
                 </div>
@@ -327,56 +328,56 @@ function scrollToSection(id: string) {
               <h2>Data Retention</h2>
               <p>We retain different types of data for different periods:</p>
 
-              <div class="not-prose my-6 overflow-hidden rounded-xl border border-slate-200">
+              <div class="not-prose my-6 overflow-hidden rounded-xl border border-zinc-800/50">
                 <table class="w-full text-sm">
-                  <thead class="bg-slate-50">
+                  <thead class="bg-zinc-900/50">
                     <tr>
-                      <th class="text-left py-3 px-4 font-semibold text-slate-900">
+                      <th class="text-left py-3 px-4 font-semibold text-zinc-300">
                         Data Type
                       </th>
-                      <th class="text-left py-3 px-4 font-semibold text-slate-900">
+                      <th class="text-left py-3 px-4 font-semibold text-zinc-300">
                         Retention Period
                       </th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-200">
+                  <tbody class="divide-y divide-zinc-800/30">
                     <tr>
-                      <td class="py-3 px-4 text-slate-700">
+                      <td class="py-3 px-4 text-zinc-300">
                         Account information
                       </td>
-                      <td class="py-3 px-4 text-slate-600">
+                      <td class="py-3 px-4 text-zinc-400">
                         Until account deletion
                       </td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-4 text-slate-700">
+                      <td class="py-3 px-4 text-zinc-300">
                         Code content (review processing)
                       </td>
-                      <td class="py-3 px-4 text-slate-600">
+                      <td class="py-3 px-4 text-zinc-400">
                         Temporary (during review)
                       </td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-4 text-slate-700">
+                      <td class="py-3 px-4 text-zinc-300">
                         Review findings
                       </td>
-                      <td class="py-3 px-4 text-slate-600">
+                      <td class="py-3 px-4 text-zinc-400">
                         90 days (configurable)
                       </td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-4 text-slate-700">
+                      <td class="py-3 px-4 text-zinc-300">
                         Audit logs
                       </td>
-                      <td class="py-3 px-4 text-slate-600">
+                      <td class="py-3 px-4 text-zinc-400">
                         1 year
                       </td>
                     </tr>
                     <tr>
-                      <td class="py-3 px-4 text-slate-700">
+                      <td class="py-3 px-4 text-zinc-300">
                         Billing records
                       </td>
-                      <td class="py-3 px-4 text-slate-600">
+                      <td class="py-3 px-4 text-zinc-400">
                         As required by law (typically 7 years)
                       </td>
                     </tr>
@@ -490,9 +491,9 @@ function scrollToSection(id: string) {
                 Users in other jurisdictions may have similar rights under applicable local data protection laws. We are committed to honoring data subject rights regardless of location.
               </p>
 
-              <div class="not-prose my-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
-                <p class="text-sm text-slate-600">
-                  <strong>Note:</strong> Sentinel does not sell personal information. We process personal data only as described in this policy.
+              <div class="not-prose my-6 p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-lg">
+                <p class="text-sm text-zinc-400">
+                  <strong class="text-zinc-300">Note:</strong> Sentinel does not sell personal information. We process personal data only as described in this policy.
                 </p>
               </div>
             </section>
@@ -531,40 +532,3 @@ function scrollToSection(id: string) {
     <LandingFooter />
   </div>
 </template>
-
-<style scoped>
-/* Prose customizations for legal content */
-.prose h2 {
-  @apply text-2xl font-semibold text-slate-900 mt-12 mb-4 pb-2 border-b border-slate-200 first:mt-0;
-  scroll-margin-top: 6rem;
-}
-
-.prose h3 {
-  @apply text-lg font-semibold text-slate-900 mt-8 mb-3;
-}
-
-.prose p {
-  @apply text-slate-600 leading-relaxed mb-4;
-}
-
-.prose ul {
-  @apply mb-4 pl-6 space-y-2;
-}
-
-.prose li {
-  @apply text-slate-600;
-}
-
-.prose a {
-  @apply text-blue-600 hover:text-blue-700 underline;
-}
-
-.prose strong {
-  @apply font-semibold text-slate-800;
-}
-
-/* Add IDs for scroll targeting */
-.prose section {
-  scroll-margin-top: 6rem;
-}
-</style>

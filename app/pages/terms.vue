@@ -1,74 +1,77 @@
 <script setup lang="ts">
-import { hasToken } from "~/services/core/api";
+import { hasToken } from '~/services/core/api'
 
 /**
  * Terms of Service Page
- *
- * Comprehensive terms governing the use of Sentinel,
- * including acceptable use, liability limitations, and legal terms.
+ * Premium dark theme with teal accents
  */
 
 definePageMeta({
   layout: false,
-});
+})
+
+usePageSeo({
+  title: 'Terms of Service',
+  description: 'Terms governing the use of Sentinel, the AI-powered code review platform. Read about acceptable use, billing, and your rights.',
+  path: '/terms',
+})
 
 useHead({
-  title: "Terms of Service - Sentinel",
   htmlAttrs: {
-    class: "scroll-smooth",
+    class: 'scroll-smooth',
   },
   bodyAttrs: {
-    class: "bg-white",
+    class: 'bg-[#09090b]',
   },
-});
+})
 
-const isCheckingAuth = ref(true);
-const isAuthenticated = ref(false);
-const scrolled = ref(false);
+const isCheckingAuth = ref(true)
+const isAuthenticated = ref(false)
+const scrolled = ref(false)
 
 onMounted(async () => {
   if (hasToken()) {
-    isAuthenticated.value = true;
+    isAuthenticated.value = true
   }
-  isCheckingAuth.value = false;
+  isCheckingAuth.value = false
 
-  window.addEventListener("scroll", handleScroll);
-});
+  window.addEventListener('scroll', handleScroll)
+})
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
+  window.removeEventListener('scroll', handleScroll)
+})
 
 function handleScroll() {
-  scrolled.value = window.scrollY > 20;
+  scrolled.value = window.scrollY > 20
 }
 
-const lastUpdated = "January 18, 2026";
-const effectiveDate = "January 18, 2026";
+const lastUpdated = 'January 18, 2026'
+const effectiveDate = 'January 18, 2026'
 
 const sections = [
-  { id: "acceptance", label: "Acceptance of Terms" },
-  { id: "description", label: "Service Description" },
-  { id: "eligibility", label: "Eligibility" },
-  { id: "accounts", label: "Accounts & Access" },
-  { id: "acceptable-use", label: "Acceptable Use" },
-  { id: "subscription", label: "Subscription & Billing" },
-  { id: "byok", label: "BYOK Responsibility" },
-  { id: "intellectual-property", label: "Intellectual Property" },
-  { id: "ai-limitations", label: "AI Limitations" },
-  { id: "liability", label: "Limitation of Liability" },
-  { id: "termination", label: "Termination" },
-  { id: "governing-law", label: "Governing Law" },
-  { id: "contact", label: "Contact" },
-];
+  { id: 'acceptance', label: 'Acceptance of Terms' },
+  { id: 'description', label: 'Service Description' },
+  { id: 'eligibility', label: 'Eligibility' },
+  { id: 'accounts', label: 'Accounts & Access' },
+  { id: 'acceptable-use', label: 'Acceptable Use' },
+  { id: 'subscription', label: 'Subscription & Billing' },
+  { id: 'byok', label: 'BYOK Responsibility' },
+  { id: 'intellectual-property', label: 'Intellectual Property' },
+  { id: 'ai-limitations', label: 'AI Limitations' },
+  { id: 'liability', label: 'Limitation of Liability' },
+  { id: 'termination', label: 'Termination' },
+  { id: 'governing-law', label: 'Governing Law' },
+  { id: 'contact', label: 'Contact' },
+]
 
-const activeSection = ref("acceptance");
+const activeSection = ref('acceptance')
 
 function scrollToSection(id: string) {
-  const element = document.getElementById(id);
+  const element = document.getElementById(id)
   if (element) {
-    element.scrollIntoView({ behavior: "smooth", block: "start" });
-    activeSection.value = id;
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    activeSection.value = id
   }
 }
 </script>
@@ -77,20 +80,18 @@ function scrollToSection(id: string) {
   <!-- Loading state -->
   <div
     v-if="isCheckingAuth"
-    class="landing-light min-h-screen flex items-center justify-center"
+    class="landing-dark min-h-screen flex items-center justify-center"
   >
     <div class="flex flex-col items-center gap-4">
-      <div
-        class="w-8 h-8 border-2 border-[var(--landing-border-subtle)] border-t-[var(--landing-accent)] rounded-full animate-spin"
-      />
-      <span class="text-[var(--landing-text-muted)] text-sm">Loading...</span>
+      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
+      <span class="text-zinc-500 text-sm">Loading...</span>
     </div>
   </div>
 
   <!-- Terms of Service page -->
   <div
     v-else
-    class="landing-light min-h-screen antialiased"
+    class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -99,22 +100,22 @@ function scrollToSection(id: string) {
     />
 
     <!-- Hero -->
-    <section class="pt-32 lg:pt-40 pb-12 lg:pb-16 bg-slate-50 border-b border-slate-200">
+    <section class="pt-32 lg:pt-40 pb-12 lg:pb-16 bg-[#0f0f12] border-b border-zinc-800/50">
       <div class="max-w-4xl mx-auto px-6 text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-medium text-slate-600 mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800/50 text-xs font-medium text-zinc-400 mb-6">
           <Icon
             name="lucide:file-text"
             class="w-3.5 h-3.5"
           />
           Legal
         </div>
-        <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-slate-900">
+        <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
           Terms of Service
         </h1>
-        <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+        <p class="mt-4 text-lg text-zinc-400 max-w-2xl mx-auto">
           The rules and guidelines governing your use of Sentinel
         </p>
-        <div class="mt-6 flex items-center justify-center gap-6 text-sm text-slate-500">
+        <div class="mt-6 flex items-center justify-center gap-6 text-sm text-zinc-500">
           <span class="flex items-center gap-1.5">
             <Icon
               name="lucide:calendar"
@@ -140,7 +141,7 @@ function scrollToSection(id: string) {
           <!-- Sidebar Navigation -->
           <aside class="hidden lg:block lg:col-span-3">
             <div class="sticky top-28">
-              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-4">
                 On this page
               </h3>
               <nav class="space-y-1">
@@ -150,8 +151,8 @@ function scrollToSection(id: string) {
                   type="button"
                   class="block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors"
                   :class="activeSection === section.id
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+                    ? 'bg-teal-500/10 text-teal-400 font-medium'
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/50'"
                   @click="scrollToSection(section.id)"
                 >
                   {{ section.label }}
@@ -161,7 +162,7 @@ function scrollToSection(id: string) {
           </aside>
 
           <!-- Content -->
-          <article class="lg:col-span-9 prose prose-slate max-w-none">
+          <article class="lg:col-span-9 prose prose-invert landing-legal-prose max-w-none">
             <!-- Acceptance of Terms -->
             <section id="acceptance">
               <h2>Acceptance of Terms</h2>
@@ -187,19 +188,19 @@ function scrollToSection(id: string) {
                 <li>Supports team collaboration on code quality</li>
               </ul>
 
-              <div class="not-prose my-8 p-6 bg-amber-50 border border-amber-100 rounded-xl">
+              <div class="not-prose my-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                 <div class="flex items-start gap-4">
-                  <div class="shrink-0 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <div class="shrink-0 w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
                     <Icon
                       name="lucide:alert-triangle"
-                      class="w-5 h-5 text-amber-600"
+                      class="w-5 h-5 text-amber-400"
                     />
                   </div>
                   <div>
-                    <h4 class="font-semibold text-slate-900 mb-2">
+                    <h4 class="font-semibold text-white mb-2">
                       Important Notice
                     </h4>
-                    <p class="text-slate-700 leading-relaxed">
+                    <p class="text-zinc-300 leading-relaxed">
                       Sentinel provides automated and advisory analysis only. Outputs are informational and do not replace human review, professional judgment, or security audits.
                     </p>
                   </div>
@@ -358,8 +359,8 @@ function scrollToSection(id: string) {
               </p>
 
               <h3>Your Content</h3>
-              <div class="not-prose my-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                <p class="text-slate-700 font-medium">
+              <div class="not-prose my-6 p-4 bg-teal-500/10 border border-teal-500/20 rounded-lg">
+                <p class="text-zinc-300 font-medium">
                   You retain all ownership rights to your code and content. We claim no intellectual property rights over the code you submit for review.
                 </p>
               </div>
@@ -382,36 +383,36 @@ function scrollToSection(id: string) {
             <section id="ai-limitations">
               <h2>AI Limitations & Disclaimers</h2>
 
-              <div class="not-prose my-8 p-6 bg-blue-50 border border-blue-100 rounded-xl">
-                <h4 class="font-semibold text-slate-900 mb-3">
+              <div class="not-prose my-8 p-6 bg-teal-500/10 border border-teal-500/20 rounded-xl">
+                <h4 class="font-semibold text-white mb-3">
                   How to Get the Best Results
                 </h4>
-                <ul class="space-y-2 text-slate-700">
+                <ul class="space-y-2 text-zinc-300">
                   <li class="flex items-start gap-2">
                     <Icon
                       name="lucide:check-circle"
-                      class="w-4 h-4 text-blue-500 mt-1 shrink-0"
+                      class="w-4 h-4 text-teal-400 mt-1 shrink-0"
                     />
                     <span>Review AI suggestions before merging - you know your codebase best</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <Icon
                       name="lucide:check-circle"
-                      class="w-4 h-4 text-blue-500 mt-1 shrink-0"
+                      class="w-4 h-4 text-teal-400 mt-1 shrink-0"
                     />
                     <span>Use Sentinel alongside your existing review process for best coverage</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <Icon
                       name="lucide:check-circle"
-                      class="w-4 h-4 text-blue-500 mt-1 shrink-0"
+                      class="w-4 h-4 text-teal-400 mt-1 shrink-0"
                     />
                     <span>Configure custom guidelines to tailor suggestions to your team's standards</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <Icon
                       name="lucide:info"
-                      class="w-4 h-4 text-blue-500 mt-1 shrink-0"
+                      class="w-4 h-4 text-teal-400 mt-1 shrink-0"
                     />
                     <span>For security-critical code, pair AI review with dedicated security audits</span>
                   </li>
@@ -577,40 +578,3 @@ function scrollToSection(id: string) {
     <LandingFooter />
   </div>
 </template>
-
-<style scoped>
-/* Prose customizations for legal content */
-.prose h2 {
-  @apply text-2xl font-semibold text-slate-900 mt-12 mb-4 pb-2 border-b border-slate-200 first:mt-0;
-  scroll-margin-top: 6rem;
-}
-
-.prose h3 {
-  @apply text-lg font-semibold text-slate-900 mt-8 mb-3;
-}
-
-.prose p {
-  @apply text-slate-600 leading-relaxed mb-4;
-}
-
-.prose ul {
-  @apply mb-4 pl-6 space-y-2;
-}
-
-.prose li {
-  @apply text-slate-600;
-}
-
-.prose a {
-  @apply text-blue-600 hover:text-blue-700 underline;
-}
-
-.prose strong {
-  @apply font-semibold text-slate-800;
-}
-
-/* Add IDs for scroll targeting */
-.prose section {
-  scroll-margin-top: 6rem;
-}
-</style>
