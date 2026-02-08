@@ -26,7 +26,7 @@ const formatDuration = (seconds: number): string => {
   <BaseCard padding="none">
     <div class="p-5">
       <div class="mb-4">
-        <h3 class="text-lg font-semibold text-text-primary">
+        <h3 class="text-base font-medium text-text-primary">
           Developer Leaderboard
         </h3>
         <p class="mt-1 text-sm text-text-muted">
@@ -36,19 +36,46 @@ const formatDuration = (seconds: number): string => {
 
       <div
         v-if="isLoading"
-        class="flex items-center justify-center py-12"
+        class="space-y-3"
       >
-        <BaseSpinner size="lg" />
+        <div
+          v-for="i in 5"
+          :key="i"
+          class="flex items-center gap-4 p-3 bg-bg-surface rounded-lg border border-border-subtle"
+        >
+          <div class="flex-shrink-0 w-8 text-center">
+            <div class="h-6 w-4 mx-auto bg-bg-hover rounded skeleton" />
+          </div>
+          <div class="w-10 h-10 rounded-full bg-bg-hover skeleton" />
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-32 bg-bg-hover rounded skeleton" />
+            <div class="h-3 w-48 bg-bg-hover rounded skeleton" />
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="text-center space-y-1">
+              <div class="h-4 w-8 bg-bg-hover rounded skeleton" />
+              <div class="h-3 w-8 bg-bg-hover rounded skeleton" />
+            </div>
+            <div class="text-center space-y-1">
+              <div class="h-4 w-8 bg-bg-hover rounded skeleton" />
+              <div class="h-3 w-12 bg-bg-hover rounded skeleton" />
+            </div>
+            <div class="text-center space-y-1">
+              <div class="h-4 w-10 bg-bg-hover rounded skeleton" />
+              <div class="h-3 w-14 bg-bg-hover rounded skeleton" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
         v-else-if="data.length > 0"
-        class="space-y-3"
+        class="space-y-3 max-h-[400px] overflow-y-auto pr-1"
       >
         <div
           v-for="(developer, index) in data"
           :key="developer.id"
-          class="flex items-center gap-4 p-3 bg-bg-surface rounded-lg border border-border-subtle"
+          class="flex items-center gap-4 p-3 bg-bg-surface rounded-lg border border-border-subtle hover:bg-bg-hover transition-colors cursor-pointer"
         >
           <div class="flex-shrink-0 w-8 text-center">
             <span class="text-lg font-bold text-text-muted">{{ index + 1 }}</span>

@@ -29,26 +29,38 @@ const chartData = computed<ChartData>(() => ({
     {
       label: 'Average',
       data: props.data.map((item) => item.avg_duration),
-      borderColor: '#6366f1',
-      backgroundColor: 'rgba(99, 102, 241, 0.1)',
+      borderColor: '#14b8a6',
+      backgroundColor: 'rgba(20, 184, 166, 0.1)',
+      borderWidth: 2,
       tension: 0.4,
       fill: true,
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      pointHoverBackgroundColor: '#14b8a6',
+      pointHoverBorderColor: '#18181b',
+      pointHoverBorderWidth: 2,
     },
     {
       label: 'Min',
       data: props.data.map((item) => item.min_duration),
       borderColor: '#10b981',
       backgroundColor: 'transparent',
+      borderWidth: 2,
       tension: 0.4,
       borderDash: [5, 5],
+      pointRadius: 0,
+      pointHoverRadius: 4,
     },
     {
       label: 'Max',
       data: props.data.map((item) => item.max_duration),
       borderColor: '#f59e0b',
       backgroundColor: 'transparent',
+      borderWidth: 2,
       tension: 0.4,
       borderDash: [5, 5],
+      pointRadius: 0,
+      pointHoverRadius: 4,
     },
   ],
 }))
@@ -90,8 +102,12 @@ const chartOptions: ChartOptions = {
     v-else-if="isLoading"
     padding="lg"
   >
-    <div class="flex items-center justify-center h-64">
-      <BaseSpinner size="lg" />
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="h-5 w-44 bg-bg-hover rounded skeleton" />
+        <div class="h-4 w-80 bg-bg-hover rounded skeleton" />
+      </div>
+      <div class="h-80 bg-bg-hover rounded-xl skeleton" />
     </div>
   </BaseCard>
   <BaseCard

@@ -58,20 +58,24 @@ const overviewCards = computed(() => [
         :key="i"
         padding="lg"
       >
-        <div class="flex items-center justify-center h-20">
-          <BaseSpinner />
+        <div class="animate-pulse space-y-3">
+          <div class="h-4 w-24 bg-bg-hover rounded" />
+          <div class="h-10 w-16 bg-bg-hover rounded" />
+          <div class="h-3 w-32 bg-bg-hover rounded" />
         </div>
       </BaseCard>
     </template>
 
     <DomainWorkspaceStatCard
-      v-for="card in overviewCards"
+      v-for="(card, index) in overviewCards"
       v-else
       :key="card.label"
       :label="card.label"
       :value="card.value"
       :description="card.description"
       :icon="card.icon"
+      class="animate-fade-in-up"
+      :style="{ animationDelay: `${index * 75}ms` }"
     />
   </div>
 </template>
