@@ -114,12 +114,6 @@ const socialLinks = [
                   {{ link.label }}
                 </NuxtLink>
               </li>
-              <li>
-                <a
-                  class="text-sm text-zinc-400 hover:text-white transition-colors"
-                  href="https://dev.usesentinel.ai/privacy"
-                >Privacy Policy</a>
-              </li>
             </ul>
           </div>
         </div>
