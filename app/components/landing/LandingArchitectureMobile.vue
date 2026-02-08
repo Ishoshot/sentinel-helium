@@ -2,25 +2,41 @@
 import {
   architectureLayers as layers,
   architectureStats,
-  badgeColors,
   statusColors,
 } from '~/composables/landing/useArchitectureData'
 
 /**
- * Landing page architecture visualization (Mobile)
+ * Landing page architecture visualization (Mobile) - Dark theme
  * Shows the Sentinel review pipeline with interactive cards
  */
+
+// Dark badge colors
+const darkBadgeColors: Record<string, string> = {
+  blue: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+  slate: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30',
+  amber: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+  purple: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+  cyan: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
+  emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+  rose: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+  indigo: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30',
+}
+
+const darkStatusColors: Record<string, string> = {
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+}
 </script>
 
 <template>
-  <section class="lg:hidden py-24 bg-slate-50 overflow-hidden">
+  <section class="lg:hidden py-24 bg-[#09090b] overflow-hidden">
     <div class="max-w-7xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center max-w-3xl mx-auto mb-16">
-        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-slate-900">
+        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Built for reliability at scale
         </h2>
-        <p class="mt-4 text-lg text-slate-600 leading-relaxed">
+        <p class="mt-4 text-lg text-zinc-400 leading-relaxed">
           A complete review pipeline from webhook to annotation. Every step designed for speed, accuracy, and transparency.
         </p>
       </div>
@@ -29,8 +45,8 @@ import {
       <div class="relative">
         <!-- Background grid pattern -->
         <div
-          class="absolute inset-0 opacity-50"
-          style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 20px 20px;"
+          class="absolute inset-0 opacity-[0.02]"
+          style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 20px 20px;"
         />
 
         <!-- Connection lines (SVG overlay) -->
@@ -40,7 +56,7 @@ import {
         >
           <defs>
             <linearGradient
-              id="lineGradient"
+              id="lineGradientDark"
               x1="0%"
               y1="0%"
               x2="100%"
@@ -48,12 +64,12 @@ import {
             >
               <stop
                 offset="0%"
-                stop-color="#3b82f6"
+                stop-color="#14b8a6"
                 stop-opacity="0.3"
               />
               <stop
                 offset="50%"
-                stop-color="#8b5cf6"
+                stop-color="#06b6d4"
                 stop-opacity="0.5"
               />
               <stop
@@ -69,7 +85,7 @@ import {
             y1="50%"
             x2="90%"
             y2="50%"
-            stroke="url(#lineGradient)"
+            stroke="url(#lineGradientDark)"
             stroke-width="2"
             stroke-dasharray="8 4"
             class="animate-pulse"
@@ -86,33 +102,33 @@ import {
           >
             <!-- Layer title -->
             <div class="flex items-center gap-2 mb-6">
-              <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+              <div class="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-400">
                 {{ layerIndex + 1 }}
               </div>
-              <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">{{ layer.title }}</span>
+              <span class="text-sm font-semibold text-zinc-500 uppercase tracking-wider">{{ layer.title }}</span>
             </div>
 
             <!-- Cards in this layer -->
             <div
               v-for="(item, itemIndex) in layer.items"
               :key="item.id"
-              class="architecture-card cursor-pointer group relative bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-slate-300 hover:scale-[1.02]"
+              class="architecture-card-mobile cursor-pointer group relative bg-[#111113] rounded-xl border border-zinc-800/50 shadow-lg shadow-black/20 overflow-hidden transition-all duration-300 hover:border-zinc-700/50 hover:scale-[1.02]"
               :style="{ animationDelay: `${(layerIndex * 200) + (itemIndex * 100)}ms` }"
             >
               <!-- Card header -->
-              <div class="relative px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <div class="relative px-4 py-3 border-b border-zinc-800/50 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                  <div class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:border-zinc-700 transition-colors">
                     <Icon
                       :name="item.icon"
-                      class="w-4 h-4 text-slate-600"
+                      class="w-4 h-4 text-zinc-400"
                     />
                   </div>
-                  <span class="text-sm font-semibold text-slate-900">{{ item.title }}</span>
+                  <span class="text-sm font-semibold text-white">{{ item.title }}</span>
                 </div>
                 <span
                   class="px-2 py-0.5 text-[10px] font-semibold rounded-full border"
-                  :class="badgeColors[item.badgeColor]"
+                  :class="darkBadgeColors[item.badgeColor]"
                 >
                   {{ item.badge }}
                 </span>
@@ -125,19 +141,19 @@ import {
                   :key="row.label"
                   class="flex items-center justify-between text-sm"
                 >
-                  <span class="text-slate-500 flex items-center gap-2">
+                  <span class="text-zinc-500 flex items-center gap-2">
                     <Icon
                       name="ph:caret-right"
-                      class="w-3 h-3 text-slate-300"
+                      class="w-3 h-3 text-zinc-600"
                     />
                     {{ row.label }}
                   </span>
-                  <span class="flex items-center gap-2 text-slate-700 font-medium">
+                  <span class="flex items-center gap-2 text-zinc-300 font-medium">
                     {{ row.value }}
                     <span
                       v-if="row.status"
                       class="w-1.5 h-1.5 rounded-full"
-                      :class="statusColors[row.status]"
+                      :class="darkStatusColors[row.status]"
                     />
                   </span>
                 </div>
@@ -153,10 +169,10 @@ import {
             :key="i"
             class="flex items-center"
           >
-            <div class="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center">
+            <div class="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 shadow-lg flex items-center justify-center">
               <Icon
                 name="ph:arrow-right-bold"
-                class="w-4 h-4 text-slate-400"
+                class="w-4 h-4 text-zinc-500"
               />
             </div>
           </div>
@@ -166,34 +182,34 @@ import {
       <!-- Bottom stats -->
       <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">
+          <div class="text-3xl font-bold text-white">
             &lt; 30s
           </div>
-          <div class="text-sm text-slate-500 mt-1">
+          <div class="text-sm text-zinc-500 mt-1">
             Avg review time
           </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">
+          <div class="text-3xl font-bold text-white">
             99.9%
           </div>
-          <div class="text-sm text-slate-500 mt-1">
+          <div class="text-sm text-zinc-500 mt-1">
             Uptime SLA
           </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">
+          <div class="text-3xl font-bold text-white">
             6
           </div>
-          <div class="text-sm text-slate-500 mt-1">
+          <div class="text-sm text-zinc-500 mt-1">
             AI providers
           </div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-slate-900">
+          <div class="text-3xl font-bold text-white">
             BYOK
           </div>
-          <div class="text-sm text-slate-500 mt-1">
+          <div class="text-sm text-zinc-500 mt-1">
             Your API keys
           </div>
         </div>
@@ -203,7 +219,7 @@ import {
 </template>
 
 <style scoped>
-.architecture-card {
+.architecture-card-mobile {
   animation: fadeInUp 0.3s ease-out forwards;
   opacity: 0;
 }
@@ -220,12 +236,12 @@ import {
 }
 
 /* Staggered floating animation for cards */
-.architecture-card:nth-child(odd) {
+.architecture-card-mobile:nth-child(odd) {
   animation: fadeInUp 0.3s ease-out forwards, subtleFloat 3s ease-in-out infinite;
   animation-delay: var(--delay, 0ms), 0.5s;
 }
 
-.architecture-card:nth-child(even) {
+.architecture-card-mobile:nth-child(even) {
   animation: fadeInUp 0.3s ease-out forwards, subtleFloatAlt 4s ease-in-out infinite;
   animation-delay: var(--delay, 0ms), 0.8s;
 }
@@ -249,7 +265,7 @@ import {
 }
 
 /* Override float on hover for lift effect */
-.architecture-card:hover {
+.architecture-card-mobile:hover {
   animation-play-state: paused;
 }
 </style>
