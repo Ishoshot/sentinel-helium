@@ -161,7 +161,7 @@ Prefer clarity over brevity.
 - Raw hex values are forbidden
 - Avoid inline styles
 
-All styling must conform to `DESIGN_SYSTEM.md`.
+All styling must conform to `DESIGN_SYSTEM.md`, `COLOR_SYSTEM.md`, `TYPOGRAPHY.md`, `MOTION.md`, `COLOR_SYSTEM.md`, `TYPOGRAPHY.md`, `MOTION.md`.
 
 ---
 

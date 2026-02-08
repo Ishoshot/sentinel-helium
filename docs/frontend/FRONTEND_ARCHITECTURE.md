@@ -14,7 +14,7 @@ All frontend implementation MUST conform to this document.
 - Styling: **Tailwind CSS**
 - UI Components: **PrimeVue (themed)**
 - Icons: **Iconify**
-- Charts: **ECharts**
+- Charts: **Chart.js (via PrimeVue)**
 - Package Manager: **pnpm**
 
 The frontend is designed as a **modern, scalable SaaS dashboard**.
