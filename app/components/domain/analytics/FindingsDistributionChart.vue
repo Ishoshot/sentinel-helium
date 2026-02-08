@@ -14,13 +14,12 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Severity colors mapping
 const severityColors: Record<string, string> = {
-  critical: '#dc2626',
-  high: '#ea580c',
-  medium: '#f59e0b',
+  critical: '#ef4444',
+  high: '#f97316',
+  medium: '#eab308',
   low: '#3b82f6',
-  info: '#6b7280',
+  info: '#71717a',
 }
 
 const chartData = computed<ChartData>(() => ({
@@ -31,18 +30,24 @@ const chartData = computed<ChartData>(() => ({
     {
       data: props.data.map((item) => item.count),
       backgroundColor: props.data.map(
-        (item) => severityColors[item.severity] || '#6b7280'
+        (item) => severityColors[item.severity] || '#71717a'
       ),
       borderWidth: 2,
-      borderColor: '#ffffff',
+      borderColor: '#18181b',
+      hoverOffset: 4,
     },
   ],
 }))
 
 const chartOptions: ChartOptions = {
+  cutout: '70%',
   plugins: {
     legend: {
       position: 'right',
+      labels: {
+        color: '#a1a1aa',
+        padding: 16,
+      },
     },
   },
 }
@@ -62,8 +67,12 @@ const chartOptions: ChartOptions = {
     v-else-if="isLoading"
     padding="lg"
   >
-    <div class="flex items-center justify-center h-64">
-      <BaseSpinner size="lg" />
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="h-5 w-40 bg-bg-hover rounded skeleton" />
+        <div class="h-4 w-56 bg-bg-hover rounded skeleton" />
+      </div>
+      <div class="h-80 bg-bg-hover rounded-xl skeleton" />
     </div>
   </BaseCard>
   <BaseCard

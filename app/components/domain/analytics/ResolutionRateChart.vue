@@ -22,25 +22,33 @@ const chartData = computed<ChartData>(() => ({
       data: props.data.map((item) => item.annotation_rate),
       borderColor: '#10b981',
       backgroundColor: 'rgba(16, 185, 129, 0.1)',
+      borderWidth: 2,
       tension: 0.4,
       fill: true,
       yAxisID: 'y',
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      pointHoverBackgroundColor: '#10b981',
+      pointHoverBorderColor: '#18181b',
+      pointHoverBorderWidth: 2,
     },
     {
       label: 'Resolved',
       data: props.data.map((item) => item.annotated_findings),
-      borderColor: '#6366f1',
-      backgroundColor: 'rgba(99, 102, 241, 0.6)',
+      borderColor: '#14b8a6',
+      backgroundColor: 'rgba(20, 184, 166, 0.6)',
       type: 'bar',
       yAxisID: 'y1',
+      borderRadius: 4,
     },
     {
       label: 'Total Findings',
       data: props.data.map((item) => item.total_findings),
-      borderColor: '#94a3b8',
-      backgroundColor: 'rgba(148, 163, 184, 0.3)',
+      borderColor: '#3f3f46',
+      backgroundColor: 'rgba(63, 63, 70, 0.4)',
       type: 'bar',
       yAxisID: 'y1',
+      borderRadius: 4,
     },
   ],
 }))
@@ -95,8 +103,12 @@ const chartOptions: ChartOptions = {
     v-else-if="isLoading"
     padding="lg"
   >
-    <div class="flex items-center justify-center h-64">
-      <BaseSpinner size="lg" />
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="h-5 w-44 bg-bg-hover rounded skeleton" />
+        <div class="h-4 w-72 bg-bg-hover rounded skeleton" />
+      </div>
+      <div class="h-80 bg-bg-hover rounded-xl skeleton" />
     </div>
   </BaseCard>
   <BaseCard
