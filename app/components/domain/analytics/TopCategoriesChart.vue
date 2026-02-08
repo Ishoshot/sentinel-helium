@@ -20,9 +20,10 @@ const chartData = computed<ChartData>(() => ({
     {
       label: 'Findings',
       data: props.data.map((item) => item.count),
-      backgroundColor: '#6366f1',
-      borderColor: '#4f46e5',
+      backgroundColor: '#14b8a6',
+      borderColor: '#0d9488',
       borderWidth: 1,
+      borderRadius: 4,
     },
   ],
 }))
@@ -59,8 +60,12 @@ const chartOptions: ChartOptions = {
     v-else-if="isLoading"
     padding="lg"
   >
-    <div class="flex items-center justify-center h-64">
-      <BaseSpinner size="lg" />
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="h-5 w-44 bg-bg-hover rounded skeleton" />
+        <div class="h-4 w-64 bg-bg-hover rounded skeleton" />
+      </div>
+      <div class="h-80 bg-bg-hover rounded-xl skeleton" />
     </div>
   </BaseCard>
   <BaseCard

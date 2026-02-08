@@ -20,18 +20,30 @@ const chartData = computed<ChartData>(() => ({
     {
       label: 'Input Tokens',
       data: props.data.map((item) => item.total_input_tokens),
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      borderColor: '#14b8a6',
+      backgroundColor: 'rgba(20, 184, 166, 0.1)',
+      borderWidth: 2,
       tension: 0.4,
       fill: true,
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      pointHoverBackgroundColor: '#14b8a6',
+      pointHoverBorderColor: '#18181b',
+      pointHoverBorderWidth: 2,
     },
     {
       label: 'Output Tokens',
       data: props.data.map((item) => item.total_output_tokens),
-      borderColor: '#8b5cf6',
-      backgroundColor: 'rgba(139, 92, 246, 0.1)',
+      borderColor: '#06b6d4',
+      backgroundColor: 'rgba(6, 182, 212, 0.1)',
+      borderWidth: 2,
       tension: 0.4,
       fill: true,
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      pointHoverBackgroundColor: '#06b6d4',
+      pointHoverBorderColor: '#18181b',
+      pointHoverBorderWidth: 2,
     },
   ],
 }))
@@ -67,8 +79,12 @@ const chartOptions: ChartOptions = {
     v-else-if="isLoading"
     padding="lg"
   >
-    <div class="flex items-center justify-center h-64">
-      <BaseSpinner size="lg" />
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <div class="h-5 w-28 bg-bg-hover rounded skeleton" />
+        <div class="h-4 w-52 bg-bg-hover rounded skeleton" />
+      </div>
+      <div class="h-80 bg-bg-hover rounded-xl skeleton" />
     </div>
   </BaseCard>
   <BaseCard
