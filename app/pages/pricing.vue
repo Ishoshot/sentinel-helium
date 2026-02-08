@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { hasToken } from '~/services/core/api'
 import { usePlans } from '~/composables/billing/usePlans'
+import { usePageSeo } from '~/composables/seo/usePageSeo'
 
 /**
  * Full pricing comparison with all features

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { OAuthProvider } from '~/types'
 import { useAuth } from '~/composables/auth/useAuth'
+import { usePageSeo } from '~/composables/seo/usePageSeo'
 
 /**
  * Login page - Premium dark OAuth authentication

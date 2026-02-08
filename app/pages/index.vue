@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { hasToken } from '~/services/core/api'
 import { useWorkspaces } from '~/composables/workspace/useWorkspaces'
+import { usePageSeo } from '~/composables/seo/usePageSeo'
 
 /**
  * Landing page with hero section and floating UI mockups
@@ -19,7 +20,7 @@ usePageSeo({
 
 useHead({
   htmlAttrs: {
-    class: 'scroll-smooth',
+    class: 'scroll-smooth bg-[#09090b]',
   },
   bodyAttrs: {
     class: 'bg-[#09090b]',
