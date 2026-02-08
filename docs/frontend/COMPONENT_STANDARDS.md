@@ -236,3 +236,10 @@ Components exist to render, not to decide.
 ---
 
 This document defines Sentinel’s component standards.
+---
+
+## Visual Specs
+
+Visual styling and component treatments are defined in `COMPONENTS.md`.
+Use this document for visual rules, and keep this file focused on engineering standards.
+
