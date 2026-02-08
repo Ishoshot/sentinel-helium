@@ -17,8 +17,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   iconGradient: '',
-  iconBg: 'bg-slate-100',
-  iconColor: 'text-slate-600',
+  iconBg: 'bg-bg-surface',
+  iconColor: 'text-text-secondary',
   status: 'coming_soon',
   features: () => [],
 })
@@ -30,24 +30,24 @@ const statusConfig = computed(() => {
     case 'available':
       return {
         label: 'Available',
-        bg: 'bg-emerald-50',
-        color: 'text-emerald-600',
-        dot: 'bg-emerald-500',
+        bg: 'bg-emerald-500/10',
+        color: 'text-emerald-400',
+        dot: 'bg-emerald-400',
       }
     case 'beta':
       return {
         label: 'Beta',
-        bg: 'bg-blue-50',
-        color: 'text-blue-600',
-        dot: 'bg-blue-500',
+        bg: 'bg-blue-500/10',
+        color: 'text-blue-400',
+        dot: 'bg-blue-400',
       }
     case 'coming_soon':
     default:
       return {
         label: 'Soon',
-        bg: 'bg-slate-100',
-        color: 'text-slate-500',
-        dot: 'bg-slate-400',
+        bg: 'bg-bg-surface',
+        color: 'text-text-muted',
+        dot: 'bg-text-muted',
       }
   }
 })
@@ -60,11 +60,11 @@ const statusConfig = computed(() => {
     @mouseleave="isHovered = false"
   >
     <div
-      class="relative overflow-hidden rounded-xl border bg-white transition-all duration-300"
+      class="relative overflow-hidden rounded-xl border bg-bg-elevated transition-all duration-300"
       :class="[
         status === 'coming_soon'
-          ? 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
-          : 'border-slate-200 hover:border-slate-300 hover:shadow-md',
+          ? 'border-border-subtle hover:border-border-muted'
+          : 'border-border-subtle hover:border-border-muted',
       ]"
     >
       <div class="relative p-4">
@@ -89,7 +89,7 @@ const statusConfig = computed(() => {
           <!-- Content -->
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <h3 class="text-sm font-semibold text-slate-900">
+              <h3 class="text-sm font-semibold text-text-primary">
                 {{ name }}
               </h3>
               <!-- Status Badge -->
@@ -104,15 +104,15 @@ const statusConfig = computed(() => {
                 {{ statusConfig.label }}
               </span>
             </div>
-            <p class="mt-0.5 truncate text-xs text-slate-500">
+            <p class="mt-0.5 truncate text-xs text-text-muted">
               {{ description }}
             </p>
           </div>
 
           <!-- Arrow indicator on hover -->
           <div
-            class="flex size-8 items-center justify-center rounded-lg text-slate-300 opacity-0 transition-all duration-200 group-hover:opacity-100"
-            :class="status === 'coming_soon' ? '' : 'bg-slate-50 text-slate-400'"
+            class="flex size-8 items-center justify-center rounded-lg text-text-muted opacity-0 transition-all duration-200 group-hover:opacity-100"
+            :class="status === 'coming_soon' ? '' : 'bg-bg-surface text-text-secondary'"
           >
             <Icon
               v-if="status !== 'coming_soon'"
@@ -138,17 +138,17 @@ const statusConfig = computed(() => {
         >
           <div
             v-if="isHovered && features.length > 0"
-            class="mt-3 overflow-hidden border-t border-slate-100 pt-3"
+            class="mt-3 overflow-hidden border-t border-border-subtle pt-3"
           >
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="feature in features.slice(0, 3)"
                 :key="feature"
-                class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 text-[11px] text-slate-600"
+                class="inline-flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-[11px] text-text-secondary"
               >
                 <Icon
                   name="lucide:check"
-                  class="size-3 text-slate-400"
+                  class="size-3 text-text-muted"
                 />
                 {{ feature }}
               </span>

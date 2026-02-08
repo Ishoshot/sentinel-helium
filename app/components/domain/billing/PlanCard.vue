@@ -35,7 +35,7 @@ const tierConfig: Record<Plan["tier"], { label: string; icon: string; gradient: 
   foundation: {
     label: "Foundation",
     icon: "lucide:layers",
-    gradient: "from-slate-600 to-slate-700",
+    gradient: "from-zinc-500 to-zinc-600",
   },
   illuminate: {
     label: "Illuminate",
@@ -124,11 +124,11 @@ function handleAction() {
 
 <template>
   <div
-    class="group relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all duration-300"
+    class="group relative flex h-full flex-col rounded-2xl border bg-bg-elevated p-6 transition-all duration-300"
     :class="[
       highlight
         ? 'border-accent shadow-lg shadow-accent/10 ring-1 ring-accent/20'
-        : 'border-border-subtle hover:border-border-muted hover:shadow-md',
+        : 'border-border-subtle hover:border-border-muted hover:shadow-lg',
       isCurrent ? 'ring-2 ring-accent/30' : '',
     ]"
   >
@@ -189,7 +189,7 @@ function handleAction() {
         v-if="yearlySavingsLabel && !isMonthly"
         class="mt-2"
       >
-        <span class="text-xs font-medium text-emerald-600">
+        <span class="text-xs font-medium text-emerald-400">
           {{ yearlySavingsLabel }} annually
         </span>
       </div>
