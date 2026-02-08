@@ -23,9 +23,9 @@ const getStatusConfig = (status: string) => {
     running: { dot: 'bg-amber-500 animate-pulse', label: 'Running' },
     in_progress: { dot: 'bg-amber-500 animate-pulse', label: 'In Progress' },
     failed: { dot: 'bg-red-500', label: 'Failed' },
-    skipped: { dot: 'bg-gray-400', label: 'Skipped' },
+    skipped: { dot: 'bg-zinc-400', label: 'Skipped' },
     queued: { dot: 'bg-blue-500 animate-pulse', label: 'Queued' },
-    pending: { dot: 'bg-gray-400', label: 'Pending' },
+    pending: { dot: 'bg-zinc-400', label: 'Pending' },
   }
   return configs[status] ?? configs.pending
 }
@@ -34,13 +34,13 @@ const getStatusConfig = (status: string) => {
 const latestStatusConfig = computed(() => {
   const status = props.group.latest_status
   const configs: Record<string, { bg: string; color: string; label: string }> = {
-    completed: { bg: 'bg-emerald-50', color: 'text-emerald-700', label: 'Completed' },
-    running: { bg: 'bg-amber-50', color: 'text-amber-700', label: 'Running' },
-    in_progress: { bg: 'bg-amber-50', color: 'text-amber-700', label: 'In Progress' },
-    failed: { bg: 'bg-red-50', color: 'text-red-700', label: 'Failed' },
-    skipped: { bg: 'bg-gray-100', color: 'text-gray-600', label: 'Skipped' },
-    queued: { bg: 'bg-blue-50', color: 'text-blue-700', label: 'Queued' },
-    pending: { bg: 'bg-gray-100', color: 'text-gray-600', label: 'Pending' },
+    completed: { bg: 'bg-emerald-500/10', color: 'text-emerald-400', label: 'Completed' },
+    running: { bg: 'bg-amber-500/10', color: 'text-amber-400', label: 'Running' },
+    in_progress: { bg: 'bg-amber-500/10', color: 'text-amber-400', label: 'In Progress' },
+    failed: { bg: 'bg-red-500/10', color: 'text-red-400', label: 'Failed' },
+    skipped: { bg: 'bg-bg-surface', color: 'text-text-muted', label: 'Skipped' },
+    queued: { bg: 'bg-blue-500/10', color: 'text-blue-400', label: 'Queued' },
+    pending: { bg: 'bg-bg-surface', color: 'text-text-muted', label: 'Pending' },
   }
   return configs[status] ?? configs.pending
 })
@@ -65,27 +65,27 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300">
+  <div class="overflow-hidden rounded-lg border border-border-subtle bg-bg-elevated transition-colors hover:border-border-muted">
     <!-- Header -->
     <button
       type="button"
-      class="w-full px-4 py-4 text-left transition-colors hover:bg-gray-50"
+      class="w-full px-4 py-4 text-left transition-colors hover:bg-bg-hover"
       @click="isExpanded = !isExpanded"
     >
       <div class="flex items-start justify-between gap-4">
         <div class="flex min-w-0 flex-1 items-start gap-3">
           <!-- PR Icon -->
-          <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-bg-surface">
             <Icon
               name="lucide:git-pull-request"
-              class="size-5 text-gray-500"
+              class="size-5 text-text-muted"
             />
           </div>
 
           <!-- PR Info -->
           <div class="min-w-0 flex-1">
             <div class="mb-1 flex flex-wrap items-center gap-2">
-              <span class="text-xs font-medium text-gray-500">
+              <span class="text-xs font-medium text-text-muted">
                 #{{ group.pull_request_number }}
               </span>
               <span
@@ -95,12 +95,12 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
                 {{ latestStatusConfig.label }}
               </span>
             </div>
-            <h3 class="text-sm font-semibold text-gray-900">
+            <h3 class="text-sm font-semibold text-text-primary">
               {{ group.pull_request_title || 'Untitled Pull Request' }}
             </h3>
-            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-              <span class="font-medium text-gray-700">{{ group.repository.name }}</span>
-              <span class="text-gray-300">·</span>
+            <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-text-muted">
+              <span class="font-medium text-text-secondary">{{ group.repository.name }}</span>
+              <span class="text-border-muted">·</span>
               <span>{{ group.runs_count }} {{ group.runs_count === 1 ? 'run' : 'runs' }}</span>
             </div>
           </div>
@@ -109,7 +109,7 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
         <!-- Expand/Collapse -->
         <Icon
           name="lucide:chevron-down"
-          class="size-5 shrink-0 text-gray-400 transition-transform"
+          class="size-5 shrink-0 text-text-muted transition-transform"
           :class="{ 'rotate-180': isExpanded }"
         />
       </div>
@@ -126,14 +126,14 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
     >
       <div
         v-if="isExpanded"
-        class="border-t border-gray-100"
+        class="border-t border-border-subtle"
       >
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-border-subtle">
           <button
             v-for="run in group.runs"
             :key="run.id"
             type="button"
-            class="group w-full px-4 py-3 text-left transition-colors hover:bg-gray-50"
+            class="group w-full px-4 py-3 text-left transition-colors hover:bg-bg-hover"
             @click="navigateToRun(run.id)"
           >
             <div class="flex items-center justify-between gap-4">
@@ -148,23 +148,23 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
                 <!-- Run info -->
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-gray-900">
+                    <span class="text-sm font-medium text-text-primary">
                       {{ formatDate(run.created_at) }}
                     </span>
                     <span
                       v-if="formatDuration(run.started_at, run.completed_at)"
-                      class="text-xs text-gray-500"
+                      class="text-xs text-text-muted"
                     >
                       {{ formatDuration(run.started_at, run.completed_at) }}
                     </span>
                     <span
                       v-if="run.status === 'skipped'"
-                      class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
+                      class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-muted"
                     >
                       Skipped
                     </span>
                   </div>
-                  <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-text-muted">
                     <span v-if="run.metrics">
                       {{ run.metrics.files_changed }} files
                     </span>
@@ -172,7 +172,7 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
                       v-if="run.metadata?.sender_login"
                       class="flex items-center gap-1"
                     >
-                      <span class="text-gray-300">·</span>
+                      <span class="text-border-muted">·</span>
                       {{ run.metadata.sender_login }}
                     </span>
                   </div>
@@ -181,7 +181,7 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
                 <!-- Findings count -->
                 <span
                   v-if="run.findings && run.findings.length > 0"
-                  class="shrink-0 rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700"
+                  class="shrink-0 rounded bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400"
                 >
                   {{ run.findings.length }} findings
                 </span>
@@ -190,7 +190,7 @@ const formatDuration = (startedAt: string | null, completedAt: string | null) =>
               <!-- Arrow -->
               <Icon
                 name="lucide:chevron-right"
-                class="size-4 shrink-0 text-gray-300 transition-colors group-hover:text-gray-500"
+                class="size-4 shrink-0 text-text-muted/50 transition-colors group-hover:text-text-muted"
               />
             </div>
           </button>

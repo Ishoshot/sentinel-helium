@@ -61,16 +61,16 @@ const visiblePages = computed(() => {
 <template>
   <div
     v-if="lastPage > 1"
-    class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 pt-6 sm:flex-row"
+    class="flex flex-col items-center justify-between gap-4 border-t border-border-subtle pt-6 sm:flex-row"
   >
-    <p class="text-sm text-gray-500">
-      Showing <span class="font-medium text-gray-900">{{ from }}</span> to <span class="font-medium text-gray-900">{{ to }}</span> of <span class="font-medium text-gray-900">{{ total }}</span> {{ itemType }}
+    <p class="text-sm text-text-muted">
+      Showing <span class="font-medium text-text-primary">{{ from }}</span> to <span class="font-medium text-text-primary">{{ to }}</span> of <span class="font-medium text-text-primary">{{ total }}</span> {{ itemType }}
     </p>
 
     <div class="flex items-center gap-1">
       <button
         type="button"
-        class="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        class="inline-flex size-9 items-center justify-center rounded-lg border border-border-subtle bg-bg-elevated text-sm text-text-secondary hover:bg-bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canGoPrevious"
         @click="emit('loadPage', currentPage - 1)"
       >
@@ -86,7 +86,7 @@ const visiblePages = computed(() => {
       >
         <span
           v-if="page === 'ellipsis'"
-          class="px-1 text-gray-400"
+          class="px-1 text-text-muted"
         >
           ...
         </span>
@@ -95,8 +95,8 @@ const visiblePages = computed(() => {
           type="button"
           class="inline-flex size-9 items-center justify-center rounded-lg border text-sm font-medium transition-colors"
           :class="page === currentPage
-            ? 'border-gray-900 bg-gray-900 text-white'
-            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'"
+            ? 'border-accent bg-accent text-white'
+            : 'border-border-subtle bg-bg-elevated text-text-secondary hover:bg-bg-hover'"
           @click="emit('loadPage', page)"
         >
           {{ page }}
@@ -105,7 +105,7 @@ const visiblePages = computed(() => {
 
       <button
         type="button"
-        class="inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        class="inline-flex size-9 items-center justify-center rounded-lg border border-border-subtle bg-bg-elevated text-sm text-text-secondary hover:bg-bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canGoNext"
         @click="emit('loadPage', currentPage + 1)"
       >
