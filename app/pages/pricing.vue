@@ -4,6 +4,7 @@ import { usePlans } from '~/composables/billing/usePlans'
 
 /**
  * Full pricing comparison with all features
+ * Premium dark theme with teal accents
  * Fetches plans from API for up-to-date pricing
  */
 
@@ -11,13 +12,18 @@ definePageMeta({
   layout: false,
 })
 
+usePageSeo({
+  title: 'Pricing',
+  description: 'Simple, transparent pricing for AI-powered code reviews. Start free with 20 reviews per month. Scale as you grow with BYOK AI providers.',
+  path: '/pricing',
+})
+
 useHead({
-  title: 'Pricing - Sentinel',
   htmlAttrs: {
     class: 'scroll-smooth',
   },
   bodyAttrs: {
-    class: 'bg-white',
+    class: 'bg-[#09090b]',
   },
 })
 
@@ -77,24 +83,44 @@ const faqs = [
     answer: 'We accept all major credit cards through our secure payment processor. Enterprise customers can request invoicing.',
   },
 ]
+
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': faqs.map(faq => ({
+          '@type': 'Question',
+          'name': faq.question,
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': faq.answer,
+          },
+        })),
+      }),
+    },
+  ],
+})
 </script>
 
 <template>
   <!-- Loading state -->
   <div
     v-if="isCheckingAuth"
-    class="landing-light min-h-screen flex items-center justify-center"
+    class="landing-dark min-h-screen flex items-center justify-center"
   >
     <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 border-2 border-[var(--landing-border-subtle)] border-t-[var(--landing-accent)] rounded-full animate-spin" />
-      <span class="text-[var(--landing-text-muted)] text-sm">Loading...</span>
+      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
+      <span class="text-zinc-500 text-sm">Loading...</span>
     </div>
   </div>
 
   <!-- Pricing page -->
   <div
     v-else
-    class="landing-light min-h-screen overflow-x-hidden antialiased"
+    class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
     <LandingNav
@@ -103,19 +129,19 @@ const faqs = [
     />
 
     <!-- Hero -->
-    <section class="pt-32 lg:pt-40 pb-16 lg:pb-20 bg-slate-50">
+    <section class="pt-32 lg:pt-40 pb-16 lg:pb-20 bg-[#0f0f12]">
       <div class="relative max-w-4xl mx-auto px-6 text-center">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-slate-900">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-white">
           Simple, transparent pricing
         </h1>
-        <p class="mt-6 text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto">
+        <p class="mt-6 text-lg lg:text-xl text-zinc-400 max-w-2xl mx-auto">
           Start free, scale as you grow. All plans include BYOK for AI providers.
         </p>
       </div>
     </section>
 
     <!-- Pricing cards -->
-    <section class="py-16 lg:py-20 bg-white">
+    <section class="py-16 lg:py-20 bg-[#09090b]">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
           <div
@@ -123,13 +149,13 @@ const faqs = [
             :key="tier.name"
             class="relative rounded-2xl p-6 transition-all duration-300"
             :class="tier.highlighted
-              ? 'bg-blue-600 ring-1 ring-blue-500 shadow-xl shadow-blue-500/20 scale-[1.02]'
-              : 'bg-white border border-slate-200 hover:border-slate-300 hover:shadow-lg'"
+              ? 'bg-gradient-to-b from-teal-500/20 to-teal-600/5 ring-1 ring-teal-500/50 shadow-xl shadow-teal-500/10 scale-[1.02]'
+              : 'bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 hover:shadow-lg hover:shadow-black/20'"
           >
             <!-- Popular badge -->
             <div
               v-if="tier.highlighted"
-              class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-white text-blue-600 text-xs font-semibold rounded-full shadow-lg"
+              class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-xs font-semibold rounded-full shadow-lg shadow-teal-500/30"
             >
               Most popular
             </div>
@@ -137,7 +163,7 @@ const faqs = [
             <!-- Plan name -->
             <div
               class="text-sm font-semibold mb-4"
-              :class="tier.highlighted ? 'text-white/80' : 'text-slate-500'"
+              :class="tier.highlighted ? 'text-teal-300' : 'text-zinc-500'"
             >
               {{ tier.name }}
             </div>
@@ -146,18 +172,18 @@ const faqs = [
             <div class="flex items-baseline gap-1 mb-2">
               <span
                 class="text-4xl font-semibold tracking-tight"
-                :class="tier.highlighted ? 'text-white' : 'text-slate-900'"
+                :class="tier.highlighted ? 'text-white' : 'text-zinc-100'"
               >{{ tier.price }}</span>
               <span
                 class="text-sm"
-                :class="tier.highlighted ? 'text-white/70' : 'text-slate-500'"
+                :class="tier.highlighted ? 'text-teal-300/70' : 'text-zinc-500'"
               >{{ tier.period }}</span>
             </div>
 
             <!-- Description -->
             <p
               class="text-sm mb-6 leading-relaxed"
-              :class="tier.highlighted ? 'text-white/80' : 'text-slate-600'"
+              :class="tier.highlighted ? 'text-zinc-300' : 'text-zinc-500'"
             >
               {{ tier.description }}
             </p>
@@ -168,12 +194,12 @@ const faqs = [
                 v-for="feat in tier.features"
                 :key="feat"
                 class="flex items-start gap-3 text-sm"
-                :class="tier.highlighted ? 'text-white/90' : 'text-slate-600'"
+                :class="tier.highlighted ? 'text-zinc-200' : 'text-zinc-400'"
               >
                 <Icon
                   name="ph:check-bold"
                   class="w-4 h-4 flex-shrink-0 mt-0.5"
-                  :class="tier.highlighted ? 'text-white' : 'text-emerald-500'"
+                  :class="tier.highlighted ? 'text-teal-400' : 'text-emerald-500'"
                 />
                 <span>{{ feat }}</span>
               </li>
@@ -184,8 +210,8 @@ const faqs = [
               :to="tier.href"
               class="block w-full text-center py-3 text-sm font-semibold rounded-xl transition-all duration-200"
               :class="tier.highlighted
-                ? 'bg-white text-blue-600 hover:bg-white/90 shadow-lg'
-                : 'bg-slate-900 text-white hover:bg-slate-800'"
+                ? 'bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30'
+                : 'bg-white text-zinc-900 hover:bg-zinc-100'"
             >
               {{ tier.cta }}
             </NuxtLink>
@@ -195,118 +221,120 @@ const faqs = [
     </section>
 
     <!-- Comparison table -->
-    <section class="py-16 lg:py-20 bg-slate-50">
+    <section class="py-16 lg:py-20 bg-[#0f0f12]">
       <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-2xl lg:text-3xl font-semibold text-slate-900 mb-10 text-center">
+        <h2 class="text-2xl lg:text-3xl font-semibold text-white mb-10 text-center">
           Compare all features
         </h2>
 
         <!-- Desktop table -->
         <div class="hidden lg:block overflow-x-auto">
-          <table class="w-full bg-white rounded-2xl overflow-hidden shadow-sm">
-            <thead>
-              <tr class="border-b border-slate-200">
-                <th class="text-left py-5 px-6 text-sm font-medium text-slate-500 w-1/5">
-                  Feature
-                </th>
-                <th
-                  v-for="tier in tiers"
-                  :key="tier.name"
-                  class="text-center py-5 px-4 text-sm font-semibold text-slate-900"
-                  :class="{ 'bg-blue-50': tier.highlighted }"
+          <div class="overflow-hidden rounded-2xl border border-zinc-800/50">
+            <table class="w-full bg-zinc-900/30">
+              <thead>
+                <tr class="border-b border-zinc-800/50">
+                  <th class="text-left py-5 px-6 text-sm font-medium text-zinc-500 w-1/5">
+                    Feature
+                  </th>
+                  <th
+                    v-for="tier in tiers"
+                    :key="tier.name"
+                    class="text-center py-5 px-4 text-sm font-semibold text-zinc-300"
+                    :class="{ 'bg-teal-500/5': tier.highlighted }"
+                  >
+                    <div>{{ tier.name }}</div>
+                    <div class="text-xs font-normal text-zinc-500 mt-1">
+                      {{ tier.price }}
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="feature in comparisonFeatures"
+                  :key="feature.name"
+                  class="border-b border-zinc-800/30 last:border-0"
                 >
-                  <div>{{ tier.name }}</div>
-                  <div class="text-xs font-normal text-slate-500 mt-1">
-                    {{ tier.price }}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="feature in comparisonFeatures"
-                :key="feature.name"
-                class="border-b border-slate-100 last:border-0"
-              >
-                <td class="py-4 px-6 text-sm text-slate-600">
-                  {{ feature.name }}
-                </td>
-                <td class="text-center py-4 px-4">
-                  <template v-if="typeof feature.foundation === 'boolean'">
-                    <Icon
-                      v-if="feature.foundation"
-                      name="ph:check-bold"
-                      class="w-5 h-5 text-emerald-500 mx-auto"
-                    />
+                  <td class="py-4 px-6 text-sm text-zinc-400">
+                    {{ feature.name }}
+                  </td>
+                  <td class="text-center py-4 px-4">
+                    <template v-if="typeof feature.foundation === 'boolean'">
+                      <Icon
+                        v-if="feature.foundation"
+                        name="ph:check-bold"
+                        class="w-5 h-5 text-emerald-500 mx-auto"
+                      />
+                      <span
+                        v-else
+                        class="text-zinc-700"
+                      >—</span>
+                    </template>
                     <span
                       v-else
-                      class="text-slate-300"
-                    >—</span>
-                  </template>
-                  <span
-                    v-else
-                    class="text-sm text-slate-900 font-medium"
-                  >{{ feature.foundation }}</span>
-                </td>
-                <td class="text-center py-4 px-4 bg-blue-50/50">
-                  <template v-if="typeof feature.illuminate === 'boolean'">
-                    <Icon
-                      v-if="feature.illuminate"
-                      name="ph:check-bold"
-                      class="w-5 h-5 text-emerald-500 mx-auto"
-                    />
+                      class="text-sm text-zinc-300 font-medium"
+                    >{{ feature.foundation }}</span>
+                  </td>
+                  <td class="text-center py-4 px-4 bg-teal-500/5">
+                    <template v-if="typeof feature.illuminate === 'boolean'">
+                      <Icon
+                        v-if="feature.illuminate"
+                        name="ph:check-bold"
+                        class="w-5 h-5 text-emerald-500 mx-auto"
+                      />
+                      <span
+                        v-else
+                        class="text-zinc-700"
+                      >—</span>
+                    </template>
                     <span
                       v-else
-                      class="text-slate-300"
-                    >—</span>
-                  </template>
-                  <span
-                    v-else
-                    class="text-sm text-slate-900 font-medium"
-                  >{{ feature.illuminate }}</span>
-                </td>
-                <td class="text-center py-4 px-4">
-                  <template v-if="typeof feature.orchestrate === 'boolean'">
-                    <Icon
-                      v-if="feature.orchestrate"
-                      name="ph:check-bold"
-                      class="w-5 h-5 text-emerald-500 mx-auto"
-                    />
+                      class="text-sm text-zinc-300 font-medium"
+                    >{{ feature.illuminate }}</span>
+                  </td>
+                  <td class="text-center py-4 px-4">
+                    <template v-if="typeof feature.orchestrate === 'boolean'">
+                      <Icon
+                        v-if="feature.orchestrate"
+                        name="ph:check-bold"
+                        class="w-5 h-5 text-emerald-500 mx-auto"
+                      />
+                      <span
+                        v-else
+                        class="text-zinc-700"
+                      >—</span>
+                    </template>
                     <span
                       v-else
-                      class="text-slate-300"
-                    >—</span>
-                  </template>
-                  <span
-                    v-else
-                    class="text-sm text-slate-900 font-medium"
-                  >{{ feature.orchestrate }}</span>
-                </td>
-                <td class="text-center py-4 px-4">
-                  <template v-if="typeof feature.sanctum === 'boolean'">
-                    <Icon
-                      v-if="feature.sanctum"
-                      name="ph:check-bold"
-                      class="w-5 h-5 text-emerald-500 mx-auto"
-                    />
+                      class="text-sm text-zinc-300 font-medium"
+                    >{{ feature.orchestrate }}</span>
+                  </td>
+                  <td class="text-center py-4 px-4">
+                    <template v-if="typeof feature.sanctum === 'boolean'">
+                      <Icon
+                        v-if="feature.sanctum"
+                        name="ph:check-bold"
+                        class="w-5 h-5 text-emerald-500 mx-auto"
+                      />
+                      <span
+                        v-else
+                        class="text-zinc-700"
+                      >—</span>
+                    </template>
                     <span
                       v-else
-                      class="text-slate-300"
-                    >—</span>
-                  </template>
-                  <span
-                    v-else
-                    class="text-sm text-slate-900 font-medium"
-                  >{{ feature.sanctum }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                      class="text-sm text-zinc-300 font-medium"
+                    >{{ feature.sanctum }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Mobile comparison hint -->
         <div class="lg:hidden text-center">
-          <p class="text-sm text-slate-500 mb-6">
+          <p class="text-sm text-zinc-500 mb-6">
             View full comparison on desktop
           </p>
           <div class="space-y-4">
@@ -314,20 +342,20 @@ const faqs = [
               v-for="tier in tiers"
               :key="tier.name"
               :to="tier.href"
-              class="block p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors"
+              class="block p-4 rounded-xl border border-zinc-800/50 bg-zinc-900/50 hover:border-zinc-700/50 transition-colors"
             >
               <div class="flex items-center justify-between">
                 <div>
-                  <div class="font-semibold text-slate-900">
+                  <div class="font-semibold text-zinc-100">
                     {{ tier.name }}
                   </div>
-                  <div class="text-sm text-slate-500">
+                  <div class="text-sm text-zinc-500">
                     {{ tier.price }} {{ tier.period }}
                   </div>
                 </div>
                 <Icon
                   name="ph:arrow-right"
-                  class="w-5 h-5 text-slate-400"
+                  class="w-5 h-5 text-zinc-600"
                 />
               </div>
             </NuxtLink>
@@ -337,26 +365,26 @@ const faqs = [
     </section>
 
     <!-- Pricing FAQ -->
-    <section class="py-16 lg:py-20 bg-white">
+    <section class="py-16 lg:py-20 bg-[#09090b]">
       <div class="max-w-3xl mx-auto px-6">
-        <h2 class="text-2xl lg:text-3xl font-semibold text-slate-900 mb-10 text-center">
+        <h2 class="text-2xl lg:text-3xl font-semibold text-white mb-10 text-center">
           Pricing FAQ
         </h2>
 
-        <div class="divide-y divide-slate-200">
+        <div class="divide-y divide-zinc-800/50">
           <details
             v-for="faq in faqs"
             :key="faq.question"
             class="group py-5"
           >
-            <summary class="flex cursor-pointer list-none items-center justify-between text-base font-semibold text-slate-900">
+            <summary class="flex cursor-pointer list-none items-center justify-between text-base font-semibold text-white">
               <span>{{ faq.question }}</span>
               <Icon
                 name="ph:plus-bold"
-                class="w-5 h-5 text-slate-400 transition-transform duration-200 group-open:rotate-45"
+                class="w-5 h-5 text-zinc-500 transition-transform duration-200 group-open:rotate-45"
               />
             </summary>
-            <p class="mt-4 text-slate-600 leading-relaxed pr-12">
+            <p class="mt-4 text-zinc-400 leading-relaxed pr-12">
               {{ faq.answer }}
             </p>
           </details>
@@ -365,17 +393,21 @@ const faqs = [
     </section>
 
     <!-- CTA -->
-    <section class="py-16 lg:py-20 bg-blue-600">
-      <div class="max-w-3xl mx-auto px-6 text-center">
+    <section class="py-16 lg:py-20 bg-[#0f0f12] relative overflow-hidden">
+      <!-- Glow effects -->
+      <div class="absolute top-0 left-1/4 w-[400px] h-[300px] bg-teal-500 rounded-full blur-[200px] opacity-10 pointer-events-none" />
+      <div class="absolute bottom-0 right-1/4 w-[300px] h-[200px] bg-cyan-500 rounded-full blur-[150px] opacity-10 pointer-events-none" />
+
+      <div class="relative max-w-3xl mx-auto px-6 text-center">
         <h2 class="text-3xl lg:text-4xl font-semibold text-white mb-4">
           Ready to get started?
         </h2>
-        <p class="text-lg text-white/90 mb-8">
+        <p class="text-lg text-zinc-400 mb-8">
           Start with 20 free reviews per month. No credit card required.
         </p>
         <NuxtLink
           to="/login"
-          class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold rounded-xl bg-white text-slate-900 hover:bg-slate-50 transition-colors shadow-xl"
+          class="inline-flex items-center gap-2 px-8 py-4 text-base font-semibold rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-200"
         >
           Get started free
           <Icon
