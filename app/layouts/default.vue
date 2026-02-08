@@ -8,8 +8,7 @@ import DomainWorkspaceWorkspaceSwitcher from '~/components/domain/workspace/Work
 import GettingStartedPanel from '~/components/GettingStartedPanel.vue'
 
 /**
- * Default layout - Modern app shell with refined sidebar
- * Sleek navigation with subtle depth and smooth interactions
+ * Default layout - App shell with dark sidebar and refined navigation
  */
 
 const userStore = useUserStore()
@@ -135,28 +134,28 @@ function toggleSidebar() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg-app">
+  <div class="min-h-screen bg-bg-app overscroll-none">
     <!-- Sidebar -->
     <aside
-      class="sidebar fixed inset-y-0 left-0 z-40 hidden flex-col bg-white lg:flex"
-      :class="isSidebarCollapsed ? 'w-[72px]' : 'w-60'"
+      class="sidebar fixed inset-y-0 left-0 z-40 hidden flex-col bg-bg-surface border-r border-border-subtle lg:flex"
+      :class="isSidebarCollapsed ? 'w-[68px]' : 'w-56'"
     >
       <!-- Logo -->
       <div
-        class="flex h-16 shrink-0 items-center border-b border-slate-100"
-        :class="isSidebarCollapsed ? 'justify-center px-3' : 'px-5'"
+        class="flex h-14 shrink-0 items-center border-b border-border-subtle"
+        :class="isSidebarCollapsed ? 'justify-center px-2' : 'px-4'"
       >
         <NuxtLink
           to="/"
-          class="flex items-center"
+          class="flex items-center justify-center"
         >
           <SentinelLogo
             v-if="!isSidebarCollapsed"
-            size="lg"
+            size="md"
           />
           <div
             v-else
-            class="flex size-9 items-center justify-center rounded-xl bg-slate-900"
+            class="flex size-9 items-center justify-center rounded-xl bg-accent"
           >
             <Icon
               name="lucide:shield-check"
@@ -168,22 +167,22 @@ function toggleSidebar() {
 
       <!-- Navigation -->
       <nav
-        class="flex-1 overflow-y-auto py-6"
-        :class="isSidebarCollapsed ? 'px-3' : 'px-3'"
+        class="flex-1 overflow-y-auto py-6 scrollbar-dark"
+        :class="isSidebarCollapsed ? 'px-2' : 'px-3'"
       >
         <!-- Main Navigation -->
-        <div class="space-y-1">
+        <div class="space-y-3">
           <NuxtLink
             v-for="item in mainNavItems"
             :key="item.to"
             :to="item.to"
             :title="isSidebarCollapsed ? item.label : undefined"
-            class="nav-item group relative flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200"
+            class="nav-item group relative flex items-center gap-3 rounded-lg text-[13px] font-medium transition-all duration-150"
             :class="[
-              isSidebarCollapsed ? 'justify-center p-3' : 'px-3 py-2.5',
+              isSidebarCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
               isActive(item.to)
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                ? 'nav-item-active text-white'
+                : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
             ]"
           >
             <Icon
@@ -199,7 +198,7 @@ function toggleSidebar() {
             <!-- Active indicator dot for collapsed state -->
             <span
               v-if="isSidebarCollapsed && isActive(item.to)"
-              class="absolute -right-1 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent"
+              class="absolute -right-0.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent-bright"
             />
           </NuxtLink>
         </div>
@@ -208,26 +207,26 @@ function toggleSidebar() {
         <div class="mt-8">
           <p
             v-if="!isSidebarCollapsed"
-            class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400"
+            class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-wider text-text-faint"
           >
             Workspace
           </p>
           <div
             v-else
-            class="mx-auto mb-3 h-px w-6 bg-slate-200"
+            class="mx-auto mb-3 h-px w-5 bg-border-subtle"
           />
-          <div class="space-y-1">
+          <div class="space-y-3">
             <NuxtLink
               v-for="item in workspaceNavItems"
               :key="item.to"
               :to="item.to"
               :title="isSidebarCollapsed ? item.label : undefined"
-              class="nav-item group relative flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200"
+              class="nav-item group relative flex items-center gap-3 rounded-lg text-[13px] font-medium transition-all duration-150"
               :class="[
-                isSidebarCollapsed ? 'justify-center p-3' : 'px-3 py-2.5',
+                isSidebarCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
                 isActive(item.to)
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'nav-item-active text-white'
+                  : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
               ]"
             >
               <Icon
@@ -242,7 +241,7 @@ function toggleSidebar() {
               </span>
               <span
                 v-if="isSidebarCollapsed && isActive(item.to)"
-                class="absolute -right-1 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent"
+                class="absolute -right-0.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent-bright"
               />
             </NuxtLink>
           </div>
@@ -254,12 +253,12 @@ function toggleSidebar() {
             v-if="helpNavItem"
             :to="helpNavItem.to"
             :title="isSidebarCollapsed ? helpNavItem.label : undefined"
-            class="nav-item group relative flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200"
+            class="nav-item group relative flex items-center gap-3 rounded-lg text-[13px] font-medium transition-all duration-150"
             :class="[
-              isSidebarCollapsed ? 'justify-center p-3' : 'px-3 py-2.5',
+              isSidebarCollapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
               isActive(helpNavItem.to)
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                ? 'nav-item-active text-white'
+                : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'
             ]"
           >
             <Icon
@@ -274,14 +273,14 @@ function toggleSidebar() {
             </span>
             <span
               v-if="isSidebarCollapsed && isActive(helpNavItem.to)"
-              class="absolute -right-1 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent"
+              class="absolute -right-0.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-accent-bright"
             />
           </NuxtLink>
         </div>
       </nav>
 
       <!-- Bottom Section -->
-      <div class="shrink-0 border-t border-slate-100">
+      <div class="shrink-0 border-t border-border-subtle">
         <!-- User Menu -->
         <div
           v-if="!isSidebarCollapsed"
@@ -303,19 +302,18 @@ function toggleSidebar() {
             :src="userStore.user?.avatar_url"
             :name="userStore.user?.name || ''"
             size="sm"
-            class="ring-2 ring-slate-100"
           />
         </div>
 
         <!-- Collapse Toggle -->
         <button
-          class="flex w-full items-center justify-center border-t border-slate-100 py-3 text-slate-400 transition-all duration-200 hover:bg-slate-50 hover:text-slate-600"
+          class="flex w-full items-center justify-center border-t border-border-subtle py-2.5 text-text-muted transition-colors duration-150 hover:bg-bg-hover hover:text-text-primary"
           :title="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           @click="toggleSidebar"
         >
           <Icon
             :name="isSidebarCollapsed ? 'lucide:panel-left-open' : 'lucide:panel-left-close'"
-            class="size-[18px]"
+            class="size-4"
           />
         </button>
       </div>
@@ -336,7 +334,7 @@ function toggleSidebar() {
       >
         <!-- Backdrop -->
         <div
-          class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
+          class="absolute inset-0 bg-black/60 backdrop-blur-sm"
           @click="closeMobileNav"
         />
 
@@ -352,10 +350,10 @@ function toggleSidebar() {
         >
           <div
             v-if="isMobileNavOpen"
-            class="relative flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-2xl"
+            class="relative flex h-full w-72 max-w-[85vw] flex-col bg-bg-surface shadow-2xl"
           >
             <!-- Header -->
-            <div class="flex h-16 items-center justify-between border-b border-slate-100 px-5">
+            <div class="flex h-14 items-center justify-between border-b border-border-subtle px-4">
               <NuxtLink
                 to="/"
                 class="flex items-center"
@@ -364,12 +362,12 @@ function toggleSidebar() {
                 <SentinelLogo size="md" />
               </NuxtLink>
               <button
-                class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                class="flex size-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-bg-hover hover:text-text-primary"
                 @click="closeMobileNav"
               >
                 <Icon
                   name="lucide:x"
-                  class="size-5"
+                  class="size-[18px]"
                 />
               </button>
             </div>
@@ -377,22 +375,22 @@ function toggleSidebar() {
             <!-- Workspace Switcher -->
             <div
               v-if="workspaceStore.hasCurrentWorkspace"
-              class="border-b border-slate-100 p-4"
+              class="border-b border-border-subtle p-3"
             >
               <DomainWorkspaceWorkspaceSwitcher />
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 overflow-y-auto p-4">
-              <div class="space-y-1">
+            <nav class="flex-1 overflow-y-auto p-4 scrollbar-dark">
+              <div class="space-y-2">
                 <NuxtLink
                   v-for="item in mainNavItems"
                   :key="item.to"
                   :to="item.to"
-                  class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150"
                   :class="isActive(item.to)
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                    ? 'nav-item-active text-white'
+                    : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'"
                   @click="closeMobileNav"
                 >
                   <Icon
@@ -405,18 +403,18 @@ function toggleSidebar() {
 
               <!-- Workspace Section -->
               <div class="mt-8">
-                <p class="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                <p class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-wider text-text-faint">
                   Workspace
                 </p>
-                <div class="space-y-1">
+                <div class="space-y-2">
                   <NuxtLink
                     v-for="item in workspaceNavItems"
                     :key="item.to"
                     :to="item.to"
-                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200"
+                    class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150"
                     :class="isActive(item.to)
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                      ? 'nav-item-active text-white'
+                      : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'"
                     @click="closeMobileNav"
                   >
                     <Icon
@@ -433,10 +431,10 @@ function toggleSidebar() {
                 <NuxtLink
                   v-if="helpNavItem"
                   :to="helpNavItem.to"
-                  class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-150"
                   :class="isActive(helpNavItem.to)
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                    ? 'nav-item-active text-white'
+                    : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'"
                   @click="closeMobileNav"
                 >
                   <Icon
@@ -449,7 +447,7 @@ function toggleSidebar() {
             </nav>
 
             <!-- User Section -->
-            <div class="border-t border-slate-100 p-4">
+            <div class="border-t border-border-subtle p-4">
               <DomainUserUserMenu
                 v-if="userStore.isAuthenticated"
                 :user="userStore.user!"
@@ -463,20 +461,20 @@ function toggleSidebar() {
     <!-- Main Area -->
     <div
       class="transition-all duration-300"
-      :class="isSidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-60'"
+      :class="isSidebarCollapsed ? 'lg:pl-[68px]' : 'lg:pl-56'"
     >
-      <!-- Top Header -->
-      <header class="sticky top-0 z-30 border-b border-slate-100 bg-white/80 backdrop-blur-xl">
-        <div class="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <!-- Top Header - Fixed position to prevent bouncing on scroll -->
+      <header class="sticky top-0 z-30 border-b border-border-subtle bg-bg-surface">
+        <div class="flex h-14 items-center justify-between gap-4 px-4 sm:px-6">
           <!-- Left: Mobile menu + Breadcrumbs -->
-          <div class="flex min-w-0 items-center gap-4">
+          <div class="flex min-w-0 items-center gap-3">
             <button
-              class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 lg:hidden"
+              class="flex size-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-bg-hover hover:text-text-primary lg:hidden"
               @click="toggleMobileNav"
             >
               <Icon
                 name="lucide:menu"
-                class="size-5"
+                class="size-[18px]"
               />
             </button>
 
@@ -486,7 +484,7 @@ function toggleSidebar() {
             />
 
             <!-- Breadcrumbs -->
-            <nav class="flex min-w-0 items-center gap-1.5 text-sm">
+            <nav class="hidden min-w-0 items-center gap-1.5 text-sm sm:flex">
               <template
                 v-for="(crumb, index) in breadcrumbs"
                 :key="crumb.to"
@@ -494,14 +492,14 @@ function toggleSidebar() {
                 <Icon
                   v-if="index > 0"
                   name="lucide:chevron-right"
-                  class="size-3.5 shrink-0 text-slate-300"
+                  class="size-3 shrink-0 text-text-faint"
                 />
                 <NuxtLink
                   :to="crumb.to"
-                  class="truncate transition-colors"
+                  class="truncate text-[13px] transition-colors"
                   :class="index === breadcrumbs.length - 1
-                    ? 'font-medium text-slate-900'
-                    : 'text-slate-500 hover:text-slate-700'"
+                    ? 'font-medium text-text-primary'
+                    : 'text-text-muted hover:text-text-secondary'"
                 >
                   {{ crumb.label }}
                 </NuxtLink>
@@ -510,17 +508,17 @@ function toggleSidebar() {
           </div>
 
           <!-- Right: Actions -->
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-0.5">
             <button
               v-if="userStore.isAuthenticated"
               type="button"
-              class="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              class="flex size-8 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-bg-hover hover:text-text-primary"
               title="Getting Started Guide"
               @click="toggleGettingStarted"
             >
               <Icon
                 name="lucide:life-buoy"
-                class="size-[18px]"
+                class="size-4"
               />
             </button>
 
@@ -540,7 +538,7 @@ function toggleSidebar() {
       </header>
 
       <!-- Main Content -->
-      <main class="min-h-[calc(100vh-4rem)]">
+      <main class="min-h-[calc(100vh-3.5rem)]">
         <slot />
       </main>
     </div>
@@ -555,15 +553,19 @@ function toggleSidebar() {
 
 <style scoped>
 .sidebar {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item {
   position: relative;
 }
 
-/* Subtle hover lift effect */
-.nav-item:not(.router-link-active):hover {
-  transform: translateX(2px);
+.nav-item-active {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  box-shadow: 0 0 16px -4px rgba(20, 184, 166, 0.5);
+}
+
+.nav-item-active:hover {
+  box-shadow: 0 0 20px -4px rgba(20, 184, 166, 0.6);
 }
 </style>

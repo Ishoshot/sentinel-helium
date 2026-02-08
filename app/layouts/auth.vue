@@ -1,15 +1,15 @@
 <script setup lang="ts">
 /**
- * Auth layout - Light theme with subtle grid background
+ * Auth layout - Dark theme with subtle grid pattern
  */
 </script>
 
 <template>
-  <div class="landing-light min-h-screen bg-white relative overflow-hidden">
+  <div class="min-h-screen bg-bg-app relative overflow-hidden">
     <!-- Subtle grid pattern -->
     <div
-      class="absolute inset-0 opacity-[0.6]"
-      style="background-image: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px); background-size: 60px 60px;"
+      class="absolute inset-0 opacity-[0.4]"
+      style="background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px;"
     />
 
     <!-- Content -->
@@ -34,7 +34,7 @@
       </main>
 
       <!-- Footer -->
-      <footer class="py-6 text-center text-sm text-slate-400">
+      <footer class="py-6 text-center text-sm text-text-muted">
         <p>&copy; {{ new Date().getFullYear() }} Sentinel. All rights reserved.</p>
       </footer>
     </div>
