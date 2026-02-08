@@ -68,7 +68,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       // Nuxt automatically maps NUXT_PUBLIC_* env vars to these values
-      apiBaseUrl: "http://sentinel.test/api",
+      apiBaseUrl: "http://sentinel-api.test/api",
       reverbAppKey: "sentinel-local-key",
       reverbHost: "localhost",
       reverbPort: "8080",
