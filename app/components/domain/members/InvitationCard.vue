@@ -36,14 +36,14 @@ const roleConfig = computed(() => {
     [MemberRole.Admin]: {
       label: 'Admin',
       icon: 'lucide:shield',
-      color: 'text-blue-700',
-      bg: 'bg-blue-100',
+      color: 'text-blue-400',
+      bg: 'bg-blue-500/10',
     },
     [MemberRole.Member]: {
       label: 'Member',
       icon: 'lucide:user',
-      color: 'text-stone-600',
-      bg: 'bg-stone-100',
+      color: 'text-text-secondary',
+      bg: 'bg-bg-surface',
     },
   }
   return configs[props.invitation.role as Exclude<MemberRole, MemberRole.Owner>]
@@ -87,29 +87,29 @@ function handleCancel() {
     @mouseleave="isHovered = false"
   >
     <div
-      class="relative overflow-hidden rounded-2xl border bg-white transition-all duration-300"
+      class="relative overflow-hidden rounded-2xl border bg-bg-elevated transition-all duration-300"
       :class="[
         invitation.is_expired
-          ? 'border-amber-200 bg-amber-50/30'
+          ? 'border-amber-500/30 bg-amber-500/5'
           : isHovered
-            ? 'border-stone-200 shadow-md'
-            : 'border-stone-100 shadow-sm',
+            ? 'border-border-muted shadow-lg'
+            : 'border-border-subtle shadow-sm',
       ]"
     >
       <!-- Status badge -->
       <div class="absolute right-3 top-3 z-10">
         <div
-          class="flex items-center gap-1 rounded-full px-2 py-1"
-          :class="invitation.is_expired ? 'bg-amber-100' : 'bg-violet-100'"
+          class="flex items-center gap-1 rounded-full px-2 py-1 ring-1"
+          :class="invitation.is_expired ? 'bg-amber-500/10 ring-amber-500/20' : 'bg-violet-500/10 ring-violet-500/20'"
         >
           <Icon
             :name="invitation.is_expired ? 'lucide:clock' : 'lucide:mail'"
             class="size-3"
-            :class="invitation.is_expired ? 'text-amber-600' : 'text-violet-600'"
+            :class="invitation.is_expired ? 'text-amber-400' : 'text-violet-400'"
           />
           <span
             class="text-[10px] font-semibold uppercase tracking-wide"
-            :class="invitation.is_expired ? 'text-amber-700' : 'text-violet-700'"
+            :class="invitation.is_expired ? 'text-amber-400' : 'text-violet-400'"
           >
             {{ invitation.is_expired ? 'Expired' : 'Pending' }}
           </span>
@@ -127,14 +127,14 @@ function handleCancel() {
       >
         <div
           v-if="isResending"
-          class="absolute inset-0 z-20 flex items-center justify-center bg-white/80 backdrop-blur-sm"
+          class="absolute inset-0 z-20 flex items-center justify-center bg-bg-elevated/80 backdrop-blur-sm"
         >
-          <div class="flex items-center gap-2 rounded-full bg-violet-100 px-4 py-2">
+          <div class="flex items-center gap-2 rounded-full bg-violet-500/10 px-4 py-2 ring-1 ring-violet-500/20">
             <Icon
               name="lucide:loader-2"
-              class="size-4 animate-spin text-violet-600"
+              class="size-4 animate-spin text-violet-400"
             />
-            <span class="text-sm font-medium text-violet-700">Resending...</span>
+            <span class="text-sm font-medium text-violet-400">Resending...</span>
           </div>
         </div>
       </Transition>
@@ -145,17 +145,17 @@ function handleCancel() {
           <div class="relative shrink-0">
             <div
               class="flex size-12 items-center justify-center rounded-full"
-              :class="invitation.is_expired ? 'bg-amber-100' : 'bg-violet-100'"
+              :class="invitation.is_expired ? 'bg-amber-500/10' : 'bg-violet-500/10'"
             >
               <Icon
                 name="lucide:user"
                 class="size-6"
-                :class="invitation.is_expired ? 'text-amber-500' : 'text-violet-500'"
+                :class="invitation.is_expired ? 'text-amber-400' : 'text-violet-400'"
               />
             </div>
             <!-- Envelope indicator -->
             <div
-              class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full ring-2 ring-white"
+              class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full ring-2 ring-bg-elevated"
               :class="invitation.is_expired ? 'bg-amber-400' : 'bg-violet-500'"
             >
               <Icon
@@ -167,13 +167,13 @@ function handleCancel() {
 
           <!-- Invitation info -->
           <div class="min-w-0 flex-1">
-            <h3 class="truncate text-sm font-semibold text-stone-900">
+            <h3 class="truncate text-sm font-semibold text-text-primary">
               {{ invitation.email }}
             </h3>
 
-            <div class="mt-1 flex items-center gap-2 text-xs text-stone-400">
+            <div class="mt-1 flex items-center gap-2 text-xs text-text-muted">
               <span>Invited by {{ invitation.invited_by.name }}</span>
-              <span class="text-stone-300">•</span>
+              <span class="text-border-muted">•</span>
               <span>{{ sentDate }}</span>
             </div>
 
@@ -200,7 +200,7 @@ function handleCancel() {
               <!-- Expiry -->
               <div
                 class="flex items-center gap-1.5 text-xs"
-                :class="invitation.is_expired ? 'text-amber-600' : 'text-stone-400'"
+                :class="invitation.is_expired ? 'text-amber-400' : 'text-text-muted'"
               >
                 <Icon
                   name="lucide:clock"
@@ -223,11 +223,11 @@ function handleCancel() {
         >
           <div
             v-if="canManage && isHovered"
-            class="mt-4 flex items-center gap-2 border-t border-stone-100 pt-4"
+            class="mt-4 flex items-center gap-2 border-t border-border-subtle pt-4"
           >
             <!-- Resend button -->
             <button
-              class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-50 px-3 py-2 text-xs font-medium text-violet-700 transition-colors hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-500/10 px-3 py-2 text-xs font-medium text-violet-400 transition-colors hover:bg-violet-500/20 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="isResending"
               @click="handleResend"
             >
@@ -240,7 +240,7 @@ function handleCancel() {
 
             <!-- Cancel button -->
             <button
-              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-stone-500 transition-colors hover:bg-red-50 hover:text-red-600"
+              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-400"
               @click="handleCancel"
             >
               <Icon

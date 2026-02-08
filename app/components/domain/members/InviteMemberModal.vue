@@ -100,17 +100,17 @@ function handleEmailBlur() {
   >
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-xl bg-gray-100">
+        <div class="flex size-10 items-center justify-center rounded-xl bg-accent/10">
           <Icon
             name="lucide:user-plus"
-            class="size-5 text-gray-600"
+            class="size-5 text-accent"
           />
         </div>
         <div>
-          <h2 class="text-lg font-semibold text-gray-900">
+          <h2 class="text-lg font-semibold text-text-primary">
             Invite team member
           </h2>
-          <p class="text-sm text-gray-500">
+          <p class="text-sm text-text-muted">
             Send an invitation to join your workspace
           </p>
         </div>
@@ -128,7 +128,7 @@ function handleEmailBlur() {
       >
         <label
           for="invite-email"
-          class="mb-2 block text-sm font-medium text-gray-900"
+          class="mb-2 block text-sm font-medium text-text-primary"
         >
           Email address
         </label>
@@ -136,7 +136,7 @@ function handleEmailBlur() {
           <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <Icon
               name="lucide:mail"
-              class="size-4 text-gray-400"
+              class="size-4 text-text-muted"
             />
           </div>
           <input
@@ -145,11 +145,11 @@ function handleEmailBlur() {
             type="email"
             placeholder="colleague@company.com"
             autocomplete="email"
-            class="w-full rounded-lg border bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+            class="w-full rounded-lg border bg-bg-surface py-2.5 pl-10 pr-10 text-sm text-text-primary transition-all duration-200 placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/10"
             :class="[
               showEmailError
-                ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
-                : 'border-gray-200 focus:border-gray-300',
+                ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10'
+                : 'border-border-subtle focus:border-border-muted',
             ]"
             @blur="handleEmailBlur"
           >
@@ -198,7 +198,7 @@ function handleEmailBlur() {
         class="transition-all duration-500 ease-out delay-75"
         :class="isReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
       >
-        <label class="mb-3 block text-sm font-medium text-gray-900">
+        <label class="mb-3 block text-sm font-medium text-text-primary">
           Select role
         </label>
         <div class="grid grid-cols-2 gap-3">
@@ -209,15 +209,15 @@ function handleEmailBlur() {
             class="group relative rounded-xl border-2 p-4 text-left transition-all duration-200"
             :class="[
               selectedRole === role.value
-                ? 'border-gray-900 bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                ? 'border-accent bg-accent/5'
+                : 'border-border-subtle hover:border-border-muted hover:bg-bg-hover'
             ]"
             @click="selectedRole = role.value"
           >
             <!-- Selected indicator -->
             <div
               class="absolute right-3 top-3 flex size-5 items-center justify-center rounded-full transition-all duration-200"
-              :class="selectedRole === role.value ? 'bg-gray-900' : 'border-2 border-gray-200 bg-white'"
+              :class="selectedRole === role.value ? 'bg-accent' : 'border-2 border-border-subtle bg-bg-surface'"
             >
               <Transition
                 enter-active-class="transition duration-150 ease-out"
@@ -238,23 +238,23 @@ function handleEmailBlur() {
             <!-- Icon -->
             <div
               class="mb-3 flex size-10 items-center justify-center rounded-lg transition-colors duration-200"
-              :class="selectedRole === role.value ? 'bg-gray-900' : 'bg-gray-100 group-hover:bg-gray-200'"
+              :class="selectedRole === role.value ? 'bg-accent' : 'bg-bg-surface group-hover:bg-bg-hover'"
             >
               <Icon
                 :name="role.icon"
                 class="size-5 transition-colors duration-200"
-                :class="selectedRole === role.value ? 'text-white' : 'text-gray-500'"
+                :class="selectedRole === role.value ? 'text-white' : 'text-text-muted'"
               />
             </div>
 
             <!-- Content -->
             <h3
               class="text-sm font-semibold transition-colors duration-200"
-              :class="selectedRole === role.value ? 'text-gray-900' : 'text-gray-700'"
+              :class="selectedRole === role.value ? 'text-text-primary' : 'text-text-secondary'"
             >
               {{ role.label }}
             </h3>
-            <p class="mt-0.5 text-xs text-gray-500">
+            <p class="mt-0.5 text-xs text-text-muted">
               {{ role.description }}
             </p>
 
@@ -263,11 +263,11 @@ function handleEmailBlur() {
               <li
                 v-for="permission in role.permissions"
                 :key="permission"
-                class="flex items-center gap-1.5 text-[11px] text-gray-400"
+                class="flex items-center gap-1.5 text-[11px] text-text-muted"
               >
                 <Icon
                   name="lucide:check"
-                  class="size-3 text-gray-300"
+                  class="size-3 text-text-muted"
                 />
                 {{ permission }}
               </li>
@@ -284,14 +284,14 @@ function handleEmailBlur() {
       >
         <div
           v-if="error"
-          class="rounded-lg border border-red-200 bg-red-50 p-3"
+          class="rounded-lg border border-red-500/20 bg-red-500/10 p-3"
         >
           <div class="flex items-center gap-2">
             <Icon
               name="lucide:alert-circle"
-              class="size-4 shrink-0 text-red-600"
+              class="size-4 shrink-0 text-red-400"
             />
-            <p class="text-sm text-red-700">
+            <p class="text-sm text-red-400">
               {{ error }}
             </p>
           </div>
@@ -301,20 +301,20 @@ function handleEmailBlur() {
 
     <template #footer>
       <div class="flex items-center justify-between">
-        <p class="text-xs text-gray-400">
+        <p class="text-xs text-text-muted">
           They'll receive an email with an invitation link
         </p>
         <div class="flex items-center gap-3">
           <button
             type="button"
-            class="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            class="rounded-lg px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover hover:text-text-primary"
             @click="handleClose"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2 text-sm font-medium text-white transition-all hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="!canSubmit"
             @click="handleSubmit"
           >
@@ -335,3 +335,9 @@ function handleEmailBlur() {
     </template>
   </BaseModal>
 </template>
+
+<style scoped>
+.hover\:shadow-glow:hover {
+  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+}
+</style>

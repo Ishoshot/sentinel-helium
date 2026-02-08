@@ -44,22 +44,22 @@ const roleConfig = computed(() => {
   }> = {
     [MemberRole.Owner]: {
       label: 'Owner',
-      color: 'text-amber-700',
-      bg: 'bg-amber-100',
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
       icon: 'lucide:crown',
       description: 'Full control over workspace',
     },
     [MemberRole.Admin]: {
       label: 'Admin',
-      color: 'text-blue-700',
-      bg: 'bg-blue-100',
+      color: 'text-blue-400',
+      bg: 'bg-blue-500/10',
       icon: 'lucide:shield',
       description: 'Can manage members and settings',
     },
     [MemberRole.Member]: {
       label: 'Member',
-      color: 'text-stone-600',
-      bg: 'bg-stone-100',
+      color: 'text-text-secondary',
+      bg: 'bg-bg-surface',
       icon: 'lucide:user',
       description: 'Can view and contribute',
     },
@@ -74,16 +74,16 @@ const availableRoles = computed(() => [
     label: 'Admin',
     description: 'Can manage members and settings',
     icon: 'lucide:shield',
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
   },
   {
     value: MemberRole.Member,
     label: 'Member',
     description: 'Can view and contribute',
     icon: 'lucide:user',
-    color: 'text-stone-600',
-    bg: 'bg-stone-50',
+    color: 'text-text-secondary',
+    bg: 'bg-bg-surface',
   },
 ])
 
@@ -128,12 +128,12 @@ onUnmounted(() => {
     @mouseleave="isHovered = false"
   >
     <div
-      class="relative overflow-hidden rounded-2xl border bg-white transition-all duration-300"
+      class="relative overflow-hidden rounded-2xl border bg-bg-elevated transition-all duration-300"
       :class="[
         isHovered
-          ? 'border-stone-200 shadow-md'
-          : 'border-stone-100 shadow-sm',
-        isOwner ? 'ring-2 ring-amber-200/50' : '',
+          ? 'border-border-muted shadow-lg'
+          : 'border-border-subtle shadow-sm',
+        isOwner ? 'ring-2 ring-amber-500/20' : '',
       ]"
     >
       <!-- Owner badge -->
@@ -141,12 +141,12 @@ onUnmounted(() => {
         v-if="isOwner"
         class="absolute right-3 top-3 z-10"
       >
-        <div class="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1">
+        <div class="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 ring-1 ring-amber-500/20">
           <Icon
             name="lucide:crown"
-            class="size-3 text-amber-600"
+            class="size-3 text-amber-400"
           />
-          <span class="text-[10px] font-semibold uppercase tracking-wide text-amber-700">Owner</span>
+          <span class="text-[10px] font-semibold uppercase tracking-wide text-amber-400">Owner</span>
         </div>
       </div>
 
@@ -158,12 +158,12 @@ onUnmounted(() => {
               :src="member.user.avatar_url"
               :name="member.user.name"
               :size="isCompact ? 'md' : 'lg'"
-              class="ring-2 ring-stone-100"
+              class="ring-2 ring-border-subtle"
             />
             <!-- Admin shield -->
             <div
               v-if="isAdmin"
-              class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-blue-500 ring-2 ring-white"
+              class="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full bg-blue-500 ring-2 ring-bg-elevated"
             >
               <Icon
                 name="lucide:shield"
@@ -175,18 +175,18 @@ onUnmounted(() => {
           <!-- Member info -->
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <h3 class="truncate text-sm font-semibold text-stone-900">
+              <h3 class="truncate text-sm font-semibold text-text-primary">
                 {{ member.user.name }}
               </h3>
               <span
                 v-if="isCurrentUser"
-                class="shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-700"
+                class="shrink-0 rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-400"
               >
                 You
               </span>
             </div>
 
-            <p class="mt-0.5 truncate text-sm text-stone-500">
+            <p class="mt-0.5 truncate text-sm text-text-muted">
               {{ member.user.email }}
             </p>
 
@@ -212,7 +212,7 @@ onUnmounted(() => {
               </div>
 
               <!-- Joined date -->
-              <div class="flex items-center gap-1.5 text-xs text-stone-400">
+              <div class="flex items-center gap-1.5 text-xs text-text-muted">
                 <Icon
                   name="lucide:calendar"
                   class="size-3"
@@ -234,7 +234,7 @@ onUnmounted(() => {
         >
           <div
             v-if="canModify && isHovered"
-            class="mt-4 flex items-center gap-2 border-t border-stone-100 pt-4"
+            class="mt-4 flex items-center gap-2 border-t border-border-subtle pt-4"
           >
             <!-- Role change dropdown -->
             <div
@@ -242,7 +242,7 @@ onUnmounted(() => {
               @click.stop
             >
               <button
-                class="flex w-full items-center justify-center gap-2 rounded-lg bg-stone-50 px-3 py-2 text-xs font-medium text-stone-600 transition-colors hover:bg-stone-100"
+                class="flex w-full items-center justify-center gap-2 rounded-lg bg-bg-surface px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
                 @click="showRoleDropdown = !showRoleDropdown"
               >
                 <Icon
@@ -263,10 +263,10 @@ onUnmounted(() => {
               >
                 <div
                   v-if="showRoleDropdown"
-                  class="absolute bottom-full left-0 z-20 mb-2 w-full overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl"
+                  class="absolute bottom-full left-0 z-20 mb-2 w-full overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated shadow-xl"
                 >
-                  <div class="border-b border-stone-100 px-3 py-2">
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                  <div class="border-b border-border-subtle px-3 py-2">
+                    <p class="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                       Select role
                     </p>
                   </div>
@@ -278,13 +278,13 @@ onUnmounted(() => {
                       :class="[
                         member.role === role.value
                           ? role.bg
-                          : 'hover:bg-stone-50'
+                          : 'hover:bg-bg-hover'
                       ]"
                       @click="handleRoleChange(role.value)"
                     >
                       <div
                         class="flex size-8 items-center justify-center rounded-lg"
-                        :class="member.role === role.value ? 'bg-white shadow-sm' : 'bg-stone-100'"
+                        :class="member.role === role.value ? 'bg-bg-elevated shadow-sm' : 'bg-bg-surface'"
                       >
                         <Icon
                           :name="role.icon"
@@ -296,7 +296,7 @@ onUnmounted(() => {
                         <div class="flex items-center gap-2">
                           <span
                             class="text-sm font-medium"
-                            :class="member.role === role.value ? role.color : 'text-stone-700'"
+                            :class="member.role === role.value ? role.color : 'text-text-primary'"
                           >
                             {{ role.label }}
                           </span>
@@ -307,7 +307,7 @@ onUnmounted(() => {
                             :class="role.color"
                           />
                         </div>
-                        <p class="text-[11px] text-stone-500">
+                        <p class="text-[11px] text-text-muted">
                           {{ role.description }}
                         </p>
                       </div>
@@ -319,7 +319,7 @@ onUnmounted(() => {
 
             <!-- Remove button -->
             <button
-              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-stone-500 transition-colors hover:bg-red-50 hover:text-red-600"
+              class="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-400"
               @click="handleRemove"
             >
               <Icon
