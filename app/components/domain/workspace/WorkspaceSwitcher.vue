@@ -92,7 +92,7 @@ function handleClickOutside(event: MouseEvent) {
         v-if="currentWorkspace"
         :name="currentWorkspace.name"
         size="sm"
-        class="rounded-lg ring-2 ring-border-subtle transition-all duration-200 group-hover:ring-accent/50"
+        class="rounded-lg"
       />
       <span class="truncate max-w-[120px]">{{ currentWorkspace?.name || 'Select Workspace' }}</span>
       <Icon

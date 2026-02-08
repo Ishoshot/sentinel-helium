@@ -1,20 +1,20 @@
 <script setup lang="ts">
 /**
- * ActivityItem - Premium activity log entry with timeline connector
- * Features colored badges, timeline visualization, and rich interactions
+ * ActivityItem - Editorial-style activity feed entry
+ * Clean, minimal design with colored accent borders and elegant typography
  */
 
 interface Props {
   avatarUrl?: string | null
   avatarName: string
-  title: string // Badge text (e.g. "Synced", "Created")
+  title: string
   actorName: string
   description: string
   timestamp: string
   icon?: string
-  type?: string // Activity type for badge color derivation
-  isFirst?: boolean // Hide upper connector line for first item
-  isLast?: boolean // Hide lower connector line for last item
+  type?: string
+  isFirst?: boolean
+  isLast?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,73 +24,83 @@ const props = withDefaults(defineProps<Props>(), {
   isLast: false,
 })
 
-// Hover state for optional chevron
-const isHovered = ref(false)
-
-// Derive badge styling from activity type or title
-// Using Design System semantic tokens: accent, success, warning, error
-const badgeConfig = computed(() => {
+// Derive accent color and icon from activity type
+const activityStyle = computed(() => {
   const type = props.type.toLowerCase()
   const title = props.title.toLowerCase()
 
-  // Sync/Connect - Sentinel Blue (Accent)
+  // Sync/Connect - Teal accent
   if (type.includes('sync') || title.includes('sync') || type.includes('connect') || title.includes('connect')) {
     return {
-      bg: 'bg-accent/10',
-      text: 'text-accent',
+      iconBg: 'bg-accent/10',
+      iconColor: 'text-accent',
+      badgeBg: 'bg-accent/10',
+      badgeText: 'text-accent',
       icon: type.includes('sync') ? 'lucide:refresh-cw' : 'lucide:link',
     }
   }
 
-  // Commit/Push - Success (Green)
+  // Commit/Push - Emerald
   if (type.includes('commit') || title.includes('commit') || type.includes('push')) {
     return {
-      bg: 'bg-success/10',
-      text: 'text-success',
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-500',
+      badgeBg: 'bg-emerald-500/10',
+      badgeText: 'text-emerald-600 dark:text-emerald-400',
       icon: 'lucide:git-commit-horizontal',
     }
   }
 
-  // Create/Add - Accent (Blue) - Primary generative action
+  // Create/Add - Sky blue
   if (type.includes('create') || title.includes('create') || type.includes('add')) {
     return {
-      bg: 'bg-accent/10',
-      text: 'text-accent',
-      icon: 'lucide:plus',
+      iconBg: 'bg-sky-500/10',
+      iconColor: 'text-sky-500',
+      badgeBg: 'bg-sky-500/10',
+      badgeText: 'text-sky-600 dark:text-sky-400',
+      icon: 'lucide:plus-circle',
     }
   }
 
-  // Member/Invite - Accent (Blue) - Workspace growth
+  // Member/Invite - Violet
   if (type.includes('invite') || type.includes('member') || type.includes('join')) {
     return {
-      bg: 'bg-accent/10',
-      text: 'text-accent',
+      iconBg: 'bg-violet-500/10',
+      iconColor: 'text-violet-500',
+      badgeBg: 'bg-violet-500/10',
+      badgeText: 'text-violet-600 dark:text-violet-400',
       icon: 'lucide:user-plus',
     }
   }
 
-  // Remove/Delete - Error (Red)
+  // Remove/Delete - Rose
   if (type.includes('remove') || type.includes('delete') || type.includes('disconnect')) {
     return {
-      bg: 'bg-error/10',
-      text: 'text-error',
+      iconBg: 'bg-rose-500/10',
+      iconColor: 'text-rose-500',
+      badgeBg: 'bg-rose-500/10',
+      badgeText: 'text-rose-600 dark:text-rose-400',
       icon: 'lucide:trash-2',
     }
   }
 
-  // Update - Warning (Amber)
+  // Update - Amber
   if (type.includes('update') || title.includes('update')) {
     return {
-      bg: 'bg-warning/10',
-      text: 'text-warning',
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-500',
+      badgeBg: 'bg-amber-500/10',
+      badgeText: 'text-amber-600 dark:text-amber-400',
       icon: 'lucide:pencil',
     }
   }
 
-  // Default - Neutral (Gray)
+  // Default - Neutral
   return {
-    bg: 'bg-bg-surface',
-    text: 'text-text-secondary',
+    iconBg: 'bg-bg-surface',
+    iconColor: 'text-text-muted',
+    badgeBg: 'bg-bg-surface',
+    badgeText: 'text-text-secondary',
     icon: props.icon || 'lucide:activity',
   }
 })
@@ -106,94 +116,64 @@ const formattedDescription = computed(() => {
 
 <template>
   <div
-    class="group relative flex gap-0"
-    @mouseenter="isHovered = true"
-    @mouseleave="isHovered = false"
+    class="group relative"
+    :class="{ 'mt-3': !isFirst }"
   >
-    <!-- Timeline connector column -->
-    <div class="relative flex flex-col items-center flex-shrink-0 w-12 sm:w-16">
-      <!-- Upper Line (hidden for first item) -->
-      <div
-        v-if="!isFirst"
-        class="absolute top-0 h-10 left-1/2 w-px -translate-x-1/2 bg-border-subtle"
-      />
-      <!-- Lower Line (hidden for last item) -->
-      <div
-        v-if="!isLast"
-        class="absolute top-10 bottom-0 left-1/2 w-px -translate-x-1/2 bg-border-subtle"
-      />
-
-      <!-- Avatar (positioned to align with content padding) -->
-      <div class="relative z-10 mt-5 ring-4 ring-bg-elevated rounded-full bg-bg-elevated">
-        <BaseAvatar
-          v-if="avatarUrl"
-          :src="avatarUrl"
-          :name="avatarName"
-          size="md"
-        />
-        <div
-          v-else
-          class="w-10 h-10 bg-bg-surface rounded-full flex items-center justify-center border border-border-subtle"
-        >
-          <Icon
-            :name="badgeConfig.icon"
-            class="w-5 h-5 text-text-muted"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div class="flex-1 min-w-0 py-5 pr-2 sm:pr-4">
-      <!-- Actor Name -->
-      <h4 class="text-sm font-semibold text-text-primary">
-        {{ actorName }}
-      </h4>
-
-      <!-- Description -->
-      <p class="text-sm text-text-secondary mt-1 leading-normal">
-        {{ formattedDescription }}
-      </p>
-
-      <!-- Badge and Timestamp row -->
-      <div class="flex flex-wrap items-center gap-3 mt-3">
-        <!-- Activity Type Badge -->
-        <div
-          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-colors"
-          :class="[badgeConfig.bg, badgeConfig.text]"
-        >
-          <Icon
-            :name="badgeConfig.icon"
-            class="w-3.5 h-3.5"
-          />
-          <span>{{ title }}</span>
-        </div>
-
-        <!-- Timestamp -->
-        <span class="text-xs text-text-muted font-medium">
-          {{ timestamp }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Hover chevron (optional, for clickable items) -->
-    <Transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0 -translate-x-2"
-      enter-to-class="opacity-100 translate-x-0"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100 translate-x-0"
-      leave-to-class="opacity-0 -translate-x-2"
+    <!-- Activity Card -->
+    <div
+      class="relative flex gap-4 p-4 rounded-xl transition-all duration-200 hover:bg-bg-hover bg-bg-surface cursor-pointer"
     >
+      <!-- Icon -->
       <div
-        v-if="isHovered"
-        class="absolute right-0 top-6 text-text-muted/50"
+        class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-105"
+        :class="activityStyle.iconBg"
       >
         <Icon
-          name="lucide:chevron-right"
+          :name="activityStyle.icon"
           class="w-5 h-5"
+          :class="activityStyle.iconColor"
         />
       </div>
-    </Transition>
+
+      <!-- Content -->
+      <div class="flex-1 min-w-0">
+        <!-- Top row: Actor + Timestamp -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <BaseAvatar
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              :name="avatarName"
+              size="xs"
+            />
+            <span class="text-sm font-medium text-text-primary truncate">
+              {{ actorName }}
+            </span>
+          </div>
+          <time class="text-xs text-text-muted whitespace-nowrap font-medium tabular-nums">
+            {{ timestamp }}
+          </time>
+        </div>
+
+        <!-- Description -->
+        <p class="mt-1.5 text-sm text-text-secondary leading-relaxed">
+          {{ formattedDescription }}
+        </p>
+
+        <!-- Activity Badge -->
+        <div class="mt-3">
+          <span
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium"
+            :class="[activityStyle.badgeBg, activityStyle.badgeText]"
+          >
+            <Icon
+              :name="activityStyle.icon"
+              class="w-3 h-3"
+            />
+            {{ title }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

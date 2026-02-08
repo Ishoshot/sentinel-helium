@@ -121,14 +121,11 @@ function toggleCollapse() {
   >
     <div
       v-if="!isDismissed"
-      class="relative overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated shadow-subtle"
+      class="relative overflow-hidden rounded-xl border border-border-subtle bg-bg-elevated"
     >
-      <!-- Subtle gradient accent at top -->
-      <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-
       <!-- Header -->
-      <div class="flex items-center justify-between p-5 pb-4">
-        <div class="flex items-center gap-4">
+      <div class="flex items-center justify-between p-6 pb-5">
+        <div class="flex items-center gap-3">
           <!-- Progress Ring -->
           <div class="relative">
             <svg
@@ -174,7 +171,7 @@ function toggleCollapse() {
             </h2>
             <p class="text-sm text-text-muted mt-0.5">
               {{ isAllComplete
-                ? 'Your workspace is ready to go'
+                ? 'Your workspace is ready'
                 : `${totalSteps - completedCount} ${totalSteps - completedCount === 1 ? 'step' : 'steps'} remaining`
               }}
             </p>
@@ -218,7 +215,7 @@ function toggleCollapse() {
       >
         <div
           v-show="!isCollapsed"
-          class="px-5 pb-5"
+          class="px-6 pb-6"
         >
           <!-- Celebration banner -->
           <Transition
@@ -231,7 +228,7 @@ function toggleCollapse() {
           >
             <div
               v-if="showCelebration && isAllComplete"
-              class="mb-4 p-4 rounded-lg bg-gradient-to-r from-success/5 via-accent/5 to-success/5 border border-success/20"
+              class="mb-5 p-5 rounded-lg bg-gradient-to-r from-success/5 via-accent/5 to-success/5 border border-success/20"
             >
               <div class="flex items-center gap-3">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
@@ -253,12 +250,12 @@ function toggleCollapse() {
           </Transition>
 
           <!-- Steps list -->
-          <div class="space-y-2">
+          <div class="space-y-3">
             <NuxtLink
               v-for="(step, index) in steps"
               :key="step.id"
               :to="step.route"
-              class="group flex items-center gap-4 p-4 rounded-xl border transition-all duration-200"
+              class="group flex items-center gap-4 p-5 rounded-xl border transition-all duration-150"
               :class="[
                 step.completed
                   ? 'bg-success/[0.03] border-success/20 hover:bg-success/[0.06]'
@@ -269,95 +266,83 @@ function toggleCollapse() {
             >
               <!-- Step indicator -->
               <div
-                class="relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                class="relative shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200"
                 :class="[
                   step.completed
-                    ? 'bg-success text-white'
+                    ? 'bg-emerald-500 text-white'
                     : index === currentStepIndex
                       ? 'bg-accent text-white'
                       : 'bg-bg-elevated border border-border-muted text-text-muted'
                 ]"
               >
-                <Transition
-                  enter-active-class="transition duration-300 ease-out"
-                  enter-from-class="scale-0 rotate-180"
-                  enter-to-class="scale-100 rotate-0"
-                  leave-active-class="transition duration-200 ease-in"
-                  leave-from-class="scale-100 rotate-0"
-                  leave-to-class="scale-0 -rotate-180"
-                  mode="out-in"
-                >
-                  <Icon
-                    v-if="step.completed"
-                    key="check"
-                    name="lucide:check"
-                    class="w-5 h-5"
-                  />
-                  <Icon
-                    v-else
-                    :key="step.icon"
-                    :name="step.icon"
-                    class="w-5 h-5"
-                  />
-                </Transition>
+                <Icon
+                  v-if="step.completed"
+                  name="lucide:check"
+                  class="size-4"
+                />
+                <Icon
+                  v-else
+                  :name="step.icon"
+                  class="size-4"
+                />
               </div>
 
               <!-- Content -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
                   <h3
-                    class="text-sm font-medium transition-colors"
-                    :class="step.completed ? 'text-success' : 'text-text-primary'"
+                    class="text-[13px] font-medium transition-colors"
+                    :class="step.completed ? 'text-emerald-400' : 'text-text-primary'"
                   >
                     {{ step.title }}
                   </h3>
                   <span
                     v-if="index === currentStepIndex && !step.completed"
-                    class="px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide rounded bg-accent/10 text-accent"
+                    class="px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide rounded bg-accent/10 text-accent"
                   >
                     Next
                   </span>
                 </div>
-                <p class="text-sm text-text-muted mt-0.5 line-clamp-1">
+                <p class="text-xs text-text-muted mt-0.5 line-clamp-1">
                   {{ step.description }}
                 </p>
               </div>
 
               <!-- Action indicator -->
-              <div class="flex-shrink-0 flex items-center gap-2">
+              <div class="shrink-0 flex items-center gap-2">
                 <span
                   v-if="!step.completed"
-                  class="text-xs font-medium text-text-muted group-hover:text-text-secondary transition-colors hidden sm:block"
+                  class="text-xs text-text-faint group-hover:text-text-muted transition-colors hidden sm:block"
                 >
                   {{ step.benefit }}
                 </span>
                 <div
-                  class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200"
+                  class="size-7 rounded-md flex items-center justify-center transition-colors"
                   :class="[
                     step.completed
-                      ? 'bg-success/10 text-success'
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : 'bg-bg-surface text-text-muted group-hover:bg-accent/10 group-hover:text-accent'
                   ]"
                 >
                   <Icon
                     :name="step.completed ? 'lucide:check' : 'lucide:arrow-right'"
-                    class="w-4 h-4 transition-transform group-hover:translate-x-0.5"
+                    class="size-3.5 transition-transform group-hover:translate-x-0.5"
                   />
                 </div>
               </div>
             </NuxtLink>
           </div>
 
-          <!-- Footer with progress bar (alternative visual) -->
+          <!-- Footer with progress bar -->
           <div class="mt-4 pt-4 border-t border-border-subtle">
-            <div class="flex items-center justify-between text-xs text-text-muted mb-2">
+            <div class="flex items-center justify-between text-[11px] text-text-muted mb-1.5">
               <span>Setup progress</span>
               <span class="font-medium text-text-secondary">{{ Math.round(progressPercentage) }}%</span>
             </div>
-            <div class="h-1.5 bg-bg-surface rounded-full overflow-hidden">
+            <div class="h-1 bg-bg-surface rounded-full overflow-hidden">
               <div
-                class="h-full rounded-full transition-all duration-700 ease-out"
-                :class="isAllComplete ? 'bg-success' : 'bg-accent'"
+                class="h-full rounded-full transition-all duration-500 ease-out"
+                :class="isAllComplete ? 'bg-emerald-500' : 'bg-accent'"
                 :style="{ width: `${progressPercentage}%` }"
               />
             </div>
