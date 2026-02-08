@@ -142,6 +142,21 @@ function handleManageSubscription(subscription: BriefingSubscription) {
   showManageSubscriptionModal.value = true;
 }
 
+function handleSubscriptionCreated() {
+  toast.success("Subscription created successfully");
+  fetchSubscriptions();
+}
+
+function handleSubscriptionUpdated() {
+  toast.success("Subscription updated successfully");
+  fetchSubscriptions();
+}
+
+function handleSubscriptionCancelled() {
+  toast.success("Subscription cancelled");
+  fetchSubscriptions();
+}
+
 function handleViewGeneration(generationId: number) {
   router.push(`/${workspaceSlug.value}/briefings/generations/${generationId}`);
 }
@@ -736,6 +751,21 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
         :briefing="selectedBriefing"
         :loading="isGenerating"
         @generate="handleConfirmGenerate"
+      />
+
+      <BriefingsBriefingSubscriptionModal
+        v-model="showSubscribeModal"
+        :briefing="selectedBriefing"
+        :subscription="null"
+        @created="handleSubscriptionCreated"
+      />
+
+      <BriefingsBriefingSubscriptionModal
+        v-model="showManageSubscriptionModal"
+        :briefing="null"
+        :subscription="selectedSubscription"
+        @updated="handleSubscriptionUpdated"
+        @cancelled="handleSubscriptionCancelled"
       />
 
       <!-- Generation Overlay -->
