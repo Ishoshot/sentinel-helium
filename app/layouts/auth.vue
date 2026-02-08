@@ -2,6 +2,10 @@
 /**
  * Auth layout - Dark theme with subtle grid pattern
  */
+
+useHead({
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 </script>
 
 <template>

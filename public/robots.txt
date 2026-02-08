@@ -1,2 +1,8 @@
 User-Agent: *
-Disallow:
+Allow: /
+Disallow: /auth/
+Disallow: /invitations/
+Disallow: /billing/
+Disallow: /briefings/
+
+Sitemap: https://usesentinel.ai/sitemap.xml

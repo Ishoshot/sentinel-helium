@@ -11,6 +11,10 @@ import GettingStartedPanel from '~/components/GettingStartedPanel.vue'
  * Default layout - App shell with dark sidebar and refined navigation
  */
 
+useHead({
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+})
+
 const userStore = useUserStore()
 const workspaceStore = useWorkspaceStore()
 const route = useRoute()
