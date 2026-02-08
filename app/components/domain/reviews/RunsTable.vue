@@ -65,10 +65,10 @@ const getRiskConfig = (run: Run) => {
   if (!level) return null
 
   const configs: Record<string, { color: string; bg: string; label: string }> = {
-    low: { color: 'text-emerald-700', bg: 'bg-emerald-50', label: 'Low' },
-    medium: { color: 'text-amber-700', bg: 'bg-amber-50', label: 'Medium' },
-    high: { color: 'text-red-700', bg: 'bg-red-50', label: 'High' },
-    critical: { color: 'text-red-700', bg: 'bg-red-50', label: 'Critical' },
+    low: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', label: 'Low' },
+    medium: { color: 'text-amber-400', bg: 'bg-amber-500/10', label: 'Medium' },
+    high: { color: 'text-red-400', bg: 'bg-red-500/10', label: 'High' },
+    critical: { color: 'text-red-400', bg: 'bg-red-500/10', label: 'Critical' },
   }
 
   return configs[level] || null
@@ -81,31 +81,31 @@ const getFindingsCount = (run: Run) => {
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+  <div class="overflow-hidden rounded-lg border border-border-subtle bg-bg-elevated">
     <!-- Desktop Table View -->
     <div class="hidden lg:block overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b border-gray-100 bg-gray-50/50">
-            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+          <tr class="border-b border-border-subtle bg-bg-surface/50">
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
               Status
             </th>
-            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
               Review
             </th>
             <th
               v-if="!props.hideRepository"
-              class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+              class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted"
             >
               Repository
             </th>
-            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-text-muted">
               Author
             </th>
-            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-text-muted">
               Duration
             </th>
-            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500">
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-text-muted">
               Created
             </th>
             <th class="w-10 px-4 py-3">
@@ -113,13 +113,13 @@ const getFindingsCount = (run: Run) => {
             </th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-border-subtle">
           <tr
             v-for="run in runs"
             :key="run.id"
             tabindex="0"
             role="link"
-            class="group cursor-pointer transition-colors hover:bg-gray-50"
+            class="group cursor-pointer transition-colors hover:bg-bg-hover"
             @click="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
             @keydown.enter.prevent="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
           >
@@ -137,7 +137,7 @@ const getFindingsCount = (run: Run) => {
                 <!-- Title row with labels -->
                 <div class="flex items-center gap-2 flex-wrap">
                   <span
-                    class="text-sm font-medium text-gray-900 group-hover:text-gray-700"
+                    class="text-sm font-medium text-text-primary group-hover:text-accent transition-colors"
                     :title="getReviewTitle(run)"
                   >
                     {{ getReviewTitle(run) }}
@@ -153,7 +153,7 @@ const getFindingsCount = (run: Run) => {
                     />
                     <span
                       v-if="getLabels(run).remaining > 0"
-                      class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
+                      class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-muted"
                     >
                       +{{ getLabels(run).remaining }}
                     </span>
@@ -169,13 +169,13 @@ const getFindingsCount = (run: Run) => {
                   <!-- Findings -->
                   <span
                     v-if="getFindingsCount(run) > 0"
-                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600"
+                    class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-secondary"
                   >
                     {{ getFindingsCount(run) }} {{ getFindingsCount(run) === 1 ? 'finding' : 'findings' }}
                   </span>
                 </div>
                 <!-- Meta row -->
-                <div class="flex items-center gap-3 text-xs text-gray-500">
+                <div class="flex items-center gap-3 text-xs text-text-muted">
                   <span
                     v-if="run.pull_request?.number || run.metadata?.pull_request_number"
                     class="inline-flex items-center gap-1 font-mono"
@@ -188,7 +188,7 @@ const getFindingsCount = (run: Run) => {
                   </span>
                   <span
                     v-if="run.pull_request?.is_draft"
-                    class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
+                    class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-muted"
                   >
                     Draft
                   </span>
@@ -203,7 +203,7 @@ const getFindingsCount = (run: Run) => {
                     />
                     <span class="max-w-[100px] truncate">{{ getBranches(run).head }}</span>
                     <template v-if="getBranches(run).base">
-                      <span class="text-gray-300">→</span>
+                      <span class="text-border-muted">→</span>
                       <span class="max-w-[80px] truncate">{{ getBranches(run).base }}</span>
                     </template>
                   </div>
@@ -216,11 +216,11 @@ const getFindingsCount = (run: Run) => {
               v-if="!props.hideRepository"
               class="px-4 py-4 whitespace-nowrap"
             >
-              <div class="flex items-center gap-2 text-sm text-gray-600">
-                <div class="flex size-8 items-center justify-center rounded-lg bg-gray-100">
+              <div class="flex items-center gap-2 text-sm text-text-secondary">
+                <div class="flex size-8 items-center justify-center rounded-lg bg-bg-surface">
                   <Icon
                     name="lucide:folder-git-2"
-                    class="size-4 text-gray-500"
+                    class="size-4 text-text-muted"
                   />
                 </div>
                 <span
@@ -243,14 +243,14 @@ const getFindingsCount = (run: Run) => {
                 />
                 <div
                   v-else
-                  class="flex size-8 items-center justify-center rounded-full bg-gray-100"
+                  class="flex size-8 items-center justify-center rounded-full bg-bg-surface"
                 >
                   <Icon
                     name="lucide:user"
-                    class="size-4 text-gray-400"
+                    class="size-4 text-text-muted"
                   />
                 </div>
-                <span class="max-w-[100px] truncate text-sm text-gray-600">
+                <span class="max-w-[100px] truncate text-sm text-text-secondary">
                   {{ getAuthor(run)?.login ?? '-' }}
                 </span>
               </div>
@@ -258,7 +258,7 @@ const getFindingsCount = (run: Run) => {
 
             <!-- Duration -->
             <td class="px-4 py-4 whitespace-nowrap text-right">
-              <span class="inline-flex items-center gap-1.5 text-sm tabular-nums text-gray-500">
+              <span class="inline-flex items-center gap-1.5 text-sm tabular-nums text-text-muted font-mono">
                 <Icon
                   name="lucide:clock"
                   class="size-3.5"
@@ -268,7 +268,7 @@ const getFindingsCount = (run: Run) => {
             </td>
 
             <!-- Date -->
-            <td class="px-4 py-4 whitespace-nowrap text-right text-sm tabular-nums text-gray-500">
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm tabular-nums text-text-muted">
               {{ formatRelativeTime(run.created_at) }}
             </td>
 
@@ -276,7 +276,7 @@ const getFindingsCount = (run: Run) => {
             <td class="px-4 py-4 whitespace-nowrap">
               <Icon
                 name="lucide:chevron-right"
-                class="size-4 text-gray-300 group-hover:text-gray-500"
+                class="size-4 text-text-muted/50 group-hover:text-text-muted transition-colors"
               />
             </td>
           </tr>
@@ -285,13 +285,13 @@ const getFindingsCount = (run: Run) => {
     </div>
 
     <!-- Mobile Card View -->
-    <div class="lg:hidden divide-y divide-gray-100">
+    <div class="lg:hidden divide-y divide-border-subtle">
       <div
         v-for="run in runs"
         :key="run.id"
         tabindex="0"
         role="link"
-        class="group cursor-pointer p-4 transition-colors hover:bg-gray-50"
+        class="group cursor-pointer p-4 transition-colors hover:bg-bg-hover"
         @click="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
         @keydown.enter.prevent="navigateTo(`/${workspaceSlug}/runs/${run.id}`)"
       >
@@ -306,18 +306,18 @@ const getFindingsCount = (run: Run) => {
             />
             <div
               v-else
-              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-100"
+              class="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-surface"
             >
               <Icon
                 name="lucide:user"
-                class="size-4 text-gray-400"
+                class="size-4 text-text-muted"
               />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-gray-900">
+              <p class="truncate text-sm font-medium text-text-primary">
                 {{ getReviewTitle(run) }}
               </p>
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-text-muted">
                 {{ getAuthor(run)?.login ?? 'Unknown' }}
               </p>
             </div>
@@ -351,14 +351,14 @@ const getFindingsCount = (run: Run) => {
           />
           <span
             v-if="getLabels(run).remaining > 0"
-            class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500"
+            class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium text-text-muted"
           >
             +{{ getLabels(run).remaining }}
           </span>
         </div>
 
         <!-- Meta Info -->
-        <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500 mb-3">
+        <div class="flex flex-wrap items-center gap-3 text-xs text-text-muted mb-3">
           <span
             v-if="run.pull_request?.number || run.metadata?.pull_request_number"
             class="inline-flex items-center gap-1 font-mono"
@@ -371,7 +371,7 @@ const getFindingsCount = (run: Run) => {
           </span>
           <span
             v-if="run.pull_request?.is_draft"
-            class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium"
+            class="rounded bg-bg-surface px-1.5 py-0.5 text-[10px] font-medium"
           >
             Draft
           </span>
@@ -385,17 +385,17 @@ const getFindingsCount = (run: Run) => {
             />
             <span class="max-w-[80px] truncate">{{ getBranches(run).head }}</span>
             <template v-if="getBranches(run).base">
-              <span class="text-gray-300">→</span>
+              <span class="text-border-muted">→</span>
               <span class="max-w-[60px] truncate">{{ getBranches(run).base }}</span>
             </template>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+        <div class="flex items-center justify-between gap-3 pt-3 border-t border-border-subtle">
           <div
             v-if="!props.hideRepository"
-            class="flex items-center gap-2 text-xs text-gray-500"
+            class="flex items-center gap-2 text-xs text-text-muted"
           >
             <Icon
               name="lucide:folder-git-2"
@@ -403,8 +403,8 @@ const getFindingsCount = (run: Run) => {
             />
             <span class="max-w-[140px] truncate">{{ getRepositoryName(run) }}</span>
           </div>
-          <div class="flex items-center gap-3 text-xs text-gray-500">
-            <span class="inline-flex items-center gap-1 tabular-nums">
+          <div class="flex items-center gap-3 text-xs text-text-muted">
+            <span class="inline-flex items-center gap-1 tabular-nums font-mono">
               <Icon
                 name="lucide:clock"
                 class="size-3"

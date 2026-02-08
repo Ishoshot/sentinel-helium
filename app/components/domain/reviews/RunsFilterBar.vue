@@ -138,19 +138,19 @@ const currentSort = computed({
     <div class="relative max-w-md">
       <Icon
         name="lucide:search"
-        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
       />
       <input
         v-model="search"
         type="search"
         placeholder="Search by PR title, branch, or commit..."
-        class="w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
+        class="w-full rounded-lg border border-border-subtle bg-bg-elevated py-2 pl-10 pr-10 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
         @keydown.escape="search = ''"
       >
       <button
         v-if="props.search.trim()"
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary"
         @click="search = ''"
       >
         <Icon
@@ -173,8 +173,8 @@ const currentSort = computed({
             type="button"
             class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.statusFilter
-              ? 'border-gray-900 bg-gray-900 text-white'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+              ? 'border-accent bg-accent text-white'
+              : 'border-border-subtle bg-bg-elevated text-text-secondary hover:border-border-muted'"
           >
             <Icon
               name="lucide:activity"
@@ -200,8 +200,8 @@ const currentSort = computed({
             type="button"
             class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.riskFilter
-              ? 'border-amber-600 bg-amber-50 text-amber-700'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+              ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+              : 'border-border-subtle bg-bg-elevated text-text-secondary hover:border-border-muted'"
           >
             <Icon
               name="lucide:shield-alert"
@@ -228,8 +228,8 @@ const currentSort = computed({
             type="button"
             class="flex h-9 max-w-[200px] items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.repositoryFilter
-              ? 'border-gray-900 bg-gray-900 text-white'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+              ? 'border-accent bg-accent text-white'
+              : 'border-border-subtle bg-bg-elevated text-text-secondary hover:border-border-muted'"
           >
             <Icon
               name="lucide:folder-git-2"
@@ -256,8 +256,8 @@ const currentSort = computed({
             type="button"
             class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="props.authorFilter
-              ? 'border-gray-900 bg-gray-900 text-white'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+              ? 'border-accent bg-accent text-white'
+              : 'border-border-subtle bg-bg-elevated text-text-secondary hover:border-border-muted'"
           >
             <Icon
               name="lucide:user"
@@ -272,19 +272,19 @@ const currentSort = computed({
         </template>
 
         <div class="w-full space-y-3 p-3">
-          <label class="text-xs font-medium uppercase tracking-wide text-gray-500">Filter by Author</label>
+          <label class="text-xs font-medium uppercase tracking-wide text-text-muted">Filter by Author</label>
           <input
             :value="props.authorFilter"
             type="text"
             placeholder="GitHub username"
-            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-0"
+            class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
             @input="authorFilter = ($event.target as HTMLInputElement).value"
             @keydown.enter="($event.target as HTMLInputElement).blur()"
           >
-          <div class="flex justify-end border-t border-gray-100 pt-3">
+          <div class="flex justify-end border-t border-border-subtle pt-3">
             <button
               type="button"
-              class="text-sm font-medium text-gray-600 hover:text-gray-900"
+              class="text-sm font-medium text-text-secondary hover:text-text-primary"
               @click="authorFilter = null"
             >
               Clear
@@ -305,8 +305,8 @@ const currentSort = computed({
             type="button"
             class="flex h-9 items-center gap-2 rounded-lg border px-3 text-sm font-medium transition-colors"
             :class="dateRangeDisplay
-              ? 'border-gray-900 bg-gray-900 text-white'
-              : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+              ? 'border-accent bg-accent text-white'
+              : 'border-border-subtle bg-bg-elevated text-text-secondary hover:border-border-muted'"
           >
             <Icon
               name="lucide:calendar"
@@ -324,28 +324,28 @@ const currentSort = computed({
 
         <div class="w-full space-y-4 p-3">
           <div class="space-y-2">
-            <label class="text-xs font-medium uppercase tracking-wide text-gray-500">From</label>
+            <label class="text-xs font-medium uppercase tracking-wide text-text-muted">From</label>
             <input
               :value="props.dateRange.from"
               type="date"
-              class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-300 focus:outline-none focus:ring-0"
+              class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-muted focus:outline-none focus:ring-0"
               @input="dateRange = { ...props.dateRange, from: ($event.target as HTMLInputElement).value }"
             >
           </div>
           <div class="space-y-2">
-            <label class="text-xs font-medium uppercase tracking-wide text-gray-500">To</label>
+            <label class="text-xs font-medium uppercase tracking-wide text-text-muted">To</label>
             <input
               :value="props.dateRange.to"
               type="date"
-              class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:border-gray-300 focus:outline-none focus:ring-0"
+              class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-muted focus:outline-none focus:ring-0"
               :min="props.dateRange.from || undefined"
               @input="dateRange = { ...props.dateRange, to: ($event.target as HTMLInputElement).value }"
             >
           </div>
-          <div class="flex justify-end border-t border-gray-100 pt-3">
+          <div class="flex justify-end border-t border-border-subtle pt-3">
             <button
               type="button"
-              class="text-sm font-medium text-gray-600 hover:text-gray-900"
+              class="text-sm font-medium text-text-secondary hover:text-text-primary"
               @click="dateRange = { from: null, to: null }"
             >
               Clear
@@ -364,7 +364,7 @@ const currentSort = computed({
         <template #trigger>
           <button
             type="button"
-            class="flex h-9 items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-sm font-medium text-gray-600 transition-colors hover:border-gray-300"
+            class="flex h-9 items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-3 text-sm font-medium text-text-secondary transition-colors hover:border-border-muted"
           >
             <Icon
               name="lucide:arrow-up-down"
@@ -380,7 +380,7 @@ const currentSort = computed({
       <button
         v-if="hasActiveFilters"
         type="button"
-        class="flex h-9 items-center gap-1.5 px-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+        class="flex h-9 items-center gap-1.5 px-2 text-sm font-medium text-text-muted hover:text-text-secondary"
         @click="emit('clearFilters')"
       >
         <Icon
@@ -396,64 +396,64 @@ const currentSort = computed({
       v-if="hasActiveFilters"
       class="flex flex-wrap items-center gap-2"
     >
-      <span class="text-xs font-medium uppercase tracking-wide text-gray-400">Active:</span>
+      <span class="text-xs font-medium uppercase tracking-wide text-text-muted">Active:</span>
 
       <button
         v-if="props.search.trim()"
         type="button"
-        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary"
         @click="search = ''"
       >
         "{{ props.search.trim() }}"
         <Icon
           name="lucide:x"
-          class="size-3 text-gray-400 group-hover:text-gray-600"
+          class="size-3 text-text-muted group-hover:text-text-secondary"
         />
       </button>
 
       <button
         v-if="props.statusFilter"
         type="button"
-        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary"
         @click="statusFilter = null"
       >
         {{ statusOptions.find(o => o.value === props.statusFilter)?.label }}
         <Icon
           name="lucide:x"
-          class="size-3 text-gray-400 group-hover:text-gray-600"
+          class="size-3 text-text-muted group-hover:text-text-secondary"
         />
       </button>
 
       <button
         v-if="props.riskFilter"
         type="button"
-        class="group inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-400"
         @click="riskFilter = null"
       >
         {{ riskOptions.find(o => o.value === props.riskFilter)?.label }}
         <Icon
           name="lucide:x"
-          class="size-3 text-amber-500 group-hover:text-amber-700"
+          class="size-3 text-amber-500 group-hover:text-amber-400"
         />
       </button>
 
       <button
         v-if="props.repositoryFilter"
         type="button"
-        class="group inline-flex max-w-[200px] items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+        class="group inline-flex max-w-[200px] items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary"
         @click="repositoryFilter = null"
       >
         <span class="truncate">{{ repositoryOptions.find(o => o.value === props.repositoryFilter)?.label }}</span>
         <Icon
           name="lucide:x"
-          class="size-3 shrink-0 text-gray-400 group-hover:text-gray-600"
+          class="size-3 shrink-0 text-text-muted group-hover:text-text-secondary"
         />
       </button>
 
       <button
         v-if="props.authorFilter?.trim()"
         type="button"
-        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary"
         @click="authorFilter = null"
       >
         <Icon
@@ -463,14 +463,14 @@ const currentSort = computed({
         {{ props.authorFilter?.trim() }}
         <Icon
           name="lucide:x"
-          class="size-3 text-gray-400 group-hover:text-gray-600"
+          class="size-3 text-text-muted group-hover:text-text-secondary"
         />
       </button>
 
       <button
         v-if="dateRangeDisplay"
         type="button"
-        class="group inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700"
+        class="group inline-flex items-center gap-1.5 rounded-md bg-bg-surface px-2 py-1 text-xs font-medium text-text-secondary"
         @click="dateRange = { from: null, to: null }"
       >
         <Icon
@@ -480,7 +480,7 @@ const currentSort = computed({
         {{ dateRangeDisplay }}
         <Icon
           name="lucide:x"
-          class="size-3 text-gray-400 group-hover:text-gray-600"
+          class="size-3 text-text-muted group-hover:text-text-secondary"
         />
       </button>
     </div>

@@ -18,52 +18,52 @@ const config = computed(() => {
   switch (props.status) {
     case RunStatus.Completed:
       return {
-        bg: 'bg-emerald-50',
-        text: 'text-emerald-700',
+        bg: 'bg-emerald-500/10',
+        text: 'text-emerald-400',
         icon: 'lucide:check-circle-2',
         label: 'Completed',
         dot: 'bg-emerald-500',
       }
     case RunStatus.Failed:
       return {
-        bg: 'bg-red-50',
-        text: 'text-red-700',
+        bg: 'bg-red-500/10',
+        text: 'text-red-400',
         icon: 'lucide:x-circle',
         label: 'Failed',
         dot: 'bg-red-500',
       }
     case RunStatus.InProgress:
       return {
-        bg: 'bg-blue-50',
-        text: 'text-blue-700',
+        bg: 'bg-accent/10',
+        text: 'text-accent',
         icon: 'lucide:loader-2',
         label: 'Running',
         spin: true,
-        dot: 'bg-blue-500',
+        dot: 'bg-accent',
       }
     case RunStatus.Queued:
       return {
-        bg: 'bg-amber-50',
-        text: 'text-amber-700',
+        bg: 'bg-amber-500/10',
+        text: 'text-amber-400',
         icon: 'lucide:clock',
         label: 'Queued',
         dot: 'bg-amber-500',
       }
     case RunStatus.Skipped:
       return {
-        bg: 'bg-gray-100',
-        text: 'text-gray-600',
+        bg: 'bg-zinc-500/10',
+        text: 'text-zinc-400',
         icon: 'lucide:slash',
         label: 'Skipped',
-        dot: 'bg-gray-400',
+        dot: 'bg-zinc-400',
       }
     default:
       return {
-        bg: 'bg-gray-100',
-        text: 'text-gray-600',
+        bg: 'bg-zinc-500/10',
+        text: 'text-zinc-400',
         icon: 'lucide:help-circle',
         label: props.status,
-        dot: 'bg-gray-400',
+        dot: 'bg-zinc-400',
       }
   }
 })
