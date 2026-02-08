@@ -16,16 +16,16 @@ const technologies = [
 </script>
 
 <template>
-  <section class="py-12 lg:py-16 bg-slate-50 border-slate-200">
+  <section class="py-12 lg:py-16 bg-[#0f0f12]">
     <div class="max-w-6xl mx-auto px-6">
-      <p class="text-center text-xs uppercase tracking-[0.15em] text-slate-400 mb-8">
+      <p class="text-center text-xs uppercase tracking-[0.15em] text-zinc-600 mb-8">
         Works with your stack
       </p>
       <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
         <div
           v-for="tech in technologies"
           :key="tech.name"
-          class="flex items-center gap-3 text-slate-500 hover:text-slate-700 transition-colors"
+          class="flex items-center gap-3 text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <Icon
             :name="tech.icon"
@@ -33,7 +33,7 @@ const technologies = [
           />
           <span class="text-sm font-medium">{{ tech.name }}</span>
         </div>
-        <span class="text-sm text-slate-400 italic">and many more...</span>
+        <span class="text-sm text-zinc-600 italic">and many more...</span>
       </div>
     </div>
   </section>

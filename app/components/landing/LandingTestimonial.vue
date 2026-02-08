@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Featured quote with clean design
+ * Featured quote with clean dark design
  */
 
 const testimonials = [
@@ -29,14 +29,15 @@ const testimonials = [
 </script>
 
 <template>
-  <section class="py-24 lg:py-32 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
+  <section class="py-24 lg:py-32 bg-[#0f0f12] relative overflow-hidden">
+
+    <div class="relative max-w-7xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-slate-900">
+        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Trusted by engineering teams
         </h2>
-        <p class="mt-4 text-lg text-slate-600">
+        <p class="mt-4 text-lg text-zinc-400">
           See what developers are saying about Sentinel.
         </p>
       </div>
@@ -46,29 +47,29 @@ const testimonials = [
         <div
           v-for="testimonial in testimonials"
           :key="testimonial.author"
-          class="relative p-6 lg:p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors"
+          class="relative p-6 lg:p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-all duration-300 hover:-translate-y-1"
         >
           <!-- Quote icon -->
           <Icon
             name="ph:quotes-bold"
-            class="w-8 h-8 text-blue-500 opacity-50 mb-4"
+            class="w-8 h-8 text-teal-500/50 mb-4"
           />
 
           <!-- Quote -->
-          <blockquote class="text-slate-600 leading-relaxed mb-6">
+          <blockquote class="text-zinc-300 leading-relaxed mb-6">
             "{{ testimonial.quote }}"
           </blockquote>
 
           <!-- Author -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-              <span class="text-xs font-semibold text-slate-900">{{ testimonial.initials }}</span>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500/20 to-cyan-500/20 border border-teal-500/30 flex items-center justify-center">
+              <span class="text-xs font-semibold text-teal-400">{{ testimonial.initials }}</span>
             </div>
             <div>
-              <div class="text-sm font-semibold text-slate-900">
+              <div class="text-sm font-semibold text-white">
                 {{ testimonial.author }}
               </div>
-              <div class="text-xs text-slate-500">
+              <div class="text-xs text-zinc-500">
                 {{ testimonial.role }}, {{ testimonial.company }}
               </div>
             </div>

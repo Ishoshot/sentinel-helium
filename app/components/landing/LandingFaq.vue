@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Landing page FAQ section 
+ * Landing page FAQ section - Dark theme
  * Clean accordion with essential questions
  */
 
@@ -35,47 +35,48 @@ const faqs = [
 <template>
   <section
     id="faq"
-    class="py-24 lg:py-32 bg-white"
+    class="py-24 lg:py-32 bg-[#0f0f12] relative overflow-hidden"
   >
-    <div class="max-w-3xl mx-auto px-6">
+
+    <div class="relative max-w-3xl mx-auto px-6">
       <!-- Header -->
       <div class="text-center mb-12">
-        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-slate-900">
+        <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Frequently asked questions
         </h2>
-        <p class="mt-4 text-lg text-slate-600">
+        <p class="mt-4 text-lg text-zinc-400">
           Everything you need to know about Sentinel.
         </p>
       </div>
 
       <!-- FAQ items -->
-      <div class="divide-y divide-slate-200">
+      <div class="divide-y divide-zinc-800/50">
         <details
           v-for="faq in faqs"
           :key="faq.question"
           class="group py-5"
         >
-          <summary class="flex cursor-pointer list-none items-center justify-between text-base font-semibold text-slate-900">
+          <summary class="flex cursor-pointer list-none items-center justify-between text-base font-semibold text-white">
             <span>{{ faq.question }}</span>
             <Icon
               name="ph:plus-bold"
-              class="w-5 h-5 text-slate-400 transition-transform duration-200 group-open:rotate-45"
+              class="w-5 h-5 text-zinc-500 transition-transform duration-200 group-open:rotate-45"
             />
           </summary>
-          <p class="mt-4 text-slate-600 leading-relaxed pr-12">
+          <p class="mt-4 text-zinc-400 leading-relaxed pr-12">
             {{ faq.answer }}
           </p>
         </details>
       </div>
 
       <!-- Contact CTA -->
-      <div class="mt-12 text-center pt-8 border-t border-slate-200">
-        <p class="text-slate-600 mb-4">
+      <div class="mt-12 text-center pt-8 border-t border-zinc-800/50">
+        <p class="text-zinc-400 mb-4">
           Still have questions?
         </p>
         <a
           href="mailto:hello@usesentinel.ai"
-          class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+          class="inline-flex items-center gap-2 text-teal-400 font-semibold hover:text-teal-300 transition-colors"
         >
           Get in touch
           <Icon
