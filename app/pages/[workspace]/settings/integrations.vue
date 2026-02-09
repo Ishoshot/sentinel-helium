@@ -5,8 +5,10 @@ import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
 import { useAppToast } from '~/composables/shared/useAppToast'
 import { useMembers } from '~/composables/members/useMembers'
 import { useGitHub } from '~/composables/integrations/useGitHub'
+import { useSlack } from '~/composables/integrations/useSlack'
 import { useWebSocket } from '~/composables/useWebSocket'
 import DomainIntegrationsGitHubConnectionCard from '~/components/domain/integrations/GitHubConnectionCard.vue'
+import DomainIntegrationsSlackConnectionCard from '~/components/domain/integrations/SlackConnectionCard.vue'
 import DomainIntegrationsIntegrationCard from '~/components/domain/integrations/IntegrationCard.vue'
 
 /**
@@ -46,6 +48,23 @@ const {
   clearError,
 } = useGitHub(workspaceId)
 
+const {
+  slackIntegration,
+  channels: slackChannels,
+  isLoading: isLoadingSlack,
+  isConnecting: isConnectingSlack,
+  isDisconnecting: isDisconnectingSlack,
+  isFetchingChannels,
+  isUpdatingChannel,
+  error: slackError,
+  fetchIntegration: fetchSlackIntegration,
+  connect: connectSlack,
+  fetchChannels: fetchSlackChannels,
+  updateChannel: updateSlackChannel,
+  disconnect: disconnectSlack,
+  clearError: clearSlackError,
+} = useSlack(workspaceId)
+
 // WebSocket for config PR events
 const { subscribeToRepositories, unsubscribeFromRepositories } = useWebSocket(workspaceId)
 
@@ -62,7 +81,10 @@ const canManage = computed(
 
 // Integration stats
 const activeIntegrationsCount = computed(() => {
-  return connection.value?.is_active ? 1 : 0
+  let count = 0
+  if (connection.value?.is_active) count++
+  if (slackIntegration.value?.is_connected) count++
+  return count
 })
 
 // Coming soon integrations data
@@ -88,19 +110,13 @@ const comingSoonIntegrations = [
     iconGradient: 'from-sky-500 to-blue-500',
     features: ['PR reviews', 'Boards integration', 'Pipeline triggers'],
   },
-  {
-    name: 'Slack',
-    description: 'Real-time notifications and alerts',
-    icon: 'lucide:message-square',
-    iconGradient: 'from-purple-500 to-pink-500',
-    features: ['Review notifications', 'Finding alerts', 'Team updates'],
-  },
 ]
 
 // Fetch data on mount
 onMounted(async () => {
   clearError()
-  await Promise.all([fetchMembers(), fetchConnection()])
+  clearSlackError()
+  await Promise.all([fetchMembers(), fetchConnection(), fetchSlackIntegration()])
 
   // Check for flash messages from GitHub callback
   const success = route.query.success as string | undefined
@@ -115,6 +131,14 @@ onMounted(async () => {
   if (errorMsg) {
     toast.error(errorMsg)
     router.replace({ query: {} })
+  }
+
+  // Check for Slack OAuth callback success
+  const slackStatus = route.query.slack as string | undefined
+  if (slackStatus === 'connected') {
+    toast.success('Slack connected successfully')
+    router.replace({ query: {} })
+    await fetchSlackIntegration()
   }
 
   isInitializing.value = false
@@ -153,6 +177,12 @@ watch(error, (newError, oldError) => {
   }
 })
 
+watch(slackError, (newError, oldError) => {
+  if (newError && newError !== oldError) {
+    toast.error(newError)
+  }
+})
+
 // Handle connect
 async function handleConnect() {
   if (!workspaceId.value) {
@@ -176,6 +206,37 @@ async function handleSync() {
   await syncRepositories()
   if (!error.value) {
     toast.success('Repositories synced')
+  }
+}
+
+// Handle Slack connect (OAuth flow - opens new tab)
+async function handleSlackConnect() {
+  if (!workspaceId.value) {
+    toast.error('Unable to connect: workspace not found')
+    return
+  }
+  toast.info('Connecting to Slack...')
+  await connectSlack()
+}
+
+// Handle Slack disconnect
+async function handleSlackDisconnect() {
+  await disconnectSlack()
+  if (!slackError.value) {
+    toast.success('Slack disconnected')
+  }
+}
+
+// Handle Slack channel fetch
+async function handleFetchSlackChannels() {
+  await fetchSlackChannels()
+}
+
+// Handle Slack channel update
+async function handleSlackChannelUpdate(channelId: string, channelName: string) {
+  await updateSlackChannel(channelId, channelName)
+  if (!slackError.value) {
+    toast.success('Slack channel updated')
   }
 }
 
@@ -315,6 +376,40 @@ function goToRepositories() {
           @disconnect="handleDisconnect"
           @sync="handleSync"
           @view-repositories="goToRepositories"
+        />
+
+        <!-- Notifications Section -->
+        <div class="mt-8 mb-5 flex items-center gap-3">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-bg-surface">
+            <Icon
+              name="lucide:bell"
+              class="size-5 text-text-primary"
+            />
+          </div>
+          <div>
+            <h2 class="text-base font-semibold text-text-primary">
+              Notifications
+            </h2>
+            <p class="text-sm text-text-muted">
+              Connect notification channels for briefings and alerts
+            </p>
+          </div>
+        </div>
+
+        <!-- Slack Integration Card -->
+        <DomainIntegrationsSlackConnectionCard
+          :integration="slackIntegration"
+          :channels="slackChannels"
+          :is-loading="isLoadingSlack"
+          :is-connecting="isConnectingSlack"
+          :is-disconnecting="isDisconnectingSlack"
+          :is-fetching-channels="isFetchingChannels"
+          :is-updating-channel="isUpdatingChannel"
+          :can-manage="canManage"
+          @connect="handleSlackConnect"
+          @disconnect="handleSlackDisconnect"
+          @fetch-channels="handleFetchSlackChannels"
+          @update-channel="handleSlackChannelUpdate"
         />
 
         <!-- Integration Benefits Card -->
