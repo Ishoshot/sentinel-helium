@@ -188,6 +188,9 @@ const goBack = () => {
             @update:risk="handleRiskChange"
           />
 
+          <!-- Status Legend -->
+          <DomainReviewsRunStatusLegend />
+
           <!-- Empty State (No Matches) -->
           <div
             v-if="filteredRuns.length === 0"

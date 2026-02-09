@@ -220,6 +220,9 @@ const inProgressCount = computed(() => runs.value.filter(r => r.status === 'in_p
       @clear-filters="clearFilters"
     />
 
+    <!-- Status Legend -->
+    <DomainReviewsRunStatusLegend />
+
     <!-- Loading State -->
     <div
       v-if="(isLoading || isInitializing) && !hasData"
