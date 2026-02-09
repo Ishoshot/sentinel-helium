@@ -59,141 +59,153 @@ const githubUrl = computed(
 </script>
 
 <template>
-  <div class="group flex h-full flex-col rounded-lg border border-border-subtle bg-bg-elevated transition-colors hover:border-border-muted">
+  <article
+    class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border bg-bg-elevated transition-all duration-200"
+    :class="[
+      repository.auto_review_enabled
+        ? 'border-border-subtle hover:border-accent/15'
+        : 'border-border-subtle hover:border-border-subtle',
+    ]"
+  >
     <!-- Header -->
-    <div class="flex items-start justify-between gap-3 p-4">
-      <div class="flex items-center gap-3 min-w-0 flex-1">
-        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-bg-surface">
-          <Icon
-            :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
-            class="size-5 text-text-muted"
-          />
-        </div>
-        <div class="min-w-0 flex-1">
-          <h3 class="truncate text-sm font-semibold text-text-primary">
-            {{ repository.name }}
-          </h3>
-          <p class="truncate text-xs text-text-muted">
-            {{ repository.owner }}
-          </p>
-        </div>
+    <div class="relative flex items-start justify-between gap-3 p-4 pb-0">
+      <!-- Icon -->
+      <div
+        class="flex size-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105"
+        :class="repository.auto_review_enabled ? 'bg-accent-glow' : 'bg-bg-surface'"
+      >
+        <Icon
+          :name="repository.private ? 'lucide:lock' : 'lucide:folder-git-2'"
+          class="size-5"
+          :class="repository.auto_review_enabled ? 'text-accent' : 'text-text-muted'"
+        />
       </div>
 
-      <!-- Status -->
-      <div class="flex flex-col items-end gap-1.5 shrink-0">
-        <span
-          class="rounded px-1.5 py-0.5 text-[10px] font-medium"
-          :class="repository.auto_review_enabled
-            ? 'bg-emerald-500/10 text-emerald-400'
-            : 'bg-bg-surface text-text-muted'"
-        >
-          {{ repository.auto_review_enabled ? 'Active' : 'Inactive' }}
+      <!-- Active indicator -->
+      <div
+        v-if="repository.auto_review_enabled"
+        class="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-1 ring-1 ring-emerald-500/20"
+      >
+        <span class="relative flex size-1.5">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          <span class="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
         </span>
-        <span
-          v-if="configStatus === 'active'"
-          class="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-medium text-blue-400"
-        >
-          Config
-        </span>
-        <span
-          v-else-if="configStatus === 'error'"
-          class="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-400"
-        >
-          Error
-        </span>
+        <span class="text-[11px] font-medium text-emerald-400">Active</span>
       </div>
+      <span
+        v-else
+        class="rounded-full bg-bg-surface px-2 py-1 text-[11px] font-medium text-text-muted ring-1 ring-border-subtle"
+      >
+        Inactive
+      </span>
     </div>
 
-    <!-- Description -->
-    <div class="flex-1 px-4">
+    <!-- Content -->
+    <div class="relative flex flex-1 flex-col p-4">
+      <!-- Title -->
+      <div class="min-w-0">
+        <h3 class="truncate text-[15px] font-semibold text-text-primary transition-colors group-hover:text-white">
+          {{ repository.name }}
+        </h3>
+        <p class="truncate text-xs text-text-muted">
+          {{ repository.owner }}
+        </p>
+      </div>
+
+      <!-- Description -->
       <p
         v-if="repository.description"
-        class="line-clamp-2 text-sm text-text-muted"
+        class="mt-2.5 line-clamp-2 flex-1 text-[13px] leading-relaxed text-text-secondary"
       >
         {{ repository.description }}
       </p>
       <p
         v-else
-        class="text-sm italic text-text-muted"
+        class="mt-2.5 flex-1 text-[13px] text-text-faint"
       >
-        No description
+        No description provided
       </p>
-    </div>
 
-    <!-- Meta -->
-    <div class="flex items-center gap-4 px-4 py-3 text-xs text-text-muted">
-      <span
-        v-if="repository.language"
-        class="flex items-center gap-1.5"
-      >
+      <!-- Tags row -->
+      <div class="mt-3 flex flex-wrap items-center gap-1.5">
         <span
-          class="size-2 rounded-full"
-          :class="languageColor"
-        />
-        {{ repository.language }}
-      </span>
-      <span class="flex items-center gap-1.5">
-        <Icon
-          name="lucide:git-branch"
-          class="size-3.5"
-        />
-        {{ repository.default_branch }}
-      </span>
+          v-if="repository.language"
+          class="hidden items-center gap-1.5 rounded-full bg-bg-surface px-2 py-0.5 text-[11px] font-medium text-text-muted ring-1 ring-border-subtle sm:inline-flex"
+        >
+          <span class="size-2 rounded-full" :class="languageColor" />
+          {{ repository.language }}
+        </span>
+        <span class="inline-flex items-center gap-1 rounded-full bg-bg-surface px-2 py-0.5 font-mono text-[11px] text-text-muted ring-1 ring-border-subtle">
+          <Icon name="lucide:git-branch" class="size-3" />
+          {{ repository.default_branch }}
+        </span>
+        <span
+          v-if="configStatus === 'active'"
+          class="inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-400 ring-1 ring-blue-500/20"
+        >
+          <Icon name="lucide:file-code" class="size-3" />
+          Config
+        </span>
+        <span
+          v-else-if="configStatus === 'error'"
+          class="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400 ring-1 ring-amber-500/20"
+        >
+          <Icon name="lucide:alert-triangle" class="size-3" />
+          Error
+        </span>
+      </div>
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between border-t border-border-subtle p-3">
+    <div class="relative flex items-center justify-between border-t border-border-subtle p-3">
       <a
         :href="githubUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-secondary"
+        class="flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-text-secondary"
       >
-        <Icon
-          name="lucide:external-link"
-          class="size-3.5"
-        />
+        <Icon name="lucide:external-link" class="size-3.5" />
         GitHub
       </a>
 
-      <div class="flex items-center gap-1 lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
-        <NuxtLink
-          :to="runsUrl"
-          class="rounded p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
-          title="View runs"
-        >
-          <Icon
-            name="lucide:history"
-            class="size-4"
-          />
-        </NuxtLink>
-
+      <div class="flex items-center gap-2">
         <template v-if="canManage">
           <button
-            class="rounded p-1.5 transition-colors"
-            :class="repository.auto_review_enabled
-              ? 'text-emerald-400 hover:bg-emerald-500/10'
-              : 'text-text-muted hover:bg-bg-hover hover:text-text-secondary'"
+            type="button"
+            role="switch"
+            :aria-checked="repository.auto_review_enabled"
             :title="repository.auto_review_enabled ? 'Disable auto-review' : 'Enable auto-review'"
+            class="relative h-5 w-9 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-elevated"
+            :class="repository.auto_review_enabled ? 'bg-accent' : 'bg-bg-surface'"
             @click="$emit('toggleAutoReview', repository.id)"
           >
-            <Icon
-              :name="repository.auto_review_enabled ? 'lucide:toggle-right' : 'lucide:toggle-left'"
-              class="size-4"
-            />
-          </button>
-          <button
-            class="rounded p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
-            title="Settings"
-            @click="$emit('openSettings', repository.id)"
-          >
-            <Icon
-              name="lucide:settings"
-              class="size-4"
+            <span
+              class="absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-md transition-transform duration-200"
+              :class="repository.auto_review_enabled ? 'translate-x-4' : 'translate-x-0'"
             />
           </button>
         </template>
+
+        <!-- Reveal actions -->
+        <div class="flex items-center gap-0.5 opacity-0 transition-all duration-200 translate-x-2 group-hover:translate-x-0 group-hover:opacity-100">
+          <NuxtLink
+            :to="runsUrl"
+            class="inline-flex items-center justify-center rounded-lg p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
+            title="View runs"
+          >
+            <Icon name="lucide:history" class="size-4" />
+          </NuxtLink>
+
+          <button
+            v-if="canManage"
+            class="inline-flex items-center justify-center rounded-lg p-1.5 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
+            title="Settings"
+            @click="$emit('openSettings', repository.id)"
+          >
+            <Icon name="lucide:settings" class="size-4" />
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </article>
 </template>
