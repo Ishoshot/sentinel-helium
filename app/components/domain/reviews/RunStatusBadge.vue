@@ -7,7 +7,7 @@ import { RunStatus } from '~/types'
 
 interface Props {
   status: RunStatus | string
-  variant?: 'badge' | 'minimal'
+  variant?: 'badge' | 'minimal' | 'dot'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -70,9 +70,35 @@ const config = computed(() => {
 </script>
 
 <template>
+  <!-- Dot Variant (Dot only, with tooltip) -->
+  <span
+    v-if="variant === 'dot'"
+    :title="config.label"
+    class="inline-flex items-center justify-center"
+  >
+    <span
+      v-if="config.spin"
+      class="relative flex size-2.5"
+    >
+      <span
+        class="absolute inline-flex size-full animate-ping rounded-full opacity-75"
+        :class="config.dot"
+      />
+      <span
+        class="relative inline-flex size-2.5 rounded-full"
+        :class="config.dot"
+      />
+    </span>
+    <span
+      v-else
+      class="size-2.5 rounded-full"
+      :class="config.dot"
+    />
+  </span>
+
   <!-- Minimal Variant (Dot + Text) -->
   <div
-    v-if="variant === 'minimal'"
+    v-else-if="variant === 'minimal'"
     class="inline-flex items-center gap-2 text-sm font-medium"
     :class="config.text"
   >

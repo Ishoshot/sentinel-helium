@@ -130,6 +130,118 @@ const currentSort = computed({
     emit('update:sortOrder', order)
   }
 })
+
+function parseIsoDate(value: string | null): Date | null {
+  if (!value) {
+    return null
+  }
+
+  const [year, month, day] = value.split('-').map(Number)
+  if (!year || !month || !day) {
+    return null
+  }
+
+  const parsed = new Date(year, month - 1, day)
+  if (Number.isNaN(parsed.getTime())) {
+    return null
+  }
+
+  return parsed
+}
+
+function formatIsoDate(value: Date): string {
+  const year = value.getFullYear()
+  const month = String(value.getMonth() + 1).padStart(2, '0')
+  const day = String(value.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function normalizePickerDate(value: Date | Date[] | null | undefined): string | null {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return formatIsoDate(value)
+  }
+
+  return null
+}
+
+const dateFromPickerValue = computed(() => parseIsoDate(props.dateRange.from))
+const dateToPickerValue = computed(() => parseIsoDate(props.dateRange.to))
+
+function handleFromDateChange(value: Date | Date[] | null | undefined): void {
+  const nextFrom = normalizePickerDate(value)
+  let nextTo = props.dateRange.to
+
+  if (nextFrom && nextTo && nextTo < nextFrom) {
+    nextTo = nextFrom
+  }
+
+  dateRange.value = { from: nextFrom, to: nextTo }
+}
+
+function handleToDateChange(value: Date | Date[] | null | undefined): void {
+  const nextTo = normalizePickerDate(value)
+  const currentFrom = props.dateRange.from
+
+  if (currentFrom && nextTo && nextTo < currentFrom) {
+    dateRange.value = { from: currentFrom, to: currentFrom }
+    return
+  }
+
+  dateRange.value = { ...props.dateRange, to: nextTo }
+}
+
+const datePickerInputClass = 'h-11 w-full rounded-xl border border-border-subtle bg-bg-surface py-2 pl-9 pr-3 text-sm font-medium text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0'
+
+const datePickerPt = {
+  panel: { class: 'mt-2 w-[19rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-subtle bg-bg-elevated p-3 shadow-elevated' },
+  header: { class: 'mb-3 grid grid-cols-[2rem_1fr_2rem] items-center gap-1 px-0.5' },
+  title: { class: 'flex items-center justify-center gap-1.5 text-sm font-semibold tracking-tight text-text-primary' },
+  selectMonth: {
+    class: 'inline-flex min-h-0 w-auto min-w-0 items-center rounded-md bg-transparent px-1.5 py-0.5 text-sm font-semibold tracking-tight text-text-primary transition-colors hover:bg-bg-hover/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-border-muted'
+  },
+  selectYear: {
+    class: 'ml-0 inline-flex min-h-0 w-auto min-w-0 items-center rounded-md bg-transparent px-1.5 py-0.5 text-sm font-semibold tracking-tight text-text-primary transition-colors hover:bg-bg-hover/80 focus:outline-none focus-visible:ring-1 focus-visible:ring-border-muted'
+  },
+  pcPrevButton: {
+    root: { class: 'inline-flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:bg-bg-hover hover:text-text-primary' }
+  },
+  pcNextButton: {
+    root: { class: 'inline-flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:bg-bg-hover hover:text-text-primary' }
+  },
+  decade: { class: 'text-sm font-semibold tracking-tight text-text-primary' },
+  monthView: { class: 'grid grid-cols-4 gap-2 pt-1' },
+  month: (options: { context?: { selected?: boolean; disabled?: boolean } }) => ({
+    class: [
+      'inline-flex h-10 items-center justify-center rounded-lg bg-transparent px-1 text-sm font-medium transition-colors',
+      options.context?.selected
+        ? 'bg-accent text-white shadow-sm shadow-accent/25'
+        : 'text-text-secondary hover:bg-bg-hover/90 hover:text-text-primary',
+      options.context?.disabled ? 'pointer-events-none cursor-not-allowed opacity-35' : ''
+    ]
+  }),
+  yearView: { class: 'grid grid-cols-5 gap-2 pt-1' },
+  year: (options: { context?: { selected?: boolean; disabled?: boolean } }) => ({
+    class: [
+      'inline-flex h-10 items-center justify-center rounded-lg bg-transparent px-1 text-sm font-medium tabular-nums transition-colors',
+      options.context?.selected
+        ? 'bg-accent text-white shadow-sm shadow-accent/25'
+        : 'text-text-secondary hover:bg-bg-hover/90 hover:text-text-primary',
+      options.context?.disabled ? 'pointer-events-none cursor-not-allowed opacity-35' : ''
+    ]
+  }),
+  tableHeaderCell: { class: 'pb-1.5 text-xs font-medium tracking-wide text-text-muted' },
+  dayCell: { class: 'p-0.5' },
+  day: (options: { context?: { selected?: boolean; disabled?: boolean; today?: boolean } }) => ({
+    class: [
+      'inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium transition-colors',
+      options.context?.selected
+        ? 'bg-accent text-white shadow-sm shadow-accent/25'
+        : 'text-text-secondary hover:bg-bg-hover/90 hover:text-text-primary',
+      options.context?.disabled ? 'cursor-not-allowed opacity-40' : '',
+      options.context?.today && !options.context?.selected ? 'ring-1 ring-accent/40' : ''
+    ]
+  })
+}
 </script>
 
 <template>
@@ -273,14 +385,20 @@ const currentSort = computed({
 
         <div class="w-full space-y-3 p-3">
           <label class="text-xs font-medium uppercase tracking-wide text-text-muted">Filter by Author</label>
-          <input
-            :value="props.authorFilter"
-            type="text"
-            placeholder="GitHub username"
-            class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
-            @input="authorFilter = ($event.target as HTMLInputElement).value"
-            @keydown.enter="($event.target as HTMLInputElement).blur()"
-          >
+          <div class="relative">
+            <Icon
+              name="lucide:user"
+              class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
+            />
+            <input
+              :value="props.authorFilter"
+              type="text"
+              placeholder="GitHub username"
+              class="w-full rounded-lg border border-border-subtle bg-bg-surface py-2 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
+              @input="authorFilter = ($event.target as HTMLInputElement).value"
+              @keydown.enter="($event.target as HTMLInputElement).blur()"
+            >
+          </div>
           <div class="flex justify-end border-t border-border-subtle pt-3">
             <button
               type="button"
@@ -299,6 +417,7 @@ const currentSort = computed({
         :options="[]"
         placeholder="Date Range"
         menu-width="w-72"
+        overflow-visible
       >
         <template #trigger>
           <button
@@ -325,22 +444,44 @@ const currentSort = computed({
         <div class="w-full space-y-4 p-3">
           <div class="space-y-2">
             <label class="text-xs font-medium uppercase tracking-wide text-text-muted">From</label>
-            <input
-              :value="props.dateRange.from"
-              type="date"
-              class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-muted focus:outline-none focus:ring-0"
-              @input="dateRange = { ...props.dateRange, from: ($event.target as HTMLInputElement).value }"
-            >
+            <div class="relative">
+              <Icon
+                name="lucide:calendar"
+                class="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-text-muted"
+              />
+              <DatePicker
+                class="w-full"
+                :model-value="dateFromPickerValue"
+                date-format="yy-mm-dd"
+                :manual-input="false"
+                append-to="self"
+                placeholder="From date"
+                :input-class="datePickerInputClass"
+                :pt="datePickerPt"
+                @update:model-value="handleFromDateChange"
+              />
+            </div>
           </div>
           <div class="space-y-2">
             <label class="text-xs font-medium uppercase tracking-wide text-text-muted">To</label>
-            <input
-              :value="props.dateRange.to"
-              type="date"
-              class="w-full rounded-lg border border-border-subtle bg-bg-surface px-3 py-2 text-sm text-text-primary focus:border-border-muted focus:outline-none focus:ring-0"
-              :min="props.dateRange.from || undefined"
-              @input="dateRange = { ...props.dateRange, to: ($event.target as HTMLInputElement).value }"
-            >
+            <div class="relative">
+              <Icon
+                name="lucide:calendar"
+                class="pointer-events-none absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-text-muted"
+              />
+              <DatePicker
+                class="w-full"
+                :model-value="dateToPickerValue"
+                date-format="yy-mm-dd"
+                :manual-input="false"
+                append-to="self"
+                placeholder="To date"
+                :input-class="datePickerInputClass"
+                :pt="datePickerPt"
+                :min-date="dateFromPickerValue || undefined"
+                @update:model-value="handleToDateChange"
+              />
+            </div>
           </div>
           <div class="flex justify-end border-t border-border-subtle pt-3">
             <button

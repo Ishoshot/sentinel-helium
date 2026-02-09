@@ -102,13 +102,18 @@ const clearFilters = () => {
 <template>
   <div class="flex flex-col sm:flex-row gap-4">
     <!-- Search -->
-    <div class="flex-1">
-      <BaseInput
-        :model-value="search"
+    <div class="relative flex-1">
+      <Icon
+        name="lucide:search"
+        class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted"
+      />
+      <input
+        :value="search"
         type="search"
         placeholder="Search runs..."
-        @update:model-value="handleSearch"
-      />
+        class="w-full rounded-lg border border-border-subtle bg-bg-elevated py-2 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-border-muted focus:outline-none focus:ring-0"
+        @input="handleSearch(($event.target as HTMLInputElement).value)"
+      >
     </div>
 
     <!-- Filters -->
