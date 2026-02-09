@@ -6,6 +6,7 @@ import { useAppToast } from '~/composables/shared/useAppToast'
 import { useMembers } from '~/composables/members/useMembers'
 import { useGitHub } from '~/composables/integrations/useGitHub'
 import DomainRepositoriesRepositorySettingsModal from '~/components/domain/repositories/RepositorySettingsModal.vue'
+import DomainIntegrationsWorkspaceApiKeys from '~/components/domain/integrations/WorkspaceApiKeys.vue'
 
 /**
  * API Keys page - BYOK management with developer console aesthetic
@@ -182,8 +183,7 @@ function getProviderLabel(provider: string | null) {
                 </div>
               </div>
               <p class="text-sm leading-relaxed text-white/70">
-                Configure your own AI provider API keys for each repository. Your keys are encrypted
-                at rest and give you full control over costs and rate limits.
+                Configure your own AI provider API keys at the workspace or repository level. Workspace keys unlock unlimited briefing generations. Your keys are encrypted at rest.
               </p>
             </div>
 
@@ -220,6 +220,14 @@ function getProviderLabel(provider: string | null) {
           </div>
         </div>
       </section>
+
+      <!-- Workspace-level API Keys -->
+      <DomainIntegrationsWorkspaceApiKeys
+        :workspace-id="workspaceId"
+        :can-manage="canManage"
+        class="transition-all delay-100 duration-700 ease-out"
+        :class="isPageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+      />
 
       <!-- Loading repositories -->
       <div
