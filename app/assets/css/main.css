@@ -90,6 +90,15 @@
     cursor: pointer;
   }
 
+  button,
+  a,
+  [role="switch"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    @apply focus:outline-none;
+  }
+
   body {
     @apply bg-bg-app text-text-primary;
   }
