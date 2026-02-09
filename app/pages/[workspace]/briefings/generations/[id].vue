@@ -40,6 +40,10 @@ const error = ref<string | null>(null);
 const isDownloading = ref(false);
 const showShareModal = ref(false);
 const showExcerpts = ref(false);
+const isNarrativeHighlighted = ref(false);
+const narrativeSectionRef = ref<HTMLElement | null>(null);
+const narrativeContentRef = ref<HTMLElement | null>(null);
+let highlightTimeout: ReturnType<typeof setTimeout> | null = null;
 const rating = ref<number | null>(null);
 const comment = ref("");
 const tagsInput = ref("");
@@ -104,6 +108,50 @@ function handleShareCreated() {
   toast.success("Share link created!");
 }
 
+function scrollToNarrativeSection() {
+  const targetElement = narrativeContentRef.value ?? narrativeSectionRef.value;
+  if (!targetElement) {
+    return;
+  }
+
+  const viewportWidth = window.innerWidth;
+  const stickyOffset = viewportWidth >= 640 ? 104 : 88;
+  const scrollPastSectionStart = viewportWidth >= 1280 ? 180 : viewportWidth >= 1024 ? 140 : viewportWidth >= 640 ? 96 : 72;
+  const targetTop = targetElement.getBoundingClientRect().top
+    + window.scrollY
+    - stickyOffset
+    + scrollPastSectionStart;
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+  });
+}
+
+function handleToggleExcerpts(options?: { shouldScroll?: boolean }) {
+  const willShowExcerpts = !showExcerpts.value;
+  showExcerpts.value = willShowExcerpts;
+
+  if (!willShowExcerpts) {
+    return;
+  }
+
+  if (options?.shouldScroll ?? true) {
+    nextTick(() => {
+      scrollToNarrativeSection();
+    });
+  }
+
+  isNarrativeHighlighted.value = true;
+  if (highlightTimeout) {
+    clearTimeout(highlightTimeout);
+  }
+  highlightTimeout = setTimeout(() => {
+    isNarrativeHighlighted.value = false;
+  }, 1200);
+}
+
 // Print handler
 function handlePrint() {
   window.print();
@@ -113,6 +161,12 @@ function handlePrint() {
 function handleGoBack() {
   router.push(`/${workspaceSlug.value}/briefings`);
 }
+
+onUnmounted(() => {
+  if (highlightTimeout) {
+    clearTimeout(highlightTimeout);
+  }
+});
 
 // Available output formats
 const availableFormats = computed(() => {
@@ -165,70 +219,81 @@ async function handleSubmitFeedback() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg-app">
-    <!-- Header (No print) -->
-    <header class="no-print sticky top-0 z-30 bg-bg-elevated/95 backdrop-blur-sm border-b border-border-subtle">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex items-center justify-between gap-4">
-          <!-- Left: Back & Title -->
-          <div class="flex items-center gap-4 min-w-0">
+  <div class="min-h-screen bg-bg-app pb-24 sm:pb-0">
+    <header class="no-print sticky top-0 z-30 border-b border-border-subtle bg-bg-elevated">
+      <div class="mx-auto max-w-4xl px-4 py-4 sm:px-6 lg:px-8">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0 flex items-start gap-3 sm:gap-4">
             <button
               type="button"
-              class="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-bg-surface transition-all duration-200"
+              class="inline-flex items-center justify-center rounded-md p-1 text-text-muted transition-colors hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              aria-label="Back to briefings"
               @click="handleGoBack"
             >
               <Icon
                 name="lucide:arrow-left"
-                class="w-5 h-5"
+                class="h-5 w-5"
               />
             </button>
 
             <div class="min-w-0">
+              <p class="text-xs font-medium uppercase tracking-wider text-text-muted">
+                Briefing
+              </p>
               <BaseSkeleton
                 v-if="isLoading"
-                class="h-6 w-48"
+                class="mt-2 h-6 w-52"
               />
               <h1
                 v-else-if="generation?.briefing"
-                class="font-semibold text-text-primary truncate"
+                class="mt-1 text-lg font-semibold tracking-tight text-text-primary sm:text-xl"
               >
-                {{ generation.briefing.title }}
+                <span class="text-balance">{{ generation.briefing.title }}</span>
               </h1>
+              <p
+                v-if="completedDate"
+                class="mt-1 text-xs text-text-muted"
+              >
+                Generated {{ completedDate.toLocaleDateString(undefined, {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                }) }}
+              </p>
             </div>
           </div>
 
-          <!-- Right: Actions -->
           <div class="flex items-center gap-2">
-            <!-- Toggle Excerpts -->
             <button
               v-if="hasExcerpts"
               type="button"
-              class="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+              class="hidden items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors sm:flex"
               :class="showExcerpts
-                ? 'bg-accent/10 text-accent'
-                : 'text-text-muted hover:text-text-secondary hover:bg-bg-surface'"
-              @click="showExcerpts = !showExcerpts"
+                ? 'border-accent/20 bg-accent/10 text-accent'
+                : 'border-border-subtle text-text-muted hover:border-border-muted hover:text-text-secondary'"
+              aria-controls="briefing-narrative"
+              :aria-expanded="showExcerpts"
+              :aria-label="showExcerpts ? 'Hide excerpts' : 'Show excerpts'"
+              @click="handleToggleExcerpts"
             >
               <Icon
-                name="lucide:share-2"
-                class="w-4 h-4"
+                name="lucide:book-open"
+                class="h-4 w-4"
               />
-              Excerpts
+              {{ showExcerpts ? 'Hide Excerpts' : 'Excerpts' }}
             </button>
 
-            <!-- Print -->
             <button
               type="button"
-              class="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-text-muted hover:text-text-secondary hover:bg-bg-surface rounded-lg transition-colors"
+              class="hidden items-center gap-2 rounded-lg border border-border-subtle px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:border-border-muted hover:text-text-secondary sm:flex"
               @click="handlePrint"
             >
               <Icon
                 name="lucide:printer"
-                class="w-4 h-4"
+                class="h-4 w-4"
               />
             </button>
 
-            <!-- Download Dropdown -->
             <BaseDropdown
               :options="availableFormats.map(f => ({ label: f.toUpperCase(), value: f }))"
               placeholder="Download"
@@ -238,25 +303,24 @@ async function handleSubmitFeedback() {
               <template #trigger>
                 <button
                   type="button"
-                  class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text-muted hover:text-text-secondary hover:bg-bg-surface rounded-lg transition-colors"
+                  class="flex items-center gap-2 rounded-lg border border-border-subtle px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:border-border-muted hover:text-text-secondary"
                   :disabled="isDownloading"
                 >
                   <Icon
                     v-if="isDownloading"
                     name="lucide:loader-2"
-                    class="w-4 h-4 animate-spin"
+                    class="h-4 w-4 animate-spin"
                   />
                   <Icon
                     v-else
                     name="lucide:download"
-                    class="w-4 h-4"
+                    class="h-4 w-4"
                   />
                   <span class="hidden sm:inline">Download</span>
                 </button>
               </template>
             </BaseDropdown>
 
-            <!-- Share Button -->
             <BaseButton
               variant="primary"
               size="sm"
@@ -264,7 +328,7 @@ async function handleSubmitFeedback() {
             >
               <Icon
                 name="lucide:share"
-                class="w-4 h-4 mr-1.5"
+                class="mr-1.5 h-4 w-4"
               />
               Share
             </BaseButton>
@@ -273,79 +337,121 @@ async function handleSubmitFeedback() {
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-      <!-- Loading State -->
+    <main class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
       <div
         v-if="isLoading"
-        class="space-y-6"
+        class="rounded-2xl border border-border-subtle bg-bg-elevated p-8 shadow-elevated"
       >
-        <BaseSkeleton class="h-10 w-3/4" />
-        <BaseSkeleton class="h-6 w-1/2" />
-        <div class="h-px bg-border-subtle my-8" />
-        <BaseSkeleton class="h-4 w-full" />
-        <BaseSkeleton class="h-4 w-full" />
-        <BaseSkeleton class="h-4 w-4/5" />
-        <BaseSkeleton class="h-4 w-full" />
-        <BaseSkeleton class="h-4 w-3/4" />
+        <div class="space-y-6">
+          <BaseSkeleton class="h-10 w-3/4" />
+          <BaseSkeleton class="h-6 w-1/2" />
+          <div class="my-8 h-px bg-border-subtle" />
+          <BaseSkeleton class="h-4 w-full" />
+          <BaseSkeleton class="h-4 w-full" />
+          <BaseSkeleton class="h-4 w-4/5" />
+          <BaseSkeleton class="h-4 w-full" />
+          <BaseSkeleton class="h-4 w-3/4" />
+        </div>
       </div>
 
-      <!-- Error State -->
       <div
         v-else-if="error"
-        class="text-center py-16"
+        class="rounded-2xl border border-error/20 bg-bg-elevated p-8 shadow-elevated sm:p-10"
       >
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-error/10 flex items-center justify-center">
+        <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-error/10">
           <Icon
             name="lucide:alert-circle"
-            class="w-8 h-8 text-error"
+            class="h-6 w-6 text-error"
           />
         </div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2">
+        <h2 class="text-xl font-semibold tracking-tight text-text-primary">
           {{ error }}
-        </h3>
-        <p class="text-sm text-text-muted mb-6">
-          We couldn't load this briefing. It may have been deleted or you don't have access.
+        </h2>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
+          We could not load this briefing. It may have been deleted or you do not have access.
         </p>
-        <BaseButton
-          variant="secondary"
-          @click="handleGoBack"
-        >
-          <Icon
-            name="lucide:arrow-left"
-            class="w-4 h-4 mr-2"
-          />
-          Back to Briefings
-        </BaseButton>
+        <div class="mt-7">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors hover:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 rounded-md"
+            @click="handleGoBack"
+          >
+            <Icon
+              name="lucide:arrow-left"
+              class="mr-2 h-4 w-4"
+            />
+            Back to Briefings
+          </button>
+        </div>
       </div>
 
-      <!-- Briefing Content -->
-      <div v-else-if="generation">
-        <!-- Narrative Component -->
-        <BriefingsBriefingNarrative
-          :generation="generation"
-          :show-achievements="true"
-          :show-excerpts="showExcerpts"
-        />
+      <div
+        v-else-if="generation"
+        class="space-y-8"
+      >
+        <section
+          id="briefing-narrative"
+          ref="narrativeSectionRef"
+          class="scroll-mt-24 overflow-hidden rounded-2xl border border-border-subtle bg-bg-elevated shadow-elevated transition-all duration-500 sm:scroll-mt-28"
+          :class="isNarrativeHighlighted ? 'ring-2 ring-accent/30' : ''"
+        >
+          <header class="border-b border-border-subtle bg-bg-surface px-6 py-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 text-sm text-text-muted">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="font-medium text-text-secondary">Narrative</span>
+                <span v-if="hasExcerpts && showExcerpts">Excerpts are visible below.</span>
+              </div>
 
-        <!-- Feedback -->
-        <section class="mt-12 rounded-2xl border border-border-subtle bg-bg-elevated p-6">
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                v-if="hasExcerpts"
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors sm:hidden"
+                :class="showExcerpts
+                  ? 'border-accent/20 bg-accent/10 text-accent'
+                  : 'border-border-subtle text-text-muted hover:border-border-muted hover:text-text-secondary'"
+                aria-controls="briefing-narrative"
+                :aria-expanded="showExcerpts"
+                :aria-label="showExcerpts ? 'Hide excerpts' : 'Show excerpts'"
+                @click="handleToggleExcerpts({ shouldScroll: false })"
+              >
+                <Icon
+                  name="lucide:book-open"
+                  class="h-3.5 w-3.5"
+                />
+                {{ showExcerpts ? 'Hide' : 'Excerpts' }}
+              </button>
+            </div>
+          </header>
+
+          <div
+            ref="narrativeContentRef"
+            class="p-6 sm:p-8 lg:p-10"
+          >
+            <BriefingsBriefingNarrative
+              :generation="generation"
+              :show-achievements="true"
+              :show-excerpts="showExcerpts"
+            />
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-border-subtle bg-bg-elevated p-6 shadow-elevated sm:p-8">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h3 class="text-base font-semibold text-text-primary">
+              <h3 class="text-lg font-semibold tracking-tight text-text-primary">
                 How was this briefing?
               </h3>
-              <p class="text-sm text-text-muted">
+              <p class="mt-1 text-sm text-text-muted">
                 Share quick feedback to help us improve.
               </p>
             </div>
             <div
               v-if="feedbackSubmitted"
-              class="inline-flex items-center gap-2 text-sm text-success"
+              class="inline-flex items-center gap-2 rounded-lg border border-success/20 bg-success/10 px-3 py-1.5 text-sm text-success"
             >
               <Icon
                 name="lucide:check-circle"
-                class="w-4 h-4"
+                class="h-4 w-4"
               />
               Feedback received
             </div>
@@ -353,18 +459,18 @@ async function handleSubmitFeedback() {
 
           <div
             v-if="!feedbackSubmitted"
-            class="mt-4 space-y-4"
+            class="mt-6 space-y-5"
           >
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-3">
               <span class="text-sm text-text-muted">Rating</span>
               <div class="flex items-center gap-2">
                 <button
                   v-for="value in 5"
                   :key="value"
                   type="button"
-                  class="flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition-colors"
+                  class="flex h-10 w-10 items-center justify-center rounded-lg border font-mono text-sm font-semibold transition-colors"
                   :class="rating === value
-                    ? 'border-accent-primary/40 bg-accent-primary/10 text-accent-primary'
+                    ? 'border-accent/40 bg-accent/10 text-accent'
                     : 'border-border-subtle bg-bg-surface text-text-secondary hover:border-border-muted'"
                   @click="rating = value"
                 >
@@ -379,8 +485,8 @@ async function handleSubmitFeedback() {
               </label>
               <textarea
                 v-model="comment"
-                rows="3"
-                class="w-full rounded-xl border border-border-subtle bg-bg-elevated px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:shadow-[0_0_0_3px_rgba(37,99,235,0.08)]"
+                rows="4"
+                class="w-full rounded-xl border border-border-subtle bg-bg-elevated px-4 py-3 text-sm text-text-primary placeholder:text-text-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 placeholder="Tell us what stood out or what we could improve."
               />
             </div>
@@ -408,7 +514,7 @@ async function handleSubmitFeedback() {
                 <Icon
                   v-if="isSubmittingFeedback"
                   name="lucide:loader-2"
-                  class="w-4 h-4 mr-2 animate-spin"
+                  class="mr-2 h-4 w-4 animate-spin"
                 />
                 Submit Feedback
               </BaseButton>
@@ -416,17 +522,16 @@ async function handleSubmitFeedback() {
           </div>
         </section>
 
-        <!-- Actions Footer (No print) -->
-        <div class="no-print mt-12 pt-8 border-t border-border-subtle">
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-4 text-sm text-text-muted">
+        <section class="no-print rounded-2xl border border-border-subtle bg-bg-elevated px-5 py-4">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-wrap items-center gap-4 text-sm text-text-muted">
               <span
                 v-if="completedDate"
                 class="flex items-center gap-1.5"
               >
                 <Icon
                   name="lucide:calendar"
-                  class="w-4 h-4"
+                  class="h-4 w-4"
                 />
                 {{ completedDate.toLocaleDateString(undefined, {
                   month: 'long',
@@ -450,7 +555,7 @@ async function handleSubmitFeedback() {
             <div class="flex items-center gap-3">
               <button
                 type="button"
-                class="text-sm text-text-muted hover:text-text-secondary transition-colors"
+                class="text-sm text-text-muted transition-colors hover:text-text-secondary"
                 @click="handleGoBack"
               >
                 Back to Briefings
@@ -464,20 +569,19 @@ async function handleSubmitFeedback() {
               >
                 <Icon
                   name="lucide:refresh-cw"
-                  class="w-4 h-4 mr-1.5"
+                  class="mr-1.5 h-4 w-4"
                 />
                 Generate Again
               </BaseButton>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </main>
 
-    <!-- Floating Actions (Mobile) -->
     <div
       v-if="generation && !isLoading"
-      class="no-print fixed bottom-0 left-0 right-0 p-4 bg-bg-elevated/95 backdrop-blur-sm border-t border-border-subtle sm:hidden"
+      class="no-print fixed bottom-0 left-0 right-0 border-t border-border-subtle bg-bg-elevated p-4 sm:hidden"
     >
       <div class="flex items-center gap-3">
         <BaseButton
@@ -487,7 +591,7 @@ async function handleSubmitFeedback() {
         >
           <Icon
             name="lucide:download"
-            class="w-4 h-4 mr-1.5"
+            class="mr-1.5 h-4 w-4"
           />
           PDF
         </BaseButton>
@@ -498,14 +602,13 @@ async function handleSubmitFeedback() {
         >
           <Icon
             name="lucide:share"
-            class="w-4 h-4 mr-1.5"
+            class="mr-1.5 h-4 w-4"
           />
           Share
         </BaseButton>
       </div>
     </div>
 
-    <!-- Share Modal -->
     <BriefingsBriefingShareModal
       v-model="showShareModal"
       :generation="generation"
