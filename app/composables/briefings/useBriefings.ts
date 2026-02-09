@@ -186,10 +186,9 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     } catch (e) {
       let message: string;
       if (e instanceof ApiError) {
-        if (e.status === 403) {
-          message = "You don't have permission to generate this briefing";
-        } else if (e.status === 429) {
-          message = "Generation limit reached. Please try again later.";
+        if (e.status === 403 || e.status === 429) {
+          // Use the API's contextual message (e.g. "You've used all 3 of your free briefings...")
+          message = e.message;
         } else {
           message = e.message;
         }
@@ -606,6 +605,10 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     () => workspaceEligibility.value?.restriction_reason ?? null
   );
 
+  const workspaceReasonCode = computed(
+    () => workspaceEligibility.value?.reason_code ?? null
+  );
+
   /**
    * Get subscription for a specific briefing
    */
@@ -687,5 +690,6 @@ export function useBriefings(workspaceId: Ref<number | null>) {
     // Eligibility
     isWorkspaceEligible,
     workspaceRestrictionReason,
+    workspaceReasonCode,
   };
 }
