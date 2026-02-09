@@ -36,25 +36,9 @@ const iconMap: Record<string, string> = {
   default: 'lucide:file-text',
 }
 
-const colorMap: Record<string, { bg: string; icon: string; gradient: string }> = {
-  standup: { bg: 'bg-amber-500/10', icon: 'text-amber-400', gradient: 'from-amber-500 to-orange-500' },
-  'standup-update': { bg: 'bg-amber-500/10', icon: 'text-amber-400', gradient: 'from-amber-500 to-orange-500' },
-  'weekly-team-summary': { bg: 'bg-blue-500/10', icon: 'text-blue-400', gradient: 'from-blue-500 to-indigo-500' },
-  'delivery-velocity': { bg: 'bg-rose-500/10', icon: 'text-rose-400', gradient: 'from-rose-500 to-pink-500' },
-  'engineer-spotlight': { bg: 'bg-violet-500/10', icon: 'text-violet-400', gradient: 'from-violet-500 to-purple-500' },
-  'company-update': { bg: 'bg-emerald-500/10', icon: 'text-emerald-400', gradient: 'from-emerald-500 to-teal-500' },
-  'sprint-retrospective': { bg: 'bg-cyan-500/10', icon: 'text-cyan-400', gradient: 'from-cyan-500 to-blue-500' },
-  'code-health': { bg: 'bg-pink-500/10', icon: 'text-pink-400', gradient: 'from-pink-500 to-rose-500' },
-  default: { bg: 'bg-bg-surface', icon: 'text-text-secondary', gradient: 'from-bg-hover to-bg-surface' },
-}
-
 const briefingIcon = computed((): string => {
   const icon = props.briefing.icon || iconMap[props.briefing.slug] || 'lucide:file-text'
   return icon
-})
-
-const briefingColors = computed(() => {
-  return colorMap[props.briefing.slug] || colorMap.default
 })
 
 // Target audience display
@@ -81,6 +65,17 @@ const audienceDisplay = computed(() => {
 const outputFormats = computed(() => {
   return props.briefing.output_formats || []
 })
+
+const outputFormatStyles: Record<string, string> = {
+  markdown: 'border-indigo-400/25 bg-gradient-to-r from-indigo-500/15 to-violet-500/10 text-indigo-200',
+  html: 'border-sky-400/25 bg-gradient-to-r from-sky-500/15 to-cyan-500/10 text-sky-200',
+  slack: 'border-emerald-400/25 bg-gradient-to-r from-emerald-500/15 to-teal-500/10 text-emerald-200',
+  email: 'border-amber-400/25 bg-gradient-to-r from-amber-500/15 to-orange-500/10 text-amber-200',
+}
+
+function getOutputFormatStyle(format: string): string {
+  return outputFormatStyles[format.toLowerCase()] || 'border-border-subtle bg-gradient-to-r from-bg-surface to-bg-elevated text-text-secondary'
+}
 
 // Check if has parameters
 const hasParameters = computed(() => {
@@ -125,39 +120,40 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <template #header>
-      <div class="flex items-center gap-4">
-        <div
-          class="flex size-14 items-center justify-center rounded-2xl ring-1 ring-border-subtle"
-          :class="[briefingColors.bg]"
-        >
+      <div class="flex min-w-0 items-center gap-4">
+        <div class="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-bg-surface">
           <Icon
             :name="briefingIcon"
-            class="size-7"
-            :class="briefingColors.icon"
+            class="size-5 text-text-secondary"
           />
         </div>
         <div class="min-w-0 flex-1">
-          <h2 class="text-xl font-semibold text-text-primary">
+          <h2 class="text-lg font-semibold tracking-tight text-text-primary">
             {{ briefing.title }}
           </h2>
-          <p class="mt-0.5 text-sm text-text-muted">
+          <p class="mt-0.5 truncate text-sm text-text-muted">
             For {{ audienceDisplay }}
           </p>
         </div>
       </div>
     </template>
 
-    <div class="space-y-6">
-      <!-- Badges row -->
+    <div class="max-h-[65vh] space-y-5 overflow-y-auto pr-1 scrollbar-hidden">
+      <section class="rounded-2xl border border-border-subtle bg-bg-surface px-4 py-3.5">
+        <p class="text-sm text-text-secondary">
+          Review what this briefing includes before opening the full generation flow.
+        </p>
+      </section>
+
       <div class="flex flex-wrap items-center gap-2">
         <!-- AI Badge -->
         <span
           v-if="briefing.requires_ai"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-400 ring-1 ring-indigo-500/20"
+          class="inline-flex items-center gap-1.5 rounded-md border border-accent/35 bg-gradient-to-r from-accent/20 to-cyan-500/15 px-2.5 py-1 text-xs font-medium text-cyan-100 shadow-sm shadow-accent/10"
         >
           <Icon
             name="lucide:sparkles"
-            class="size-3.5"
+            class="size-3.5 text-accent"
           />
           AI-Powered
         </span>
@@ -165,11 +161,11 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <!-- Schedulable badge -->
         <span
           v-if="briefing.is_schedulable"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20"
+          class="inline-flex items-center gap-1.5 rounded-md border border-emerald-400/25 bg-gradient-to-r from-emerald-500/15 to-teal-500/10 px-2.5 py-1 text-xs font-medium text-emerald-200 shadow-sm shadow-emerald-500/10"
         >
           <Icon
             name="lucide:calendar"
-            class="size-3.5"
+            class="size-3.5 text-emerald-300"
           />
           Schedulable
         </span>
@@ -177,11 +173,11 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <!-- Subscription badge -->
         <span
           v-if="hasSubscription"
-          class="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-400 ring-1 ring-amber-500/20"
+          class="inline-flex items-center gap-1.5 rounded-md border border-amber-400/30 bg-gradient-to-r from-amber-500/20 to-orange-500/10 px-2.5 py-1 text-xs font-medium text-amber-100 shadow-sm shadow-amber-500/10"
         >
           <Icon
             name="lucide:bell"
-            class="size-3.5"
+            class="size-3.5 text-amber-300"
           />
           Subscribed
         </span>
@@ -190,89 +186,112 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
         <span
           v-for="format in outputFormats"
           :key="format"
-          class="inline-flex items-center rounded-lg bg-bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary ring-1 ring-border-subtle"
+          class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium"
+          :class="getOutputFormatStyle(format)"
         >
           {{ format.toUpperCase() }}
         </span>
       </div>
 
       <!-- Description -->
-      <div class="rounded-xl bg-bg-surface p-5 ring-1 ring-border-subtle">
+      <section class="rounded-2xl border border-border-subtle bg-bg-surface p-4">
         <h3 class="mb-2 text-sm font-semibold text-text-primary">
           About this briefing
         </h3>
         <p class="text-sm leading-relaxed text-text-secondary">
           {{ briefing.description }}
         </p>
-      </div>
+      </section>
 
       <!-- Parameters section -->
-      <div v-if="hasParameters">
-        <h3 class="mb-3 text-sm font-semibold text-text-primary">
-          Configuration Options
-        </h3>
-        <div class="space-y-2">
-          <div
-            v-for="{ key, property, required } in parameterEntries"
-            :key="key"
-            class="flex items-start gap-3 rounded-xl bg-bg-elevated p-4 ring-1 ring-border-subtle"
-          >
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-bg-surface">
-              <Icon
-                :name="property.type === 'array' ? 'lucide:list' : property.type === 'boolean' ? 'lucide:toggle-left' : property.format === 'date' ? 'lucide:calendar' : 'lucide:type'"
-                class="size-4 text-text-muted"
-              />
+      <section
+        v-if="hasParameters"
+        class="rounded-2xl border border-border-subtle bg-bg-elevated p-5"
+      >
+        <div class="flex items-start gap-3">
+          <div class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-bg-surface text-text-muted">
+            <Icon
+              name="lucide:sliders-horizontal"
+              class="size-4"
+            />
+          </div>
+          <div class="flex-1 space-y-4">
+            <div>
+              <h3 class="text-sm font-semibold text-text-primary">
+                Configuration Options
+              </h3>
+              <p class="mt-1 text-sm text-text-muted">
+                Customize the inputs used when this briefing runs.
+              </p>
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-medium text-text-primary">
-                  {{ key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
-                </span>
-                <span
-                  v-if="required"
-                  class="rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-medium text-red-400"
-                >
-                  Required
-                </span>
-              </div>
-              <p
-                v-if="property.description"
-                class="mt-1 text-xs text-text-muted"
+            <div class="space-y-2">
+              <div
+                v-for="{ key, property, required } in parameterEntries"
+                :key="key"
+                class="rounded-xl border border-border-subtle bg-bg-surface p-3.5"
               >
-                {{ property.description }}
-              </p>
-              <p class="mt-1.5 font-mono text-[11px] text-text-muted">
-                {{ formatPropertyType(property) }}
-              </p>
+                <div class="flex items-start gap-3">
+                  <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-bg-hover text-text-muted">
+                    <Icon
+                      :name="property.type === 'array' ? 'lucide:list' : property.type === 'boolean' ? 'lucide:toggle-left' : property.format === 'date' ? 'lucide:calendar' : 'lucide:type'"
+                      class="size-4"
+                    />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="text-sm font-medium text-text-primary">
+                        {{ key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }}
+                      </span>
+                      <span
+                        v-if="required"
+                        class="inline-flex items-center rounded-md border border-error/25 bg-error/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-error"
+                      >
+                        Required
+                      </span>
+                    </div>
+                    <p
+                      v-if="property.description"
+                      class="mt-1 text-xs text-text-muted"
+                    >
+                      {{ property.description }}
+                    </p>
+                    <p class="mt-1.5 inline-flex items-center rounded-md border border-border-subtle bg-bg-elevated px-2 py-1 font-mono text-[11px] text-text-muted">
+                      {{ formatPropertyType(property) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- No parameters -->
-      <div
+      <section
         v-else
-        class="flex items-center gap-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 p-5 ring-1 ring-emerald-500/20"
+        class="rounded-2xl border border-border-subtle bg-bg-surface p-4"
       >
-        <div class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/20">
-          <Icon
-            name="lucide:zap"
-            class="size-6 text-emerald-400"
-          />
+        <div class="flex items-start gap-3">
+          <div class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-bg-elevated text-text-muted">
+            <Icon
+              name="lucide:zap"
+              class="size-4"
+            />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-text-primary">
+              No configuration needed
+            </p>
+            <p class="mt-1 text-sm text-text-muted">
+              This briefing runs with optimized defaults and no extra setup.
+            </p>
+          </div>
         </div>
-        <div>
-          <p class="font-medium text-text-primary">
-            No configuration needed
-          </p>
-          <p class="mt-0.5 text-sm text-text-secondary">
-            This briefing generates with optimal settings automatically.
-          </p>
-        </div>
-      </div>
+      </section>
     </div>
 
     <template #footer>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-2 text-xs text-text-muted">
           <Icon
             :name="briefing.is_system ? 'lucide:shield-check' : 'lucide:user'"
@@ -280,30 +299,30 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
           />
           <span>{{ briefing.is_system ? 'System template' : 'Custom template' }}</span>
         </div>
-        <div class="flex items-center gap-3">
-          <button
+        <div class="flex w-full items-center gap-2 sm:w-auto sm:justify-end sm:gap-3">
+          <BaseButton
             v-if="briefing.is_schedulable && !hasSubscription"
-            type="button"
-            class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2.5 text-sm font-medium text-text-secondary transition-all hover:border-border-muted hover:bg-bg-hover"
+            class="flex-1 whitespace-nowrap sm:flex-none"
+            variant="secondary"
             @click="$emit('subscribe', briefing)"
           >
             <Icon
               name="lucide:bell-plus"
-              class="size-4"
+              class="mr-2 size-4"
             />
             Subscribe
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-glow active:scale-[0.98]"
+          </BaseButton>
+          <BaseButton
+            class="flex-1 whitespace-nowrap sm:flex-none"
+            variant="primary"
             @click="$emit('view', briefing)"
           >
             <Icon
               name="lucide:arrow-right"
-              class="size-4"
+              class="mr-2 size-4"
             />
             View Briefing
-          </button>
+          </BaseButton>
         </div>
       </div>
     </template>
@@ -311,7 +330,13 @@ const hasSubscription = computed(() => !!props.subscription?.is_active)
 </template>
 
 <style scoped>
-.hover\:shadow-glow:hover {
-  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 </style>
