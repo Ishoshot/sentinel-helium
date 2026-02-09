@@ -83,10 +83,10 @@ const providerIcons: Record<string, string> = {
 }
 
 const providerColors: Record<string, { bg: string; text: string; border: string }> = {
-  anthropic: { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/20' },
-  openai: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
-  google: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
-  mistral: { bg: 'bg-violet-500/10', text: 'text-violet-400', border: 'border-violet-500/20' },
+  anthropic: { bg: 'bg-bg-surface', text: 'text-text-secondary', border: 'border-border-subtle' },
+  openai: { bg: 'bg-bg-surface', text: 'text-text-secondary', border: 'border-border-subtle' },
+  google: { bg: 'bg-bg-surface', text: 'text-text-secondary', border: 'border-border-subtle' },
+  mistral: { bg: 'bg-bg-surface', text: 'text-text-secondary', border: 'border-border-subtle' },
 }
 
 watch(
@@ -279,10 +279,10 @@ async function handleCreateConfigPr() {
             <!-- Header -->
             <div class="relative border-b border-border-subtle px-6 py-5">
               <div class="flex items-center gap-4">
-                <div class="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-teal-600 shadow-lg">
+                <div class="flex size-12 items-center justify-center rounded-xl border border-border-subtle bg-bg-surface">
                   <Icon
                     name="lucide:folder-git-2"
-                    class="size-6 text-white"
+                    class="size-6 text-text-secondary"
                   />
                 </div>
                 <div class="flex-1">
@@ -314,17 +314,14 @@ async function handleCreateConfigPr() {
               class="max-h-[65vh] space-y-6 overflow-y-auto p-6"
             >
               <!-- Auto-review Section -->
-              <div class="rounded-xl border border-border-subtle bg-gradient-to-b from-bg-elevated to-bg-surface/50 p-5">
+              <div class="rounded-xl border border-border-subtle bg-bg-elevated p-5">
                 <div class="flex items-center justify-between gap-4">
                   <div class="flex items-center gap-4">
-                    <div
-                      class="flex size-11 items-center justify-center rounded-xl"
-                      :class="autoReviewEnabled ? 'bg-emerald-500/10' : 'bg-bg-surface'"
-                    >
+                    <div class="flex size-11 items-center justify-center rounded-xl bg-bg-surface">
                       <Icon
                         :name="autoReviewEnabled ? 'lucide:zap' : 'lucide:zap-off'"
                         class="size-5"
-                        :class="autoReviewEnabled ? 'text-emerald-400' : 'text-text-muted'"
+                        :class="autoReviewEnabled ? 'text-text-secondary' : 'text-text-muted'"
                       />
                     </div>
                     <div>
@@ -358,10 +355,10 @@ async function handleCreateConfigPr() {
               <div class="space-y-4 py-2">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="flex size-9 items-center justify-center rounded-lg bg-amber-500/10">
+                    <div class="flex size-9 items-center justify-center rounded-lg bg-bg-surface">
                       <Icon
                         name="lucide:key"
-                        class="size-4 text-amber-400"
+                        class="size-4 text-text-muted"
                       />
                     </div>
                     <div>
@@ -373,10 +370,11 @@ async function handleCreateConfigPr() {
                       </p>
                     </div>
                   </div>
-                  <button
+                  <BaseButton
                     v-if="canManage && !showAddKeyForm"
-                    type="button"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3.5 py-2 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98]"
+                    variant="secondary"
+                    size="sm"
+                    class="whitespace-nowrap"
                     @click="showAddKeyForm = true"
                   >
                     <Icon
@@ -384,7 +382,7 @@ async function handleCreateConfigPr() {
                       class="size-3.5"
                     />
                     Add Key
-                  </button>
+                  </BaseButton>
                 </div>
 
                 <!-- Add Key Form -->
@@ -508,7 +506,7 @@ async function handleCreateConfigPr() {
                       <div class="flex items-center gap-2 text-xs text-text-muted">
                         <Icon
                           name="lucide:shield-check"
-                          class="size-3.5 text-emerald-400"
+                          class="size-3.5 text-text-muted"
                         />
                         <span>Encrypted at rest. Never displayed again.</span>
                       </div>
@@ -525,26 +523,20 @@ async function handleCreateConfigPr() {
                       </div>
 
                       <div class="flex justify-end gap-2 border-t border-border-subtle pt-4">
-                        <button
-                          type="button"
-                          class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
+                        <BaseButton
+                          variant="secondary"
                           @click="showAddKeyForm = false"
                         >
                           Cancel
-                        </button>
-                        <button
-                          type="button"
-                          class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                        </BaseButton>
+                        <BaseButton
+                          variant="primary"
+                          :loading="isSubmittingKey"
                           :disabled="!newKeyProvider || !newKeyValue || isSubmittingKey"
                           @click="handleAddKey"
                         >
-                          <Icon
-                            v-if="isSubmittingKey"
-                            name="lucide:loader-2"
-                            class="size-4 animate-spin"
-                          />
-                          {{ isSubmittingKey ? 'Saving...' : 'Save Key' }}
-                        </button>
+                          Save Key
+                        </BaseButton>
                       </div>
                     </div>
                   </div>
@@ -624,26 +616,22 @@ async function handleCreateConfigPr() {
                       </div>
 
                       <div class="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          class="rounded-lg px-3 py-2 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
+                        <BaseButton
+                          variant="secondary"
+                          size="sm"
                           @click="handleCancelEdit"
                         >
                           Cancel
-                        </button>
-                        <button
-                          type="button"
-                          class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3 py-2 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                        </BaseButton>
+                        <BaseButton
+                          variant="primary"
+                          size="sm"
+                          :loading="isSubmittingKey"
                           :disabled="isSubmittingKey"
                           @click="handleSaveEdit"
                         >
-                          <Icon
-                            v-if="isSubmittingKey"
-                            name="lucide:loader-2"
-                            class="size-3.5 animate-spin"
-                          />
                           Save
-                        </button>
+                        </BaseButton>
                       </div>
                     </div>
 
@@ -727,10 +715,10 @@ async function handleCreateConfigPr() {
               <!-- Configuration Section -->
               <div class="space-y-4 py-2">
                 <div class="flex items-center gap-3">
-                  <div class="flex size-9 items-center justify-center rounded-lg bg-violet-500/10">
+                  <div class="flex size-9 items-center justify-center rounded-lg bg-bg-surface">
                     <Icon
                       name="lucide:file-code"
-                      class="size-4 text-violet-400"
+                      class="size-4 text-text-muted"
                     />
                   </div>
                   <div>
@@ -772,14 +760,14 @@ async function handleCreateConfigPr() {
                 <!-- Config Active -->
                 <div
                   v-else-if="hasConfig"
-                  class="rounded-xl border border-border-subtle bg-gradient-to-b from-bg-elevated to-bg-surface/50 p-4"
+                  class="rounded-xl border border-border-subtle bg-bg-elevated p-4"
                 >
                   <div class="flex items-start justify-between gap-4">
                     <div class="flex items-start gap-3">
-                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+                      <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-surface">
                         <Icon
                           name="lucide:check"
-                          class="size-4 text-emerald-400"
+                          class="size-4 text-text-secondary"
                         />
                       </div>
                       <div>
@@ -813,13 +801,14 @@ async function handleCreateConfigPr() {
                         </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      class="shrink-0 rounded-lg border border-border-subtle bg-bg-elevated px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-hover"
+                    <BaseButton
+                      variant="secondary"
+                      size="sm"
+                      class="shrink-0 whitespace-nowrap"
                       @click="showConfigViewer = true"
                     >
                       View
-                    </button>
+                    </BaseButton>
                   </div>
                 </div>
 
@@ -845,25 +834,22 @@ async function handleCreateConfigPr() {
                         </p>
                       </div>
                     </div>
-                    <button
+                    <BaseButton
                       v-if="canManage"
-                      type="button"
-                      class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                      variant="primary"
+                      size="sm"
+                      class="shrink-0 whitespace-nowrap"
+                      :loading="isCreatingConfigPr"
                       :disabled="isCreatingConfigPr"
                       @click="handleCreateConfigPr"
                     >
                       <Icon
-                        v-if="isCreatingConfigPr"
-                        name="lucide:loader-2"
-                        class="size-3.5 animate-spin"
-                      />
-                      <Icon
-                        v-else
+                        v-if="!isCreatingConfigPr"
                         name="lucide:git-pull-request"
                         class="size-3.5"
                       />
                       Create Config PR
-                    </button>
+                    </BaseButton>
                   </div>
                 </div>
               </div>
@@ -882,31 +868,27 @@ async function handleCreateConfigPr() {
                 class="flex-1"
               />
               <div class="flex items-center gap-3">
-                <button
-                  type="button"
-                  class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
+                <BaseButton
+                  variant="secondary"
+                  class="whitespace-nowrap"
                   @click="close"
                 >
                   Cancel
-                </button>
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent to-teal-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                </BaseButton>
+                <BaseButton
+                  variant="primary"
+                  class="whitespace-nowrap"
+                  :loading="isUpdating"
                   :disabled="!hasChanges || !canManage || isUpdating"
                   @click="handleSave"
                 >
                   <Icon
-                    v-if="isUpdating"
-                    name="lucide:loader-2"
-                    class="size-4 animate-spin"
-                  />
-                  <Icon
-                    v-else
+                    v-if="!isUpdating"
                     name="lucide:check"
                     class="size-4"
                   />
                   Save Changes
-                </button>
+                </BaseButton>
               </div>
             </div>
           </div>
@@ -924,10 +906,10 @@ async function handleCreateConfigPr() {
   >
     <template #header>
       <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-xl bg-violet-500/10">
+        <div class="flex size-10 items-center justify-center rounded-xl border border-border-subtle bg-bg-surface">
           <Icon
             name="lucide:file-code"
-            class="size-5 text-violet-400"
+            class="size-5 text-text-secondary"
           />
         </div>
         <div>
@@ -967,13 +949,12 @@ async function handleCreateConfigPr() {
 
     <template #footer>
       <div class="flex justify-end">
-        <button
-          type="button"
-          class="rounded-lg px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover"
+        <BaseButton
+          variant="secondary"
           @click="showConfigViewer = false"
         >
           Close
-        </button>
+        </BaseButton>
       </div>
     </template>
   </BaseModal>
@@ -991,9 +972,3 @@ async function handleCreateConfigPr() {
     @cancel="keyToDelete = null"
   />
 </template>
-
-<style scoped>
-.hover\:shadow-glow:hover {
-  box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
-}
-</style>
