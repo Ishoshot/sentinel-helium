@@ -33,6 +33,11 @@ export interface StoreProviderKeyRequest {
   provider_model_id?: number;
 }
 
+export interface StoreWorkspaceProviderKeyRequest {
+  provider: AiProvider;
+  key: string;
+}
+
 export const AI_PROVIDERS: { value: AiProvider; label: string }[] = [
   { value: "anthropic", label: "Anthropic" },
   { value: "openai", label: "OpenAI" },
@@ -72,6 +77,36 @@ export interface Connection {
   installation: Installation | null;
   created_at: string;
   updated_at: string;
+}
+
+// Slack integration
+export interface SlackIntegration {
+  id: number;
+  workspace_id: number;
+  bot_user_id: string | null;
+  slack_team_id: string | null;
+  team_name: string | null;
+  channel_id: string | null;
+  channel_name: string | null;
+  has_channel: boolean;
+  is_active: boolean;
+  is_connected: boolean;
+  is_fully_configured: boolean;
+  connected_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SlackChannel {
+  id: string;
+  name: string;
+  is_member: boolean;
+  num_members: number;
+}
+
+export interface SlackConnectResponse {
+  data: SlackIntegration;
+  oauth_url: string;
 }
 
 // GitHub API response types
