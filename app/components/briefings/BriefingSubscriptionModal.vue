@@ -708,7 +708,6 @@ function close(): void {
                 No channels selected
               </span>
             </div>
-
           </div>
         </div>
       </section>

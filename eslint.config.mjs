@@ -12,6 +12,16 @@ export default withNuxt(
   // Vue plugin configuration for standalone: false mode
   ...pluginVue.configs['flat/recommended'],
   {
+    files: ['**/*.ts', '**/*.mts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+  },
+  {
     files: ['**/*.vue'],
     languageOptions: {
       parser: vueParser,

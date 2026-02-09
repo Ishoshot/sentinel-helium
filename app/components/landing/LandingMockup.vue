@@ -65,7 +65,10 @@ onUnmounted(() => {
     <div class="max-w-[1400px] mx-auto px-4">
       <div class="relative">
         <!-- Glow effect -->
-        <div class="absolute -inset-8 pointer-events-none" aria-hidden="true">
+        <div
+          class="absolute -inset-8 pointer-events-none"
+          aria-hidden="true"
+        >
           <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-[70%] h-40 bg-teal-500/15 rounded-full blur-[80px]" />
         </div>
 

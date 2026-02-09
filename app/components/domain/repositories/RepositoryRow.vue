@@ -110,14 +110,20 @@ const githubUrl = computed(
             v-if="configStatus === 'active'"
             class="inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-400 ring-1 ring-blue-500/20"
           >
-            <Icon name="lucide:file-code" class="size-3" />
+            <Icon
+              name="lucide:file-code"
+              class="size-3"
+            />
             Config
           </span>
           <span
             v-else-if="configStatus === 'error'"
             class="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400 ring-1 ring-amber-500/20"
           >
-            <Icon name="lucide:alert-triangle" class="size-3" />
+            <Icon
+              name="lucide:alert-triangle"
+              class="size-3"
+            />
             Error
           </span>
         </div>
@@ -142,11 +148,17 @@ const githubUrl = computed(
           v-if="repository.language"
           class="inline-flex items-center gap-1.5 rounded-full bg-bg-surface px-2.5 py-0.5 text-xs text-text-muted ring-1 ring-border-subtle"
         >
-          <span class="size-2 rounded-full" :class="languageColor" />
+          <span
+            class="size-2 rounded-full"
+            :class="languageColor"
+          />
           {{ repository.language }}
         </span>
         <span class="inline-flex items-center gap-1.5 rounded-full bg-bg-surface px-2.5 py-0.5 font-mono text-xs text-text-muted ring-1 ring-border-subtle">
-          <Icon name="lucide:git-branch" class="size-3.5" />
+          <Icon
+            name="lucide:git-branch"
+            class="size-3.5"
+          />
           {{ repository.default_branch }}
         </span>
       </div>
@@ -178,14 +190,20 @@ const githubUrl = computed(
             class="inline-flex items-center justify-center rounded-lg p-2 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
             title="GitHub"
           >
-            <Icon name="lucide:external-link" class="size-4" />
+            <Icon
+              name="lucide:external-link"
+              class="size-4"
+            />
           </a>
           <NuxtLink
             :to="runsUrl"
             class="inline-flex items-center justify-center rounded-lg p-2 text-text-muted hover:bg-bg-hover hover:text-text-secondary"
             title="View runs"
           >
-            <Icon name="lucide:history" class="size-4" />
+            <Icon
+              name="lucide:history"
+              class="size-4"
+            />
           </NuxtLink>
 
           <button
@@ -194,7 +212,10 @@ const githubUrl = computed(
             title="Settings"
             @click="$emit('openSettings', repository.id)"
           >
-            <Icon name="lucide:settings" class="size-4" />
+            <Icon
+              name="lucide:settings"
+              class="size-4"
+            />
           </button>
         </div>
       </div>
