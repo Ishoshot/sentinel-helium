@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWorkspaceStore } from "~/stores/useWorkspaceStore";
 import { useBriefings } from "~/composables/briefings/useBriefings";
+import { useSlack } from "~/composables/integrations/useSlack";
 import { useAppToast } from "~/composables/shared/useAppToast";
 import type { Briefing, BriefingSubscription } from "~/types";
 import BaseContainer from "~/components/base/BaseContainer.vue";
@@ -40,6 +41,8 @@ const {
   generateBriefing,
 } = useBriefings(workspaceId);
 
+const { isConnected: isSlackConnected, fetchIntegration: fetchSlackIntegration } = useSlack(workspaceId);
+
 const isInitializing = ref(true);
 const isPageReady = ref(false);
 
@@ -76,6 +79,7 @@ onMounted(async () => {
         fetchGenerations({ perPage: 20 }),
         fetchSubscriptions(),
         fetchWorkspaceEligibility(),
+        fetchSlackIntegration(),
       ]);
     }
   } finally {
@@ -757,6 +761,7 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
         v-model="showSubscribeModal"
         :briefing="selectedBriefing"
         :subscription="null"
+        :is-slack-connected="isSlackConnected"
         @created="handleSubscriptionCreated"
       />
 
@@ -764,6 +769,7 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
         v-model="showManageSubscriptionModal"
         :briefing="null"
         :subscription="selectedSubscription"
+        :is-slack-connected="isSlackConnected"
         @updated="handleSubscriptionUpdated"
         @cancelled="handleSubscriptionCancelled"
       />

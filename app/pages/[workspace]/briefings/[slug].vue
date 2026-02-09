@@ -202,208 +202,235 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
 
 <template>
   <BaseContainer>
-    <div class="min-h-[calc(100vh-64px)] flex flex-col -m-4 sm:-m-6 lg:-m-8">
-      <!-- Header -->
-      <div class="px-4 sm:px-6 lg:px-8 py-6 border-b border-border-subtle bg-bg-elevated shrink-0">
-        <div class="flex items-center gap-4">
-          <button
-            type="button"
-            class="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-bg-hover transition-all duration-200"
-            @click="handleGoBack"
-          >
-            <Icon
-              name="lucide:arrow-left"
-              class="w-5 h-5"
-            />
-          </button>
-
-          <div class="flex-1 min-w-0">
-            <BaseSkeleton
-              v-if="isLoadingBriefings"
-              class="h-7 w-48"
-            />
-            <h1
-              v-else
-              class="text-xl font-semibold text-text-primary truncate"
-            >
-              {{ briefing?.title ?? 'Briefing' }}
-            </h1>
-            <p
-              v-if="briefing?.description"
-              class="text-sm text-text-muted truncate mt-1"
-            >
-              {{ briefing.description }}
-            </p>
-          </div>
-
-          <!-- AI Badge -->
-          <div
-            v-if="briefing?.requires_ai"
-            class="shrink-0 hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 bg-blue-500/10 rounded-md"
-          >
-            <Icon
-              name="lucide:sparkles"
-              class="w-3.5 h-3.5"
-            />
-            AI-Powered
-          </div>
-        </div>
-      </div>
-
-      <!-- Content -->
-      <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Loading State -->
-        <div
-          v-if="isInitializing"
-          class="text-center"
-        >
-          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-bg-surface flex items-center justify-center">
-            <Icon
-              name="lucide:loader-2"
-              class="w-8 h-8 text-text-muted animate-spin"
-            />
-          </div>
-          <p class="text-sm text-text-muted">
-            Loading briefing...
-          </p>
-        </div>
-
-        <!-- Not Found State -->
-        <div
-          v-else-if="!briefing && !isLoadingBriefings"
-          class="text-center"
-        >
-          <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-red-500/10 flex items-center justify-center">
-            <Icon
-              name="lucide:file-question"
-              class="w-8 h-8 text-red-400"
-            />
-          </div>
-          <h3 class="text-lg font-semibold text-text-primary mb-2">
-            Briefing not found
-          </h3>
-          <p class="text-sm text-text-muted mb-6">
-            This briefing doesn't exist or you don't have access to it.
-          </p>
-          <BaseButton
-            variant="secondary"
-            @click="handleGoBack"
-          >
-            <Icon
-              name="lucide:arrow-left"
-              class="w-4 h-4 mr-2"
-            />
-            Back to Briefings
-          </BaseButton>
-        </div>
-
-        <!-- Start Generation State -->
-        <div
-          v-else-if="showStartState"
-          class="text-center max-w-lg"
-        >
-          <!-- Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-bg-surface flex items-center justify-center">
-            <Icon
-              :name="briefing?.icon ?? 'lucide:file-text'"
-              class="w-10 h-10 text-text-secondary"
-            />
-          </div>
-
-          <h2 class="text-2xl font-bold text-text-primary mb-3">
-            Ready to generate?
-          </h2>
-          <p class="text-text-secondary mb-8 leading-relaxed">
-            {{ briefing?.description }}
-          </p>
-
-          <!-- Configuration hint -->
-          <div
-            v-if="hasParameters"
-            class="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm text-text-secondary bg-bg-surface rounded-lg"
-          >
-            <Icon
-              name="lucide:sliders"
-              class="w-4 h-4"
-            />
-            Configure options before generating
-          </div>
-
-          <div class="flex flex-col items-center gap-4">
-            <BaseButton
-              variant="primary"
-              size="lg"
-              :disabled="isStartingGeneration || !isGenerationAllowed"
-              @click="handleOpenGenerateModal"
-            >
-              <Icon
-                v-if="isStartingGeneration"
-                name="lucide:loader-2"
-                class="w-5 h-5 mr-2 animate-spin"
-              />
-              <Icon
-                v-else
-                name="lucide:sparkles"
-                class="w-5 h-5 mr-2"
-              />
-              {{ isStartingGeneration ? 'Starting...' : 'Generate Briefing' }}
-            </BaseButton>
-
-            <p
-              v-if="!isGenerationAllowed && restrictionReason"
-              class="max-w-md text-center text-sm text-text-muted"
-            >
-              {{ restrictionReason }}
-            </p>
-
+    <div class="-mx-6 -my-6 min-h-[calc(100vh-64px)] bg-bg-app sm:-mx-8 sm:-my-8 lg:-mx-12 lg:-my-10">
+      <header class="border-b border-border-subtle bg-bg-elevated">
+        <div class="mx-auto w-full max-w-4xl px-4 py-7 sm:px-6 lg:px-8">
+          <div class="flex items-start gap-4">
             <button
               type="button"
-              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
+              class="inline-flex items-center justify-center rounded-md p-1 text-text-muted transition-colors hover:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+              aria-label="Back to briefings"
               @click="handleGoBack"
             >
-              Cancel
+              <Icon
+                name="lucide:arrow-left"
+                class="h-5 w-5"
+              />
+            </button>
+
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-medium uppercase tracking-wider text-text-muted">
+                Briefing Template
+              </p>
+              <BaseSkeleton
+                v-if="isLoadingBriefings"
+                class="mt-2 h-8 w-60"
+              />
+              <h1
+                v-else
+                class="mt-1 text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl"
+              >
+                <span class="text-balance">{{ briefing?.title ?? 'Briefing' }}</span>
+              </h1>
+              <p
+                v-if="briefing?.description"
+                class="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary"
+              >
+                <span class="text-pretty">{{ briefing.description }}</span>
+              </p>
+            </div>
+
+            <div
+              v-if="briefing?.requires_ai"
+              class="hidden shrink-0 items-center gap-1.5 rounded-lg border border-accent/20 bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent sm:flex"
+            >
+              <Icon
+                name="lucide:sparkles"
+                class="h-3.5 w-3.5"
+              />
+              AI-Powered
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto flex w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+        <div
+          v-if="isInitializing"
+          class="mx-auto w-full rounded-2xl border border-border-subtle bg-bg-elevated p-8 shadow-elevated sm:p-10"
+        >
+          <div class="flex items-center gap-3 text-text-secondary">
+            <Icon
+              name="lucide:loader-2"
+              class="h-5 w-5 animate-spin"
+            />
+            <p class="text-sm">
+              Loading briefing...
+            </p>
+          </div>
+        </div>
+
+        <div
+          v-else-if="!briefing && !isLoadingBriefings"
+          class="mx-auto w-full rounded-2xl border border-error/20 bg-bg-elevated p-8 shadow-elevated sm:p-10"
+        >
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-error/10">
+            <Icon
+              name="lucide:file-question"
+              class="h-6 w-6 text-error"
+            />
+          </div>
+          <h2 class="text-xl font-semibold tracking-tight text-text-primary">
+            Briefing not found
+          </h2>
+          <p class="mt-2 max-w-xl text-sm leading-relaxed text-text-secondary">
+            This briefing does not exist or you do not have access.
+          </p>
+          <div class="mt-7">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors hover:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 rounded-md"
+              @click="handleGoBack"
+            >
+              <Icon
+                name="lucide:arrow-left"
+                class="mr-2 h-4 w-4"
+              />
+              Back to Briefings
             </button>
           </div>
         </div>
 
-        <!-- Progress State -->
         <div
-          v-else-if="showProgressState"
-          class="w-full max-w-2xl"
+          v-else-if="showStartState"
+          class="mx-auto w-full rounded-2xl border border-border-subtle bg-bg-elevated p-8 shadow-elevated sm:p-10"
         >
-          <BriefingsBriefingProgress
-            variant="fullscreen"
-            :progress="progress"
-            :message="trackedGeneration?.progress_message"
-            :status="trackedGeneration?.status as BriefingGenerationStatus"
-          />
+          <div class="flex items-start gap-5">
+            <div class="mt-0.5 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-border-subtle bg-bg-surface">
+              <Icon
+                :name="briefing?.icon ?? 'lucide:file-text'"
+                class="h-7 w-7 text-text-secondary"
+              />
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.75rem]">
+                Ready to generate
+              </h2>
+              <p class="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
+                <span class="text-pretty">{{ briefing?.description }}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <div
+              v-if="hasParameters"
+              class="inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-surface px-3 py-1.5 text-sm text-text-secondary"
+            >
+              <Icon
+                name="lucide:sliders"
+                class="h-4 w-4"
+              />
+              Configure options before generating
+            </div>
+            <div
+              v-if="briefing?.requires_ai"
+              class="inline-flex items-center gap-2 rounded-lg border border-accent/20 bg-accent/10 px-3 py-1.5 text-sm text-accent"
+            >
+              <Icon
+                name="lucide:cpu"
+                class="h-4 w-4"
+              />
+              AI narrative enabled
+            </div>
+          </div>
+
+          <div class="mt-8 border-t border-border-subtle pt-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <BaseButton
+                variant="primary"
+                size="lg"
+                :disabled="isStartingGeneration || !isGenerationAllowed"
+                @click="handleOpenGenerateModal"
+              >
+                <Icon
+                  v-if="isStartingGeneration"
+                  name="lucide:loader-2"
+                  class="mr-2 h-5 w-5 animate-spin"
+                />
+                <Icon
+                  v-else
+                  name="lucide:sparkles"
+                  class="mr-2 h-5 w-5"
+                />
+                {{ isStartingGeneration ? 'Starting...' : 'Generate Briefing' }}
+              </BaseButton>
+
+              <button
+                type="button"
+                class="text-sm text-text-muted transition-colors hover:text-text-secondary"
+                @click="handleGoBack"
+              >
+                Cancel
+              </button>
+            </div>
+
+            <p
+              v-if="!isGenerationAllowed && restrictionReason"
+              class="mt-4 text-sm text-text-muted"
+            >
+              {{ restrictionReason }}
+            </p>
+          </div>
         </div>
 
-        <!-- Complete State -->
         <div
-          v-else-if="showCompleteState"
-          class="text-center max-w-lg"
+          v-else-if="showProgressState"
+          class="mx-auto w-full rounded-2xl border border-border-subtle bg-bg-elevated p-8 shadow-elevated sm:p-10"
         >
-          <!-- Success Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-            <Icon
-              name="lucide:check"
-              class="w-10 h-10 text-emerald-400"
+          <h2 class="text-xl font-semibold tracking-tight text-text-primary">
+            Generating briefing
+          </h2>
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
+            We are processing your workspace data and composing your narrative.
+          </p>
+
+          <div class="mt-7">
+            <BriefingsBriefingProgress
+              variant="fullscreen"
+              :progress="progress"
+              :message="trackedGeneration?.progress_message"
+              :status="trackedGeneration?.status as BriefingGenerationStatus"
             />
           </div>
 
-          <h2 class="text-2xl font-bold text-text-primary mb-3">
-            Your briefing is ready!
+          <p class="mt-4 text-xs text-text-muted">
+            {{ isProcessing ? 'Processing your workspace data...' : isPolling ? 'Tracking live progress...' : 'Waiting for updates...' }}
+          </p>
+        </div>
+
+        <div
+          v-else-if="showCompleteState"
+          class="mx-auto w-full rounded-2xl border border-success/20 bg-bg-elevated p-8 shadow-elevated sm:p-10"
+        >
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10">
+            <Icon
+              name="lucide:check"
+              class="h-6 w-6 text-success"
+            />
+          </div>
+
+          <h2 class="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.75rem]">
+            Your briefing is ready
           </h2>
-          <p class="text-text-secondary mb-8">
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
             {{ briefing?.title }} has been generated successfully.
             View the full narrative and share it with your team.
           </p>
 
-          <!-- Achievements preview -->
           <div
             v-if="trackedGeneration?.achievements?.length"
-            class="mb-8"
+            class="mt-8"
           >
             <BriefingsBriefingAchievements
               :achievements="trackedGeneration.achievements"
@@ -412,84 +439,85 @@ const restrictionReason = computed(() => workspaceRestrictionReason.value);
             />
           </div>
 
-          <div class="flex flex-col items-center gap-4">
-            <BaseButton
-              variant="primary"
-              size="lg"
-              @click="handleViewBriefing"
-            >
-              <Icon
-                name="lucide:eye"
-                class="w-5 h-5 mr-2"
-              />
-              View Briefing
-            </BaseButton>
+          <div class="mt-8 border-t border-success/20 pt-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <BaseButton
+                variant="primary"
+                size="lg"
+                @click="handleViewBriefing"
+              >
+                <Icon
+                  name="lucide:eye"
+                  class="mr-2 h-5 w-5"
+                />
+                View Briefing
+              </BaseButton>
 
-            <button
-              type="button"
-              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
-              @click="handleGoBack"
-            >
-              Back to Briefings
-            </button>
+              <button
+                type="button"
+                class="text-sm text-text-muted transition-colors hover:text-text-secondary"
+                @click="handleGoBack"
+              >
+                Back to Briefings
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Failed State -->
         <div
           v-else-if="showFailedState"
-          class="text-center max-w-lg"
+          class="mx-auto w-full rounded-2xl border border-error/20 bg-bg-elevated p-8 shadow-elevated sm:p-10"
         >
-          <!-- Error Icon -->
-          <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-red-500/10 flex items-center justify-center">
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-error/10">
             <Icon
               name="lucide:alert-circle"
-              class="w-10 h-10 text-red-400"
+              class="h-6 w-6 text-error"
             />
           </div>
 
-          <h2 class="text-2xl font-bold text-text-primary mb-3">
+          <h2 class="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.75rem]">
             Generation failed
           </h2>
-          <p class="text-text-secondary mb-4">
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-text-secondary">
             Something went wrong while generating your briefing.
           </p>
 
           <div
             v-if="trackedGeneration?.error_message"
-            class="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-left"
+            class="mt-4 rounded-xl border border-error/20 bg-error/10 p-4"
           >
-            <p class="text-sm text-red-400">
+            <p class="text-sm text-error">
               {{ trackedGeneration.error_message }}
             </p>
           </div>
 
-          <div class="flex flex-col items-center gap-4">
-            <BaseButton
-              variant="primary"
-              size="lg"
-              @click="handleRetry"
-            >
-              <Icon
-                name="lucide:refresh-cw"
-                class="w-5 h-5 mr-2"
-              />
-              Try Again
-            </BaseButton>
+          <div class="mt-8 border-t border-error/20 pt-6">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <BaseButton
+                variant="primary"
+                size="lg"
+                @click="handleRetry"
+              >
+                <Icon
+                  name="lucide:refresh-cw"
+                  class="mr-2 h-5 w-5"
+                />
+                Try Again
+              </BaseButton>
 
-            <button
-              type="button"
-              class="text-sm text-text-muted hover:text-text-secondary transition-colors"
-              @click="handleGoBack"
-            >
-              Back to Briefings
-            </button>
+              <button
+                type="button"
+                class="text-sm text-text-muted transition-colors hover:text-text-secondary"
+                @click="handleGoBack"
+              >
+                Back to Briefings
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
 
-    <!-- Generate Modal -->
     <BriefingsBriefingGenerateModal
       v-if="briefing"
       v-model="showGenerateModal"
