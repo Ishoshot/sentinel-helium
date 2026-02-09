@@ -36,6 +36,16 @@ export enum BriefingDeliveryChannel {
   Push = "push",
 }
 
+export enum BriefingLimitReasonCode {
+  FeatureDisabled = "feature_disabled",
+  BriefingInactive = "briefing_inactive",
+  PlanNotEligible = "plan_not_eligible",
+  FreeAllowanceExhausted = "free_allowance_exhausted",
+  RateLimitReached = "rate_limit_reached",
+  ConcurrentLimitReached = "concurrent_limit_reached",
+  InsufficientData = "insufficient_data",
+}
+
 export enum AchievementType {
   Milestone = "milestone",
   Streak = "streak",
@@ -69,11 +79,13 @@ export interface Briefing {
   updated_at: string;
   can_generate?: boolean;
   restriction_reason?: string | null;
+  reason_code?: BriefingLimitReasonCode | null;
 }
 
 export interface BriefingWorkspaceEligibility {
   can_generate: boolean;
   restriction_reason: string | null;
+  reason_code: BriefingLimitReasonCode | null;
 }
 
 /**
@@ -326,7 +338,7 @@ export interface BriefingSubscription {
   schedule_hour: number;
   parameters: Record<string, unknown>;
   delivery_channels: readonly BriefingDeliveryChannel[];
-  slack_webhook_url?: string | null;
+
   last_generated_at: string | null;
   next_scheduled_at: string;
   is_active: boolean;
@@ -368,7 +380,7 @@ export interface CreateSubscriptionRequest {
   schedule_hour?: number;
   parameters?: Record<string, unknown>;
   delivery_channels: readonly BriefingDeliveryChannel[];
-  slack_webhook_url?: string | null;
+
 }
 
 export interface UpdateSubscriptionRequest {
@@ -377,7 +389,7 @@ export interface UpdateSubscriptionRequest {
   schedule_hour?: number;
   parameters?: Record<string, unknown>;
   delivery_channels?: readonly BriefingDeliveryChannel[];
-  slack_webhook_url?: string | null;
+
   is_active?: boolean;
 }
 

@@ -51,6 +51,7 @@ export function useBriefingsService() {
     return {
       can_generate: Boolean(response.can_generate),
       restriction_reason: response.restriction_reason ?? null,
+      reason_code: response.reason_code ?? null,
     };
   }
 
@@ -65,6 +66,7 @@ export function useBriefingsService() {
       | (ApiResponse<Briefing> & {
           can_generate?: boolean;
           restriction_reason?: string | null;
+          reason_code?: string | null;
         })
       | Briefing
     >(`/workspaces/${workspaceId}/briefings/${slug}`);
@@ -74,6 +76,7 @@ export function useBriefingsService() {
         ...response.data,
         can_generate: response.can_generate,
         restriction_reason: response.restriction_reason ?? null,
+        reason_code: (response.reason_code as Briefing["reason_code"]) ?? null,
       };
     }
 
