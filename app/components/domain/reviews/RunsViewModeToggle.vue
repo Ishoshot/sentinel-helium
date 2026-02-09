@@ -19,15 +19,15 @@ const options = [
 </script>
 
 <template>
-  <div class="flex items-center gap-1 rounded-lg border border-border-subtle bg-bg-elevated p-1">
+  <div class="inline-flex max-w-full items-center gap-1 rounded-xl border border-border-subtle bg-bg-elevated/70 p-1">
     <button
       v-for="option in options"
       :key="option.value"
       type="button"
-      class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+      class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
       :class="props.modelValue === option.value
-        ? 'bg-accent text-white'
-        : 'text-text-muted hover:text-text-secondary'"
+        ? 'bg-accent text-white shadow-sm'
+        : 'text-text-muted hover:bg-bg-hover hover:text-text-secondary'"
       @click="emit('update:modelValue', option.value)"
     >
       <Icon

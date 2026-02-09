@@ -127,7 +127,7 @@ const getFindingsCount = (run: Run) => {
             <td class="px-4 py-4 whitespace-nowrap">
               <DomainRunStatusBadge
                 :status="run.status"
-                variant="badge"
+                variant="dot"
               />
             </td>
 
@@ -332,7 +332,7 @@ const getFindingsCount = (run: Run) => {
             </span>
             <DomainRunStatusBadge
               :status="run.status"
-              variant="badge"
+              variant="dot"
             />
           </div>
         </div>
