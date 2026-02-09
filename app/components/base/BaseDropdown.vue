@@ -22,6 +22,7 @@ interface Props {
   placeholder?: string
   searchable?: boolean
   menuWidth?: string
+  overflowVisible?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,7 +31,8 @@ const props = withDefaults(defineProps<Props>(), {
   align: 'right',
   direction: 'down',
   searchable: false,
-  menuWidth: 'w-48'
+  menuWidth: 'w-48',
+  overflowVisible: false
 })
 
 const emit = defineEmits<{
@@ -97,6 +99,14 @@ const alignmentClasses = computed(() => {
 const directionClasses = computed(() => {
   return props.direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
 })
+
+const contentContainerClasses = computed(() => {
+  if (props.overflowVisible) {
+    return 'py-2 overflow-visible'
+  }
+
+  return 'py-2 max-h-64 overflow-y-auto'
+})
 </script>
 
 <template>
@@ -120,24 +130,30 @@ const directionClasses = computed(() => {
     >
       <div
         v-if="isOpen"
-        class="absolute z-[100] w-full min-w-[12rem] max-w-[calc(100vw-2rem)] rounded-xl shadow-elevated overflow-hidden ring-1 ring-border-subtle bg-bg-elevated"
-        :class="[alignmentClasses, directionClasses, menuWidth]"
+        class="absolute z-[100] w-full min-w-[12rem] max-w-[calc(100vw-2rem)] rounded-xl shadow-elevated ring-1 ring-border-subtle bg-bg-elevated"
+        :class="[alignmentClasses, directionClasses, menuWidth, props.overflowVisible ? 'overflow-visible' : 'overflow-hidden']"
       >
         <!-- Search -->
         <div
           v-if="searchable"
           class="p-2 border-b border-border-subtle"
         >
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search..."
-            class="w-full h-8 px-2 text-sm bg-bg-surface border border-border-subtle rounded focus:outline-none focus:border-accent"
-            @click.stop
-          >
+          <div class="relative">
+            <Icon
+              name="lucide:search"
+              class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-text-muted"
+            />
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search..."
+              class="h-8 w-full rounded border border-border-subtle bg-bg-surface py-1.5 pl-8 pr-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+              @click.stop
+            >
+          </div>
         </div>
 
-        <div class="py-2 max-h-64 overflow-y-auto">
+        <div :class="contentContainerClasses">
           <slot>
             <template
               v-for="(item, index) in displayItems"
@@ -152,7 +168,7 @@ const directionClasses = computed(() => {
               <!-- Menu item -->
               <button
                 v-else
-                class="w-full flex items-center justify-between px-3 py-2.5 mx-2 text-sm rounded-lg transition-all duration-150"
+                class="mx-2 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150"
                 :class="[
                   item.danger
                     ? 'text-error hover:bg-error-light'
@@ -162,14 +178,14 @@ const directionClasses = computed(() => {
                 style="width: calc(100% - 1rem);"
                 @click="handleItemClick(item)"
               >
-                <div class="flex items-center gap-3">
+                <div class="flex min-w-0 flex-1 items-center gap-3">
                   <Icon
                     v-if="item.icon"
                     :name="item.icon"
                     class="w-4 h-4"
                     :class="item.danger ? '' : 'text-text-muted'"
                   />
-                  <span>{{ item.label }}</span>
+                  <span class="truncate text-left">{{ item.label }}</span>
                 </div>
                 <Icon
                   v-if="item.active"

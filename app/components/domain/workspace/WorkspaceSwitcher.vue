@@ -113,7 +113,7 @@ function handleClickOutside(event: MouseEvent) {
     >
       <div
         v-if="isOpen"
-        class="absolute left-0 z-50 mt-3 w-72 bg-bg-elevated/95 backdrop-blur-xl border border-border-subtle rounded-xl shadow-2xl overflow-hidden"
+        class="absolute left-0 z-[50] mt-3 w-72 bg-bg-elevated/95 backdrop-blur-xl border border-border-subtle rounded-xl shadow-2xl overflow-hidden"
       >
         <!-- Header -->
         <div class="px-4 py-3 border-b border-border-subtle bg-bg-surface/50">
