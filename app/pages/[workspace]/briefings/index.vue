@@ -805,16 +805,13 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
             </p>
             <div class="mt-6 flex justify-center gap-1">
               <span
-                class="size-2 animate-bounce rounded-full bg-accent"
-                style="animation-delay: 0ms;"
+                class="briefings-dot-delay-0 size-2 animate-bounce rounded-full bg-accent"
               />
               <span
-                class="size-2 animate-bounce rounded-full bg-accent"
-                style="animation-delay: 150ms;"
+                class="briefings-dot-delay-150 size-2 animate-bounce rounded-full bg-accent"
               />
               <span
-                class="size-2 animate-bounce rounded-full bg-accent"
-                style="animation-delay: 300ms;"
+                class="briefings-dot-delay-300 size-2 animate-bounce rounded-full bg-accent"
               />
             </div>
           </div>
@@ -825,6 +822,18 @@ const recentGenerations = computed(() => generations.value.slice(0, 3));
 </template>
 
 <style scoped>
+.briefings-dot-delay-0 {
+  animation-delay: 0ms;
+}
+
+.briefings-dot-delay-150 {
+  animation-delay: 150ms;
+}
+
+.briefings-dot-delay-300 {
+  animation-delay: 300ms;
+}
+
 .hover\:shadow-glow:hover {
   box-shadow: 0 0 20px -5px rgba(20, 184, 166, 0.4);
 }

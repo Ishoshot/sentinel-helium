@@ -13,6 +13,7 @@ import {
   WEBSOCKET_CONNECTION_TIMEOUT,
   BRIEFING_POLLING_INTERVAL,
 } from "~/constants/animations";
+import { logDebug, logWarn } from '~/utils/logger'
 
 /**
  * Composable for tracking a single briefing generation with real-time updates
@@ -109,9 +110,9 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
    * Handle generation started event
    */
   function handleStartedEvent(event: BriefingStartedEvent) {
-    console.log("[Briefing] Received started event", event);
+    logDebug('Briefing started event received', event)
     if (event.generation_id !== generationId.value) {
-      console.log("[Briefing] Ignoring started event for different generation");
+      logDebug('Ignoring briefing started event for different generation', event)
       return;
     }
 
@@ -128,9 +129,9 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
    * Handle progress event
    */
   function handleProgressEvent(event: BriefingProgressEvent) {
-    console.log("[Briefing] Received progress event", event);
+    logDebug('Briefing progress event received', event)
     if (event.generation_id !== generationId.value) {
-      console.log("[Briefing] Ignoring progress event for different generation");
+      logDebug('Ignoring briefing progress event for different generation', event)
       return;
     }
 
@@ -151,9 +152,9 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
    * Handle completed event
    */
   function handleCompletedEvent(event: BriefingCompletedEvent) {
-    console.log("[Briefing] Received completed event", event);
+    logDebug('Briefing completed event received', event)
     if (event.generation_id !== generationId.value) {
-      console.log("[Briefing] Ignoring completed event for different generation");
+      logDebug('Ignoring briefing completed event for different generation', event)
       return;
     }
 
@@ -168,9 +169,9 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
    * Handle failed event
    */
   function handleFailedEvent(event: BriefingFailedEvent) {
-    console.log("[Briefing] Received failed event", event);
+    logDebug('Briefing failed event received', event)
     if (event.generation_id !== generationId.value) {
-      console.log("[Briefing] Ignoring failed event for different generation");
+      logDebug('Ignoring briefing failed event for different generation', event)
       return;
     }
 
@@ -288,18 +289,18 @@ export function useBriefingGeneration(workspaceId: Ref<number | null>) {
 
       if (!wsConnected.value || wsError.value) {
         // WebSocket failed, fall back to polling
-        console.warn("[Briefing] WebSocket connection failed, falling back to polling", {
+        logWarn('WebSocket connection failed, falling back to polling', {
           connected: wsConnected.value,
           error: wsError.value
         });
         stopWebSocket();
         startPolling(id);
       } else {
-        console.log("[Briefing] Using WebSocket for real-time updates");
+        logDebug('Using WebSocket for real-time updates')
       }
     } catch {
       // WebSocket not available, use polling
-      console.warn("[Briefing] WebSocket not available, using polling");
+      logWarn('WebSocket not available, using polling')
       startPolling(id);
     }
   }

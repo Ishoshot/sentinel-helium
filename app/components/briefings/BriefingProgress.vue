@@ -273,8 +273,7 @@ const currentStep = computed(() => {
       >
         <div class="absolute inset-0 rounded-3xl border-2 border-accent/30 animate-ping" />
         <div
-          class="absolute inset-0 rounded-3xl border-2 border-accent/20 animate-ping"
-          style="animation-delay: 0.5s"
+          class="progress-ring-delay absolute inset-0 rounded-3xl border-2 border-accent/20 animate-ping"
         />
       </div>
     </div>
@@ -339,5 +338,9 @@ const currentStep = computed(() => {
 
 .animate-shimmer {
   animation: shimmer 2s infinite;
+}
+
+.progress-ring-delay {
+  animation-delay: 0.5s;
 }
 </style>
