@@ -81,6 +81,12 @@ export default defineNuxtConfig({
     preset: "node-server",
   },
 
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 850,
+    },
+  },
+
   modules: [
     "@nuxt/a11y",
     "@nuxt/fonts",
@@ -94,6 +100,10 @@ export default defineNuxtConfig({
     "@primevue/nuxt-module",
     "@vueuse/nuxt",
   ],
+
+  a11y: {
+    logIssues: false,
+  },
 
   site: {
     url: "https://usesentinel.ai",
@@ -119,7 +129,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       // Nuxt automatically maps NUXT_PUBLIC_* env vars to these values
-      apiBaseUrl: "http://sentinel-api.test/api",
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || "https://sentinel-api.test/api",
       reverbAppKey: "sentinel-local-key",
       reverbHost: "localhost",
       reverbPort: "8080",

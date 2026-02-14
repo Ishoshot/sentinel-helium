@@ -50,5 +50,5 @@ See the [docs](./docs) folder for detailed documentation:
 
 - [Design System](./docs/frontend/DESIGN_SYSTEM.md)
 - [Frontend Architecture](./docs/frontend/FRONTEND_ARCHITECTURE.md)
-- [Component Standards](./docs/frontend/COMPONENT_STANDARDS.md)
+- [Components](./docs/frontend/COMPONENTS.md)
 - [State & Data](./docs/frontend/STATE_AND_DATA.md)

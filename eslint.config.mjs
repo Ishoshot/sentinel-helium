@@ -22,6 +22,17 @@ export default withNuxt(
     },
   },
   {
+    rules: {
+      'no-console': 'error',
+    },
+  },
+  {
+    files: ['app/utils/logger.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
     files: ['**/*.vue'],
     languageOptions: {
       parser: vueParser,
@@ -38,7 +49,8 @@ export default withNuxt(
       'vue/require-prop-types': 'off',
       'vue/one-component-per-file': 'off',
       'vue/prefer-import-from-vue': 'off',
-      'vue/no-v-html': ['warn', { ignorePattern: '^highlightedCode$' }],
+      'vue/no-static-inline-styles': ['error', { allowBinding: true }],
+      'vue/no-v-html': ['warn', { ignorePattern: '^(highlightedCode|html|narrativeHtml)$' }],
     },
   }
 )
