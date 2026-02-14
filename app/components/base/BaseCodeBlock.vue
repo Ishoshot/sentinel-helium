@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ThemeRegistrationRaw } from 'shiki'
 import { CLIPBOARD_FEEDBACK_CODE } from '~/constants/animations'
 import { useAppToast } from '~/composables/shared/useAppToast'
+import { logError } from '~/utils/logger'
 
 const toast = useAppToast()
 
@@ -44,71 +44,21 @@ const languageClass = computed(() => {
 
 const shikiLanguage = computed(() => (props.language || 'text').toLowerCase())
 
-// const sentinelShikiTheme: ThemeRegistrationRaw = {
-//   name: 'sentinel',
-//   settings: [
-//     {
-//       scope: ['comment', 'punctuation.definition.comment'],
-//       settings: { foreground: 'var(--color-text-muted)' },
-//     },
-//     {
-//       scope: ['keyword', 'storage.type', 'storage.modifier'],
-//       settings: { foreground: 'var(--color-accent-primary)' },
-//     },
-//     {
-//       scope: ['string', 'punctuation.definition.string'],
-//       settings: { foreground: 'var(--color-text-secondary)' },
-//     },
-//     {
-//       scope: ['constant.numeric'],
-//       settings: { foreground: 'var(--color-text-secondary)' },
-//     },
-//     {
-//       scope: ['entity.name.function', 'support.function'],
-//       settings: { foreground: 'var(--color-text-secondary)' },
-//     },
-//     {
-//       scope: ['entity.name.type', 'support.type'],
-//       settings: { foreground: 'var(--color-text-secondary)' },
-//     },
-//   ],
-//   type: 'light',
-//   colors: {
-//     'editor.background': 'transparent',
-//     'editor.foreground': 'var(--color-text-primary)',
-//   },
-// }
-
 const highlightedCode = ref<string>('')
 
 let highlightRequestId = 0
 
 async function highlightCode(code: string, lang: string): Promise<string> {
-  const { codeToHtml } = await import('shiki/bundle/web')
+  const { highlightCodeHtml } = await import('~/utils/code-highlighter')
 
   try {
-    return await codeToHtml(code, {
-      lang,
-      themes: {
-        light: 'github-light',
-        dark: 'github-dark',
-      },
-      defaultColor: 'light',
-      structure: 'inline',
-    })
+    return await highlightCodeHtml(code, lang)
   } catch {
-    if (lang === 'text') throw new Error('Failed to highlight code')
+    if (lang === 'text') {
+      throw new Error('Failed to highlight code')
+    }
 
-    return codeToHtml(code, {
-      lang: 'text',
-      themes:
-      {
-        light: 'github-light',
-        dark: 'github-dark'
-      },
-      defaultColor: 'light',
-      structure: 'inline',
-    })
+    return highlightCodeHtml(code, 'text')
   }
 }
 
@@ -163,7 +113,7 @@ async function handleCopy(_: MouseEvent) {
       document.body.removeChild(textarea)
       copySucceeded = true
     } catch (fallbackError) {
-      console.error('Failed to copy code:', fallbackError)
+      logError('Failed to copy code', fallbackError)
       toast.error('Failed to copy to clipboard')
     }
   }

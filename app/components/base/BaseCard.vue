@@ -43,9 +43,14 @@ const cardClasses = computed(() => [
     <!-- Inner glow effect -->
     <div
       v-if="glow"
-      class="absolute inset-0 pointer-events-none rounded-xl"
-      style="background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 0%, transparent 50%)"
+      class="base-card-glow-overlay absolute inset-0 pointer-events-none rounded-xl"
     />
     <slot />
   </div>
 </template>
+
+<style scoped>
+.base-card-glow-overlay {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+}
+</style>

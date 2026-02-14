@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import { logError } from '~/utils/logger'
 
 interface Props {
   /**
@@ -45,7 +46,7 @@ async function parseMarkdown(content: string): Promise<void> {
       html.value = DOMPurify.sanitize(rawHtml as string)
     }
   } catch (error) {
-    console.error('Markdown parsing error:', error)
+    logError('Markdown parsing error', error)
     if (requestId === parseRequestId) {
       html.value = DOMPurify.sanitize(content)
     }

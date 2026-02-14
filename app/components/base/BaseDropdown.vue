@@ -13,10 +13,16 @@ interface DropdownItem {
   active?: boolean
 }
 
+interface DropdownOption {
+  label: string
+  value: unknown
+  icon?: string
+}
+
 interface Props {
   items?: DropdownItem[]
-  options?: { label: string; value: any; icon?: string }[]
-  modelValue?: any
+  options?: DropdownOption[]
+  modelValue?: unknown
   align?: 'left' | 'right'
   direction?: 'down' | 'up'
   placeholder?: string
@@ -36,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: any): void
+  (e: 'update:modelValue', value: unknown): void
 }>()
 
 const isOpen = ref(false)
@@ -168,14 +174,13 @@ const contentContainerClasses = computed(() => {
               <!-- Menu item -->
               <button
                 v-else
-                class="mx-2 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150"
+                class="mx-2 w-[calc(100%-1rem)] flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150"
                 :class="[
                   item.danger
                     ? 'text-error hover:bg-error-light'
                     : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary',
                   item.active ? 'bg-bg-surface font-medium' : ''
                 ]"
-                style="width: calc(100% - 1rem);"
                 @click="handleItemClick(item)"
               >
                 <div class="flex min-w-0 flex-1 items-center gap-3">

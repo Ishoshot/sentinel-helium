@@ -78,13 +78,12 @@ onUnmounted(() => {
 
         <!-- Modal content -->
         <Transition
-          enter-active-class="transition duration-300"
+          enter-active-class="transition duration-300 modal-spring-transition"
           enter-from-class="opacity-0 scale-95 translate-y-2"
           enter-to-class="opacity-100 scale-100 translate-y-0"
           leave-active-class="transition ease-in duration-150"
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
-          style="transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1)"
         >
           <div
             v-if="modelValue"
@@ -131,3 +130,9 @@ onUnmounted(() => {
     </Transition>
   </Teleport>
 </template>
+
+<style scoped>
+.modal-spring-transition {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+</style>
