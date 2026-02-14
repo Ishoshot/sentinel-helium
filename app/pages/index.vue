@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { hasToken } from '~/services/core/api'
+import { hasAuthPresenceCookie, syncAuthPresenceWithToken } from '~/services/core/api'
 import { useWorkspaces } from '~/composables/workspace/useWorkspaces'
 import { usePageSeo } from '~/composables/seo/usePageSeo'
 
@@ -64,38 +64,24 @@ useHead({
   ],
 })
 
-const router = useRouter()
-const { workspaces, fetchWorkspaces } = useWorkspaces()
+const { fetchWorkspaces } = useWorkspaces()
 
-const isCheckingAuth = ref(true)
-const isAuthenticated = ref(false)
+const isAuthenticated = hasAuthPresenceCookie()
 
 // Scroll-based header state
 const scrolled = ref(false)
 
-// Animation states for staggered reveals
-const heroVisible = ref(false)
-const mockupVisible = ref(false)
-
-onMounted(async () => {
-  // Check if user has a token
-  if (hasToken()) {
-    isAuthenticated.value = true
-    await fetchWorkspaces()
-  }
-  isCheckingAuth.value = false
-
+onMounted(() => {
   // Add scroll listener for header
   window.addEventListener('scroll', handleScroll)
+  handleScroll()
 
-  // Staggered animation reveals
-  setTimeout(() => {
-    heroVisible.value = true
-  }, 100)
-
-  setTimeout(() => {
-    mockupVisible.value = true
-  }, 400)
+  requestAnimationFrame(() => {
+    const hasToken = syncAuthPresenceWithToken()
+    if (isAuthenticated && hasToken) {
+      void fetchWorkspaces()
+    }
+  })
 })
 
 onUnmounted(() => {
@@ -108,20 +94,7 @@ function handleScroll() {
 </script>
 
 <template>
-  <!-- Loading state -->
   <div
-    v-if="isCheckingAuth"
-    class="landing-dark min-h-screen flex items-center justify-center"
-  >
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
-      <span class="text-zinc-500 text-sm">Loading...</span>
-    </div>
-  </div>
-
-  <!-- Landing page -->
-  <div
-    v-else
     class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
@@ -134,16 +107,15 @@ function handleScroll() {
     <section class="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
       <!-- Subtle grid pattern -->
       <div
-        class="absolute inset-0 opacity-[0.03]"
-        style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 60px 60px;"
+        class="landing-grid-pattern absolute inset-0 opacity-[0.03]"
       />
 
       <div class="relative max-w-8xl mx-auto px-6 my-10">
-        <LandingHero :visible="heroVisible" />
+        <LandingHero :visible="true" />
 
         <!-- Floating UI Mockups -->
         <div class="mt-16 lg:mt-24 relative">
-          <LandingMockup :visible="mockupVisible" />
+          <LandingMockup :visible="true" />
         </div>
       </div>
     </section>
@@ -180,3 +152,10 @@ function handleScroll() {
     <LandingFooter />
   </div>
 </template>
+
+<style scoped>
+.landing-grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+</style>

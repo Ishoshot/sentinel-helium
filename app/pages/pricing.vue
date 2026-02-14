@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { hasToken } from '~/services/core/api'
+import { hasAuthPresenceCookie, syncAuthPresenceWithToken } from '~/services/core/api'
 import { usePlans } from '~/composables/billing/usePlans'
 import { usePageSeo } from '~/composables/seo/usePageSeo'
 
@@ -30,20 +30,18 @@ useHead({
 
 const { plans, fetchPlans, comparisonFeatures } = usePlans()
 
-const isCheckingAuth = ref(true)
-const isAuthenticated = ref(false)
+await fetchPlans()
+
+const isAuthenticated = hasAuthPresenceCookie()
 const scrolled = ref(false)
 
-onMounted(async () => {
-  if (hasToken()) {
-    isAuthenticated.value = true
-  }
-  isCheckingAuth.value = false
-
-  // Fetch plans from API
-  await fetchPlans()
-
+onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  handleScroll()
+
+  requestAnimationFrame(() => {
+    syncAuthPresenceWithToken()
+  })
 })
 
 onUnmounted(() => {
@@ -107,20 +105,8 @@ useHead({
 </script>
 
 <template>
-  <!-- Loading state -->
-  <div
-    v-if="isCheckingAuth"
-    class="landing-dark min-h-screen flex items-center justify-center"
-  >
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-8 h-8 border-2 border-zinc-800 border-t-teal-500 rounded-full animate-spin" />
-      <span class="text-zinc-500 text-sm">Loading...</span>
-    </div>
-  </div>
-
   <!-- Pricing page -->
   <div
-    v-else
     class="landing-dark min-h-screen overflow-x-hidden antialiased"
   >
     <!-- Navigation -->
