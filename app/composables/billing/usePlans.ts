@@ -1,4 +1,5 @@
 import type { Plan, PlanTier } from '~/types'
+import { logError } from '~/utils/logger'
 
 /**
  * Composable for fetching and working with plans
@@ -39,8 +40,9 @@ export function usePlans() {
       return plans.value
     }
     catch (err) {
-      error.value = err instanceof Error ? err : new Error('Failed to fetch plans')
-      console.error('Failed to fetch plans:', err)
+      const normalizedError = err instanceof Error ? err : new Error('Failed to fetch plans')
+      error.value = normalizedError
+      logError(`Failed to fetch plans: ${normalizedError.message}`)
       return []
     }
     finally {

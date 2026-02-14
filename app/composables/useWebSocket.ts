@@ -13,6 +13,7 @@ import type {
   ConfigPrCreatedEvent,
 } from '~/types';
 import { useAppToast } from '~/composables/shared/useAppToast';
+import { logDebug, logError } from '~/utils/logger'
 
 type EventHandler<T> = (event: T) => void;
 
@@ -60,14 +61,14 @@ export function useWebSocket(workspaceId: Ref<number | null>) {
 
       // Handle subscription success
       channel.value.subscribed(() => {
-        console.log(`[WebSocket] Successfully subscribed to ${channelName}`);
+        logDebug(`WebSocket subscribed: ${channelName}`)
         isConnected.value = true;
         error.value = null;
       });
 
       // Handle subscription errors
       channel.value.error((err: Error) => {
-        console.error(`[WebSocket] Subscription error:`, err);
+        logError(`WebSocket subscription error: ${channelName}`, err)
         const message = err instanceof Error ? err.message : 'Failed to subscribe to channel';
         error.value = message;
         isConnected.value = false;
@@ -116,12 +117,12 @@ export function useWebSocket(workspaceId: Ref<number | null>) {
 
       // Handle subscription success
       repositoriesChannel.subscribed(() => {
-        console.log(`[WebSocket] Successfully subscribed to ${channelName}`);
+        logDebug(`WebSocket subscribed: ${channelName}`)
       });
 
       // Handle subscription errors
       repositoriesChannel.error((err: Error) => {
-        console.error(`[WebSocket] Repositories subscription error:`, err);
+        logError(`WebSocket repositories subscription error: ${channelName}`, err)
       });
 
       // Register event listeners using the broadcastAs event names

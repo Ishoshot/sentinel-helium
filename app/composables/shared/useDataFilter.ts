@@ -1,17 +1,19 @@
-import { getNestedValue } from "~/utils/object";
+import { getNestedValue } from '~/utils/object'
+
+type FilterValue = unknown
 
 export interface FilterConfig<T> {
-  searchFields?: string[]; // Fields to search in (support dot notation)
-  filters?: Record<string, (item: T, value: any) => boolean>; // Custom filter functions
+  searchFields?: string[] // Fields to search in (support dot notation)
+  filters?: Record<string, (item: T, value: FilterValue) => boolean> // Custom filter functions
 }
 
 export interface FilterState {
-  search: string;
-  filters: Record<string, any>;
+  search: string
+  filters: Record<string, FilterValue>
   sort: {
-    field: string | null;
-    direction: "asc" | "desc";
-  };
+    field: string | null
+    direction: 'asc' | 'desc'
+  }
 }
 
 /**
@@ -24,83 +26,99 @@ export function useDataFilter<T>(
   config: FilterConfig<T> = {}
 ) {
   // State
-  const search = ref("");
-  const activeFilters = ref<Record<string, any>>({});
-  const sort = ref<{ field: string | null; direction: "asc" | "desc" }>({
+  const search = ref('')
+  const activeFilters = ref<Record<string, FilterValue>>({})
+  const sort = ref<{ field: string | null; direction: 'asc' | 'desc' }>({
     field: null,
-    direction: "desc",
-  });
+    direction: 'desc',
+  })
 
   // Set filter value (undefined/null removes the filter)
-  function setFilter(key: string, value: any) {
-    if (value === null || value === undefined || value === "") {
-      const newFilters = { ...activeFilters.value };
-      delete newFilters[key];
-      activeFilters.value = newFilters;
+  function setFilter(key: string, value: FilterValue): void {
+    if (value === null || value === undefined || value === '') {
+      const newFilters = { ...activeFilters.value }
+      delete newFilters[key]
+      activeFilters.value = newFilters
     } else {
       activeFilters.value = {
         ...activeFilters.value,
         [key]: value,
-      };
+      }
     }
   }
 
   // Clear all filters
-  function clearFilters() {
-    search.value = "";
-    activeFilters.value = {};
+  function clearFilters(): void {
+    search.value = ''
+    activeFilters.value = {}
+  }
+
+  function compareValues(aValue: unknown, bValue: unknown): number {
+    if (aValue === bValue) {
+      return 0
+    }
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return aValue > bValue ? 1 : -1
+    }
+
+    const aText = String(aValue ?? '').toLowerCase()
+    const bText = String(bValue ?? '').toLowerCase()
+
+    if (aText === bText) {
+      return 0
+    }
+
+    return aText > bText ? 1 : -1
   }
 
   // Filtered data computed property
   const filteredData = computed(() => {
-    let result = [...data.value];
+    let result = [...data.value]
 
     // 1. Apply Search
     if (search.value && config.searchFields?.length) {
-      const query = search.value.toLowerCase();
+      const query = search.value.toLowerCase()
       result = result.filter((item) => {
         return config.searchFields!.some((field) => {
-          const value = getNestedValue(item, field);
+          const value = getNestedValue(item, field)
           return String(value ?? "")
             .toLowerCase()
-            .includes(query);
-        });
-      });
+            .includes(query)
+        })
+      })
     }
 
     // 2. Apply Filters
     Object.entries(activeFilters.value).forEach(([key, value]) => {
-      if (value === null || value === undefined) return;
+      if (value === null || value === undefined) return
 
       // Use custom filter function if provided
-      const customFilter = config.filters?.[key];
+      const customFilter = config.filters?.[key]
       if (customFilter) {
-        result = result.filter((item) => customFilter(item, value));
-        return;
+        result = result.filter((item) => customFilter(item, value))
+        return
       }
 
       // Default: Exact match (supports nested keys)
       result = result.filter((item) => {
-        const itemValue = getNestedValue(item, key);
-        return itemValue === value;
-      });
-    });
+        const itemValue = getNestedValue(item, key)
+        return itemValue === value
+      })
+    })
 
     // 3. Apply Sort
     if (sort.value.field) {
       result.sort((a, b) => {
-        const aValue = getNestedValue(a, sort.value.field!);
-        const bValue = getNestedValue(b, sort.value.field!);
-
-        if (aValue === bValue) return 0;
-
-        const comparison = aValue > bValue ? 1 : -1;
-        return sort.value.direction === "asc" ? comparison : -comparison;
-      });
+        const aValue = getNestedValue(a, sort.value.field!)
+        const bValue = getNestedValue(b, sort.value.field!)
+        const comparison = compareValues(aValue, bValue)
+        return sort.value.direction === 'asc' ? comparison : -comparison
+      })
     }
 
-    return result;
-  });
+    return result
+  })
 
   return {
     // State
@@ -114,5 +132,5 @@ export function useDataFilter<T>(
     // Actions
     setFilter,
     clearFilters,
-  };
+  }
 }

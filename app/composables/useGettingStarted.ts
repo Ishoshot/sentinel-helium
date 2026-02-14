@@ -5,6 +5,7 @@
 import { useUserStore } from "~/stores/useUserStore";
 import { useApiClient } from "~/services/core/api";
 import { GETTING_STARTED_AUTO_SHOW } from "~/constants/animations";
+import { logError } from '~/utils/logger'
 
 const isGettingStartedOpen = ref(false);
 
@@ -34,7 +35,7 @@ export function useGettingStarted() {
           userStore.user.has_seen_getting_started = true;
         }
       } catch (error) {
-        console.error("Failed to mark getting started as seen:", error);
+        logError('Failed to mark getting started as seen', error)
       }
     }
   }
