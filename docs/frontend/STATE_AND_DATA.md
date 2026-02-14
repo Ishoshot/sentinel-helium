@@ -1,239 +1,120 @@
-# Sentinel – State and Data Management
+# Sentinel - State and Data Contract
 
-This document defines how state and data are managed in Sentinel’s frontend.
-It establishes clear ownership boundaries between pages, composables, stores, and services.
-
-All frontend data flow MUST conform to this document.
+This file defines ownership for state, fetching, mutations, and revalidation.
 
 ---
 
-## State Management Philosophy
+## Ownership Hierarchy
 
-Sentinel follows a **minimal, explicit state model**.
+Source of truth order:
 
-Principles:
+1. Backend
+2. Services
+3. Composables
+4. Pages
+5. Components
 
-- local state first
-- global state only when necessary
-- backend is the source of truth
-- frontend state is derived, not authoritative
-
-State exists to support the UI, not to replace backend logic.
-
----
-
-## State Ownership Hierarchy
-
-State ownership follows a strict hierarchy:
-
-1. **Backend** – authoritative source of truth
-2. **Services** – fetch and normalize data
-3. **Composables** – orchestrate data for UI
-4. **Pages** – compose data into views
-5. **Components** – render state via props
-
-Breaking this hierarchy is forbidden.
+Violating this order creates hidden coupling.
 
 ---
 
-## Global State (Stores)
+## State Placement Rules
 
-### Purpose of Stores
+Use local state by default.
 
-Stores are used sparingly and intentionally.
+Use stores only for:
 
-Valid use cases:
+- authenticated session/user shell context
+- current workspace context
+- cross-route UI preferences
+- feature flags used by multiple areas
 
-- authenticated user session
-- active Workspace context
-- feature flags
-- UI preferences (theme, layout state)
-
----
-
-### Store Rules
-
-Stores MUST:
-
-- hold minimal state
-- expose explicit getters/actions
-- remain framework-agnostic where possible
-
-Stores MUST NOT:
-
-- fetch data directly
-- contain business logic
-- mirror backend models in full
-- coordinate workflows
-
-If a store grows complex, it is likely misused.
+Do not place page-specific fetch payloads in global stores.
 
 ---
 
-## Local State
+## Service Contract
 
-Local state belongs in:
+Services are responsible for:
 
-- pages
-- composables
-- components (UI-only)
+- making HTTP calls
+- auth header usage
+- response normalization
+- consistent error shape
 
-Rules:
-
-- local state is preferred by default
-- lift state only when shared
-- reset state predictably on navigation
+Services are not responsible for UI state.
 
 ---
 
-## Data Fetching
+## Composable Contract
 
-### Services Layer
+Composables are responsible for:
 
-All API interaction occurs through **services**.
+- orchestrating one use case or closely related use cases
+- exposing explicit state: `data`, `isLoading`, `error`
+- coordinating multiple service calls when needed
+- exposing mutation methods that pages call
 
-Services:
-
-- encapsulate HTTP calls
-- normalize backend responses
-- handle errors consistently
-- attach authentication headers
-
-Pages, components, and stores MUST NOT call APIs directly.
+Composables should not hide side effects.
 
 ---
 
-### Composables
+## Page Contract
 
-Composables are the primary orchestration layer.
+Pages are responsible for:
 
-Responsibilities:
+- route params/query interpretation
+- selecting composables
+- binding state into UI
+- handling navigation and page-level UX decisions
 
-- call services
-- manage loading and error states
-- transform raw data into UI-ready shapes
-- coordinate multiple service calls if needed
-
-Composables do not perform business logic.
+Pages should not implement API details.
 
 ---
 
-## Caching Strategy
+## Component Contract
 
-- Cache conservatively
-- Prefer short-lived caches
-- Invalidate aggressively on mutations
+Components:
 
-Caching is an optimization, not a guarantee.
+- receive state via props
+- emit intent upward
+- keep only UI-local state
 
----
-
-## Data Freshness
-
-- Data is refreshed on navigation where appropriate
-- Critical data is revalidated after mutations
-- Stale data must be visually distinguishable if shown
-
-Never assume cached data is current.
+Components must not fetch or own domain workflows.
 
 ---
 
-## Error Handling
+## Mutation and Revalidation Rules
 
-### Error Sources
-
-Errors may originate from:
-
-- network failures
-- authorization issues
-- backend validation
-- limit enforcement
+- All writes go through services (invoked by composables).
+- After successful writes, revalidate affected reads.
+- Optimistic updates are optional and must be reversible.
+- Keep mutation side effects explicit in composables.
 
 ---
 
-### Error Handling Rules
+## Loading and Error Rules
 
-- Errors are handled centrally in services
-- Composables expose error state explicitly
-- Pages decide how errors are presented
-- Components render error states passed to them
-
-Errors must never fail silently.
+- Loading states must be explicit and testable.
+- Prefer skeletons for layout-heavy regions.
+- Errors must surface with actionable context.
+- Never silently swallow API errors.
 
 ---
 
-## Loading States
+## Performance Rules
 
-- Loading state is explicit and observable
-- Skeletons are preferred over spinners
-- Layout stability must be preserved
-
-Loading is part of the UX, not an afterthought.
-
----
-
-## Mutations
-
-### Mutation Rules
-
-- All mutations go through services
-- Mutations trigger data revalidation
-- Optimistic updates are allowed only when safe
-
-Optimistic updates must be reversible.
+- Use server-driven pagination for large lists.
+- Avoid unbounded in-memory datasets.
+- Move heavy aggregation to backend where possible.
+- Cache conservatively and invalidate aggressively after writes.
 
 ---
 
-## Pagination & Large Datasets
+## Forbidden Patterns
 
-- Pagination is server-driven
-- Cursor or offset strategies are explicit
-- Virtualization is used where necessary
+- API calls in components or stores
+- Business logic in stores
+- Shared mutable state without a clear owner
+- Implicit fetches triggered by unrelated UI changes
 
-Never load unbounded datasets into memory.
-
----
-
-## Authorization & Visibility
-
-- Backend enforces authorization
-- Frontend reflects permissions in the UI
-- Unauthorized actions are hidden or disabled
-
-Frontend authorization is advisory, not authoritative.
-
----
-
-## Synchronization & Consistency
-
-- UI state must reflect backend state
-- After mutations, data is refreshed or reconciled
-- Conflicts are resolved explicitly
-
-Inconsistent state erodes trust.
-
----
-
-## Anti-Patterns (Forbidden)
-
-- Fetching data in components
-- Global stores for page-specific data
-- Implicit side effects in composables
-- Hidden mutation of shared state
-- Assuming backend behavior
-
----
-
-## Guiding Principles
-
-- Backend is truth
-- Services fetch
-- Composables orchestrate
-- Pages compose
-- Components render
-
-If data flow feels unclear, the design is wrong.
-
----
-
-This document defines Sentinel’s frontend state and data contract.
