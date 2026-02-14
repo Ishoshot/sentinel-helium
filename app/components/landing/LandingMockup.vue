@@ -73,7 +73,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Browser container -->
-        <div class="relative rounded-xl overflow-hidden border border-[#232328] shadow-2xl shadow-black/60 bg-[#1c1c1e]">
+        <div class="animate-fade-in [animation-delay:120ms] [animation-fill-mode:both] relative rounded-xl overflow-hidden border border-[#232328] shadow-2xl shadow-black/60 bg-[#1c1c1e]">
           <!-- Browser chrome bar -->
           <div class="h-11 bg-[#2a2a2c] border-b border-[#3a3a3c] flex items-center px-4 relative">
             <!-- macOS traffic light buttons -->
@@ -449,7 +449,7 @@ onUnmounted(() => {
               <div class="flex-1 min-w-0 bg-[#0e0e10]">
                 <div class="p-4 sm:p-6 lg:p-8">
                   <!-- Page title -->
-                  <h2 class="text-xl sm:text-[28px] font-semibold text-white mb-4 sm:mb-6">
+                  <h2 class="animate-fade-in-up [animation-delay:220ms] [animation-fill-mode:both] text-xl sm:text-[28px] font-semibold text-white mb-4 sm:mb-6">
                     {{ activeNavItem }}
                   </h2>
 

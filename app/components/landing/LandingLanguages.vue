@@ -82,7 +82,7 @@ function tripleArray(arr: Language[]): Language[] {
   <section class="py-24 lg:py-32 bg-[#09090b] relative overflow-hidden">
     <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center mb-16">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center mb-16">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-sm font-medium mb-6">
           <Icon
             name="ph:tree-structure-bold"
@@ -105,7 +105,8 @@ function tripleArray(arr: Language[]): Language[] {
         <div
           v-for="(row, rowIndex) in rows"
           :key="rowIndex"
-          class="relative"
+          class="animate-fade-in-up [animation-fill-mode:both] relative"
+          :style="{ animationDelay: `${120 + (rowIndex * 80)}ms` }"
         >
           <!-- Fade edges -->
           <div class="absolute left-0 top-0 bottom-0 w-24 lg:w-40 bg-gradient-to-r from-[#09090b] to-transparent z-30 pointer-events-none" />
@@ -162,7 +163,7 @@ function tripleArray(arr: Language[]): Language[] {
 
       <!-- Bottom stats -->
       <div class="mt-16 flex flex-wrap items-center justify-center gap-8 lg:gap-16">
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up [animation-delay:420ms] [animation-fill-mode:both] flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
             <Icon
               name="ph:function-bold"
@@ -178,7 +179,7 @@ function tripleArray(arr: Language[]): Language[] {
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up [animation-delay:500ms] [animation-fill-mode:both] flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
             <Icon
               name="ph:tree-structure-bold"
@@ -194,7 +195,7 @@ function tripleArray(arr: Language[]): Language[] {
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="animate-fade-in-up [animation-delay:580ms] [animation-fill-mode:both] flex items-center gap-3">
           <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
             <Icon
               name="ph:package-bold"

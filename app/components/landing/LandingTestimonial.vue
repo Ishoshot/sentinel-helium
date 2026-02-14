@@ -32,7 +32,7 @@ const testimonials = [
   <section class="py-24 lg:py-32 bg-[#0f0f12] relative overflow-hidden">
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center mb-16">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center mb-16">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Trusted by engineering teams
         </h2>
@@ -44,9 +44,10 @@ const testimonials = [
       <!-- Testimonials grid -->
       <div class="grid md:grid-cols-3 gap-6">
         <div
-          v-for="testimonial in testimonials"
+          v-for="(testimonial, index) in testimonials"
           :key="testimonial.author"
-          class="relative p-6 lg:p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-all duration-300 hover:-translate-y-1"
+          class="animate-fade-in-up [animation-fill-mode:both] relative p-6 lg:p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-all duration-300 hover:-translate-y-1"
+          :style="{ animationDelay: `${120 + (index * 100)}ms` }"
         >
           <!-- Quote icon -->
           <Icon

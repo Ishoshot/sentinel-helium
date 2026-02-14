@@ -33,7 +33,7 @@ const steps = [
   >
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center max-w-3xl mx-auto mb-16">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Three steps to better code reviews
         </h2>
@@ -47,7 +47,8 @@ const steps = [
         <div
           v-for="(step, index) in steps"
           :key="step.number"
-          class="relative"
+          class="animate-fade-in-up [animation-fill-mode:both] relative"
+          :style="{ animationDelay: `${120 + (index * 100)}ms` }"
         >
           <!-- Connector line (desktop only) -->
           <div
@@ -81,7 +82,7 @@ const steps = [
       </div>
 
       <!-- CTA -->
-      <div class="mt-16 text-center">
+      <div class="animate-fade-in-up [animation-delay:380ms] [animation-fill-mode:both] mt-16 text-center">
         <NuxtLink
           to="/login"
           class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl bg-white text-zinc-900 hover:bg-zinc-100 transition-colors shadow-lg"

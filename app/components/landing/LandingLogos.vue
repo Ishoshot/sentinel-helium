@@ -18,14 +18,15 @@ const technologies = [
 <template>
   <section class="py-12 lg:py-16 bg-[#0f0f12]">
     <div class="max-w-6xl mx-auto px-6">
-      <p class="text-center text-xs uppercase tracking-[0.15em] text-zinc-600 mb-8">
+      <p class="animate-fade-in-up [animation-fill-mode:both] text-center text-xs uppercase tracking-[0.15em] text-zinc-600 mb-8">
         Works with your stack
       </p>
       <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
         <div
-          v-for="tech in technologies"
+          v-for="(tech, index) in technologies"
           :key="tech.name"
-          class="flex items-center gap-3 text-zinc-500 hover:text-zinc-300 transition-colors"
+          class="animate-fade-in-up [animation-fill-mode:both] flex items-center gap-3 text-zinc-500 hover:text-zinc-300 transition-colors"
+          :style="{ animationDelay: `${120 + (index * 70)}ms` }"
         >
           <Icon
             :name="tech.icon"
@@ -33,7 +34,7 @@ const technologies = [
           />
           <span class="text-sm font-medium">{{ tech.name }}</span>
         </div>
-        <span class="text-sm text-zinc-600 italic">and many more...</span>
+        <span class="animate-fade-in-up [animation-delay:520ms] [animation-fill-mode:both] text-sm text-zinc-600 italic">and many more...</span>
       </div>
     </div>
   </section>
