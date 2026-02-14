@@ -1,62 +1,46 @@
-# Sentinel – Frontend Design System
+# Sentinel - Frontend Design System
 
-This document defines the design system contract for Sentinel’s frontend.
-It combines the visual vision with the non-negotiable system rules.
-
-All frontend interfaces MUST conform to this document.
+This file is the design entrypoint and source map.
+It defines non-negotiable visual constraints and points to detailed contracts.
 
 ---
 
-## Design Vision
+## Design Direction
 
-Sentinel’s interface is a dark, refined command center for developers.
-It should feel calm, precise, and trustworthy, with clear hierarchy and subtle motion.
+Sentinel UI should feel:
 
-### Pitfalls to Avoid
+- calm
+- precise
+- trustworthy
+- developer-first
 
-- Generic SaaS aesthetic
-- Timid color usage
-- Flat, lifeless surfaces
-- Weak hierarchy
-- Static UI without feedback
+Avoid generic SaaS styling and decorative noise.
 
 ---
 
-## System References (Authoritative)
+## Authoritative Design Contracts
 
-- **Color System**: `COLOR_SYSTEM.md`
-- **Typography**: `TYPOGRAPHY.md`
-- **Motion**: `MOTION.md`
-- **Component Visuals**: `COMPONENTS.md`
-- **Charting**: `CHARTING.md`
-
-These documents define the detailed visual contract.
-
----
-
-## Design Token Rules
-
-- All colors, spacing, and typography must be tokenized.
-- Raw hex values must not be used in components.
-- Tokens are the single source of truth.
+- `COLOR_SYSTEM.md` - color tokens and usage
+- `TYPOGRAPHY.md` - type scale and hierarchy
+- `MOTION.md` - motion timing and approved patterns
+- `COMPONENTS.md` - component visual + engineering contract
+- `CHARTING.md` - visualization standards
+- `UX_PRINCIPLE.md` - product UX behavior and tone
 
 ---
 
-## Accessibility
+## Global Rules
 
-- Maintain sufficient contrast
-- Do not rely on color alone
-- Ensure keyboard navigation
-- Use semantic HTML
+- Use tokenized styles only.
+- Keep contrast and readability high.
+- Prioritize information hierarchy over decoration.
+- Maintain consistency across pages and domains.
 
 ---
 
-## Guiding Principles
+## Accessibility Baseline
 
-When in doubt:
-
-- remove instead of add
-- simplify instead of decorate
-- clarify instead of impress
-
-This document defines Sentinel’s frontend design system.
+- keyboard navigable interactions
+- semantic HTML first
+- color not used as the sole meaning carrier
+- reduced-motion support where animation exists

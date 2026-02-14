@@ -1,221 +1,93 @@
-# Sentinel – Frontend Project Context
+# Sentinel - Frontend Agent Contract
 
-This document defines the mandatory context and enforcement rules for all AI agents
-working on Sentinel’s frontend codebase.
-
-Failure to follow these rules is considered a violation of project standards.
+This file defines mandatory rules for AI agents working in Sentinel frontend.
 
 ---
 
-## Required Reading
+## Required Docs (Read Before Relevant Changes)
 
-### Frontend Documentation (MANDATORY – EVERY SESSION)
-
-Before making ANY frontend code changes, you MUST read:
-
-- `docs/frontend/DESIGN_SYSTEM.md`
-
-  - Visual foundations
-  - Color, typography, spacing, motion rules
-  - Apple-inspired restraint principles
-
+- `docs/frontend/CODING_STANDARDS.md`
 - `docs/frontend/FRONTEND_ARCHITECTURE.md`
-
-  - Application structure
-  - Responsibilities of pages, components, composables, services, stores
-
-- `docs/frontend/COMPONENT_STANDARDS.md`
-
-  - Component categories
-  - Props/emits rules
-  - PrimeVue usage constraints
-
 - `docs/frontend/STATE_AND_DATA.md`
+- `docs/frontend/COMPONENTS.md`
+- `docs/frontend/DESIGN_SYSTEM.md`
+- `docs/frontend/UX_PRINCIPLE.md`
+- `docs/frontend/CHARTING.md` (when chart work is involved)
 
-  - State ownership hierarchy
-  - Data fetching and mutation rules
-  - Error and loading handling
-
-- `docs/frontend/CHARTING.md`
-  - Charting philosophy
-  - ECharts rules
-  - Dashboard visualization constraints
-
-These documents define the **authoritative frontend contracts**.
-
-**Never assume. Always verify against these documents.**
+Never guess when a contract exists.
 
 ---
 
-### Product Documentation (MANDATORY – FIRST SESSION)
+## Enforcement Rules
 
-On your first interaction with this repository, read:
-
-- `docs/product/PRD.md`
-- `docs/product/GLOSSARY.md`
-- `docs/product/PLANS_AND_LIMITS.md`
-- `docs/product/UX_PRINCIPLES.md`
-
-You may create memory after reading these documents.
-If unsure about terminology, UX intent, or product behavior, re-read the relevant document.
+1. Before component changes: follow `COMPONENTS.md`.
+2. Before layout/style/motion changes: follow `DESIGN_SYSTEM.md`, `MOTION.md`, `TYPOGRAPHY.md`, `COLOR_SYSTEM.md`.
+3. Before data fetching/mutations: follow `STATE_AND_DATA.md`.
+4. Before naming or UX copy decisions: follow `UX_PRINCIPLE.md`.
+5. Before chart updates: follow `CHARTING.md`.
 
 ---
 
-## Enforcement Rules (Non-Negotiable)
+## Architecture Boundaries
 
-1. **Before creating or modifying components**  
-   → Read `COMPONENT_STANDARDS.md`
+- Pages compose route-level UI.
+- Composables orchestrate async/domain flows.
+- Services own API calls and normalization.
+- Components render and emit intent.
+- Stores contain minimal global context only.
 
-2. **Before deciding layout, color, spacing, or motion**  
-   → Read `DESIGN_SYSTEM.md`
-
-3. **Before fetching or mutating data**  
-   → Read `STATE_AND_DATA.md`
-
-4. **Before adding charts or metrics**  
-   → Read `CHARTING.md`
-
-5. **Before naming anything user-facing**  
-   → Verify terminology in `GLOSSARY.md`
+Violation of these boundaries is a bug.
 
 ---
 
-## Domain Vocabulary (STRICT)
+## Canonical Product Terms
 
-Frontend code MUST use the **exact domain terms** defined in `GLOSSARY.md`.
+Use these terms consistently in frontend copy and naming:
 
-No synonyms. No rewording.
+- Workspace
+- Repository
+- Run
+- Finding
+- Member
+- Plan
 
-Examples:
-
-- **Workspace** (not organization, account)
-- **Repository** (not repo in UI copy)
-- **Run** (not review or execution)
-- **Finding** (not issue or problem)
-
-If a term does not exist in the glossary, it must be added there first.
+UI note: "Review" can be used as UX language for Runs.
 
 ---
 
-## Frontend Architecture Principles
+## Design and UX Constraints
 
-From `FRONTEND_ARCHITECTURE.md`:
-
-- Pages compose views
-- Composables orchestrate logic
-- Services fetch data
-- Components render UI
-- Stores hold minimal global state
-
-Violating this separation is forbidden.
+- Calm, clear, predictable interfaces.
+- Signal over noise.
+- Tokenized styling only.
+- No decorative UI that does not improve decisions.
+- Explicit feedback for loading, success, errors, and limits.
 
 ---
 
-## Component Enforcement
+## Tooling Contract
 
-From `COMPONENT_STANDARDS.md`:
+- Nuxt 4
+- Vue 3 Composition API (`<script setup>`)
+- TypeScript
+- Tailwind CSS
+- PrimeVue
+- pnpm
 
-- Components are presentational by default
-- Components receive data via props
-- Components emit user intent via emits
-- Components MUST NOT fetch data
-- Components MUST NOT contain business logic
-
-If a component feels “smart”, it is wrong.
-
----
-
-## State & Data Enforcement
-
-From `STATE_AND_DATA.md`:
-
-- Backend is the source of truth
-- All API calls go through services
-- Composables manage loading and error state
-- Stores are used sparingly and intentionally
-- Optimistic updates are allowed only when safe
-
-Frontend state is **derived**, not authoritative.
+Forbidden: Options API.
 
 ---
 
-## Design System Enforcement (CRITICAL)
+## Forbidden Patterns
 
-From `DESIGN_SYSTEM.md`:
-
-- Grayscale-first design
-- Single accent color (Sentinel Blue)
-- No decorative color
-- No arbitrary spacing
-- No raw hex values
-- Tokens are mandatory
-
-If removing color breaks clarity, the design is wrong.
-
----
-
-## PrimeVue & UI Libraries
-
-- PrimeVue is the primary UI component library
-- Components must be themed using Sentinel tokens
-- PrimeVue internals must not leak into pages
-- No secondary UI libraries without documentation
-
----
-
-## Tooling Expectations
-
-Frontend code must comply with:
-
-- **Nuxt 4**
-- **Vue 3 Composition API only**
-- **TypeScript (no `any`)**
-- **Tailwind CSS**
-- **pnpm**
-
-Options API is forbidden.
-
----
-
-## Forbidden Shortcuts
-
-AI agents MUST NOT:
-
-- fetch data inside components
-- place orchestration logic in pages
-- bypass composables to call services directly from components
-- invent new UX patterns without documentation
-- introduce decorative UI elements
-- diverge from the design system
-- assume platform-specific behavior
-
-If a change violates these rules, stop.
+- Data fetching in components
+- Business logic in stores
+- Prop mutation
+- Silent error swallowing
+- Hidden side effects that cross ownership boundaries
 
 ---
 
 ## Uncertainty Rule
 
-If you are unsure about:
-
-- UX intent
-- data ownership
-- component responsibility
-- naming
-- design decisions
-
-You MUST pause and ask for clarification instead of guessing.
-
----
-
-## Guiding Principles
-
-Sentinel frontend values:
-
-- calm over clever
-- clarity over density
-- consistency over novelty
-- trust over flair
-
-The UI should feel as if it was designed by Apple for developers.
-
-This file is authoritative.
+If ownership, terminology, or UX behavior is unclear, stop and ask instead of guessing.
