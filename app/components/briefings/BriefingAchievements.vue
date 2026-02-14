@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Achievement } from "~/types";
-import { getAchievementIcon, getAchievementStyle } from "~/types/briefings";
+import { getAchievementIcon, getAchievementStyle } from "~/utils/briefing-icons";
 
 interface Props {
   achievements: readonly Achievement[];

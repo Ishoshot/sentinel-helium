@@ -102,6 +102,15 @@ function handleDownload(format: BriefingOutputFormat) {
   emit("download", props.generation, format);
 }
 
+function handleDownloadSelection(value: unknown): void {
+  if (typeof value !== "string") {
+    return;
+  }
+
+  const format = value as BriefingOutputFormat;
+  handleDownload(format);
+}
+
 function handleShare() {
   emit("share", props.generation);
 }
@@ -272,7 +281,7 @@ function handleShare() {
           :options="availableFormats.map(f => ({ label: f.toUpperCase(), value: f }))"
           placeholder="Download"
           menu-width="w-32"
-          @update:model-value="(v: BriefingOutputFormat) => handleDownload(v)"
+          @update:model-value="handleDownloadSelection"
         >
           <template #trigger>
             <button

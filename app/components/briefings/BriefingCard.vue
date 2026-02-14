@@ -50,12 +50,19 @@ const colorMap: Record<string, { bg: string; icon: string; accent: string }> = {
   default: { bg: "bg-bg-surface", icon: "text-text-secondary", accent: "from-bg-hover/50" },
 };
 
+const defaultIcon = "lucide:file-text";
+const defaultColors = {
+  bg: "bg-bg-surface",
+  icon: "text-text-secondary",
+  accent: "from-bg-hover/50",
+};
+
 const briefingIcon = computed(() => {
-  return props.briefing.icon || iconMap[props.briefing.slug] || iconMap.default;
+  return props.briefing.icon ?? iconMap[props.briefing.slug] ?? defaultIcon;
 });
 
 const briefingColors = computed(() => {
-  return colorMap[props.briefing.slug] || colorMap.default;
+  return colorMap[props.briefing.slug] ?? defaultColors;
 });
 
 const audienceDisplay = computed(() => {

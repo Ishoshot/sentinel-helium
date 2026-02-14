@@ -6,6 +6,7 @@
 
 import type { Briefing } from '~/types/briefings'
 import { buildInitialValues } from '~/types/schema'
+import BriefingParameterForm from '~/components/briefings/BriefingParameterForm.vue'
 
 interface Props {
   briefing: Briefing
@@ -121,7 +122,7 @@ function handleGenerate() {
         <div class="rounded-xl border border-border-muted bg-bg-elevated p-4">
           <BriefingParameterForm
             v-model="parameters"
-            :schema="briefing.parameter_schema"
+            :schema="briefing.parameter_schema!"
             :disabled="loading"
           />
         </div>

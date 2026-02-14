@@ -9,6 +9,7 @@ import {
 } from "~/utils/briefing-icons";
 import { CLIPBOARD_FEEDBACK_DEFAULT } from "~/constants/animations";
 import { useAppToast } from "~/composables/shared/useAppToast";
+import { logError } from '~/utils/logger'
 
 const toast = useAppToast();
 
@@ -31,7 +32,7 @@ let narrativeParseRequestId = 0;
 /**
  * Parse markdown narrative asynchronously to prevent UI blocking on large documents.
  */
-async function parseNarrative(content: string | null): Promise<void> {
+async function parseNarrative(content: string | null | undefined): Promise<void> {
   if (!content) {
     narrativeHtml.value = "";
     return;
@@ -51,7 +52,7 @@ async function parseNarrative(content: string | null): Promise<void> {
       narrativeHtml.value = DOMPurify.sanitize(rawHtml as string);
     }
   } catch (error) {
-    console.error("Narrative parsing error:", error);
+    logError('Narrative parsing error', error)
     if (requestId === narrativeParseRequestId) {
       narrativeHtml.value = DOMPurify.sanitize(content);
     }
@@ -92,7 +93,7 @@ async function copyExcerpt(key: string | number, value: string | undefined) {
       copiedExcerpt.value = null;
     }, CLIPBOARD_FEEDBACK_DEFAULT);
   } catch (e) {
-    console.error("Failed to copy:", e);
+    logError('Failed to copy excerpt', e)
     toast.error("Failed to copy to clipboard");
   }
 }
@@ -101,6 +102,7 @@ async function copyExcerpt(key: string | number, value: string | undefined) {
 
 // Generation metadata
 const aiGeneration = computed(() => props.generation.ai_generation);
+const metadata = computed(() => props.generation.metadata ?? null);
 const completedAt = computed(() => {
   if (!props.generation.completed_at) return null;
   return new Date(props.generation.completed_at);
@@ -229,12 +231,10 @@ function getAchievementKey(achievement: Achievement, index: number): string {
           <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <div class="absolute top-0 left-1/4 w-1 h-1 bg-amber-400 rounded-full animate-bounce" />
             <div
-              class="absolute top-2 right-1/3 w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
-              style="animation-delay: 0.1s"
+              class="confetti-delay-100 absolute top-2 right-1/3 w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
             />
             <div
-              class="absolute bottom-2 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-bounce"
-              style="animation-delay: 0.2s"
+              class="confetti-delay-200 absolute bottom-2 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-bounce"
             />
           </div>
 
@@ -364,6 +364,14 @@ function getAchievementKey(achievement: Achievement, index: number): string {
 </template>
 
 <style scoped>
+.confetti-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.confetti-delay-200 {
+  animation-delay: 0.2s;
+}
+
 /* Enhanced prose styling for narrative content */
 .narrative-content :deep(h1) {
   @apply text-2xl font-bold text-text-primary mt-8 mb-4 first:mt-0;
