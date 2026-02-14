@@ -147,6 +147,12 @@ const riskBadge = computed(() => {
   return configs[level] ?? { label: level, icon: 'lucide:info', variant: 'default' as const, color: 'text-text-muted' }
 })
 
+const defaultStatusConfig = {
+  gradient: 'from-violet-500 to-purple-400',
+  bgGradient: 'from-violet-500/10 via-violet-500/5 to-transparent',
+  icon: 'lucide:clock',
+}
+
 // Status configuration
 const statusConfig = computed(() => {
   const configs: Record<string, { gradient: string; bgGradient: string; icon: string }> = {
@@ -176,7 +182,7 @@ const statusConfig = computed(() => {
       icon: 'lucide:skip-forward',
     },
   }
-  return configs[run.value?.status ?? 'queued'] ?? configs.queued
+  return configs[run.value?.status ?? 'queued'] ?? defaultStatusConfig
 })
 
 // Collapsible state

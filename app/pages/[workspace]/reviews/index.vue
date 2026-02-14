@@ -4,6 +4,7 @@ import { useGitHubService } from '~/services/integrations/githubService'
 import { useRuns, type WorkspaceRunsParams } from '~/composables/reviews/useRuns'
 import type { Repository } from '~/types'
 import { useAppToast } from '~/composables/shared/useAppToast'
+import { logError } from '~/utils/logger'
 
 /**
  * Code Reviews page
@@ -89,7 +90,7 @@ const fetchRepositories = async () => {
     const response = await githubService.listRepositories(workspaceId.value)
     repositories.value = response.data
   } catch (e) {
-    console.error('Failed to load repositories', e)
+    logError('Failed to load repositories', e)
     toast.error('Failed to load repositories')
   } finally {
     isLoadingRepos.value = false

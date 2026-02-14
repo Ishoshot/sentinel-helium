@@ -216,8 +216,7 @@ const teamMembers = computed(() => {
 
     <!-- Analytics Overview - full width, staggered animation -->
     <div
-      class="animate-fade-in-up"
-      style="animation-delay: 75ms"
+      class="animate-delay-75 animate-fade-in-up"
     >
       <DomainAnalyticsAnalyticsOverview
         :metrics="overviewMetrics"
@@ -228,8 +227,7 @@ const teamMembers = computed(() => {
     <!-- Getting Started Card -->
     <DomainWorkspaceGettingStartedCard
       v-if="showGettingStarted"
-      class="mt-8 animate-fade-in-up"
-      style="animation-delay: 150ms"
+      class="animate-delay-150 mt-8 animate-fade-in-up"
       :workspace-slug="workspaceSlug"
       :is-git-hub-connected="isGitHubConnected"
       :members-count="members.length"
@@ -241,8 +239,7 @@ const teamMembers = computed(() => {
 
     <!-- Analytics Charts Section -->
     <div
-      class="mt-8 space-y-6 animate-fade-in-up"
-      style="animation-delay: 225ms"
+      class="animate-delay-225 mt-8 space-y-6 animate-fade-in-up"
     >
       <!-- Section Header -->
       <h2 class="text-sm font-medium text-text-muted uppercase tracking-wide">
@@ -324,8 +321,7 @@ const teamMembers = computed(() => {
 
     <!-- Two Column Layout - responsive grid -->
     <div
-      class="mt-8 grid gap-6 xl:grid-cols-3 animate-fade-in-up"
-      style="animation-delay: 300ms"
+      class="animate-delay-300 mt-8 grid animate-fade-in-up gap-6 xl:grid-cols-3"
     >
       <!-- Left Column - Recent Activity (takes more space) -->
       <div class="xl:col-span-2">
@@ -448,3 +444,21 @@ const teamMembers = computed(() => {
     </div>
   </BaseContainer>
 </template>
+
+<style scoped>
+.animate-delay-75 {
+  animation-delay: 75ms;
+}
+
+.animate-delay-150 {
+  animation-delay: 150ms;
+}
+
+.animate-delay-225 {
+  animation-delay: 225ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+</style>

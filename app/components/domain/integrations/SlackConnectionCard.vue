@@ -8,7 +8,7 @@ import type { SlackIntegration, SlackChannel } from '~/types'
 
 interface Props {
   integration: SlackIntegration | null
-  channels: SlackChannel[]
+  channels: readonly SlackChannel[]
   isLoading?: boolean
   isConnecting?: boolean
   isDisconnecting?: boolean
