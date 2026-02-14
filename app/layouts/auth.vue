@@ -12,8 +12,7 @@ useHead({
   <div class="min-h-screen bg-bg-app relative overflow-hidden">
     <!-- Subtle grid pattern -->
     <div
-      class="absolute inset-0 opacity-[0.4]"
-      style="background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px;"
+      class="auth-grid-pattern absolute inset-0 opacity-[0.4]"
     />
 
     <!-- Content -->
@@ -44,3 +43,10 @@ useHead({
     </div>
   </div>
 </template>
+
+<style scoped>
+.auth-grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+</style>

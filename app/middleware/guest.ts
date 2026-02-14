@@ -22,7 +22,10 @@ export default defineNuxtRouteMiddleware(async () => {
       const sortedWorkspaces = [...workspaceStore.workspaces].sort(
         (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       )
-      return navigateTo(`/${sortedWorkspaces[0].slug}`)
+      const firstWorkspace = sortedWorkspaces[0]
+      if (firstWorkspace) {
+        return navigateTo(`/${firstWorkspace.slug}`)
+      }
     }
 
     // Otherwise, still redirect to home (user might need to create a workspace)

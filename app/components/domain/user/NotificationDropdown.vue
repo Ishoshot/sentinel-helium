@@ -8,7 +8,7 @@ import type { Notification } from '~/types'
 
 interface Props {
   notifications: readonly Notification[]
-  unreadCount: number
+  unreadCount?: number
   isLoading?: boolean
   isMarkingRead?: boolean
 }

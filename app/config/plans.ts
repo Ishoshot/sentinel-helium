@@ -2,7 +2,7 @@
  * Plan Configuration - Single Source of Truth
  *
  * This file defines all plan data for the frontend.
- * Must stay in sync with backend docs/product/PLANS_AND_LIMITS.md
+ * Must stay in sync with backend plan/limit contracts.
  *
  * Plan tiers and their details:
  * | Plan        | Monthly | Runs/Month | Team Size | Support   |
