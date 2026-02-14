@@ -9,7 +9,14 @@ const props = defineProps<{
 const isExpanded = ref(true)
 
 const workspaceStore = useWorkspaceStore()
-const workspaceSlug = computed(() => workspaceStore.activeWorkspace?.slug ?? workspaceStore.currentWorkspaceSlug)
+const workspaceSlug = computed(() => workspaceStore.currentWorkspace?.slug ?? workspaceStore.currentWorkspaceSlug)
+
+const defaultStatusDotConfig = { dot: 'bg-zinc-400', label: 'Pending' }
+const defaultLatestStatusConfig = {
+  bg: 'bg-bg-surface',
+  color: 'text-text-muted',
+  label: 'Pending',
+}
 
 const navigateToRun = (runId: number) => {
   if (!workspaceSlug.value) return
@@ -27,7 +34,7 @@ const getStatusConfig = (status: string) => {
     queued: { dot: 'bg-blue-500 animate-pulse', label: 'Queued' },
     pending: { dot: 'bg-zinc-400', label: 'Pending' },
   }
-  return configs[status] ?? configs.pending
+  return configs[status] ?? defaultStatusDotConfig
 }
 
 // Latest status badge
@@ -42,7 +49,7 @@ const latestStatusConfig = computed(() => {
     queued: { bg: 'bg-blue-500/10', color: 'text-blue-400', label: 'Queued' },
     pending: { bg: 'bg-bg-surface', color: 'text-text-muted', label: 'Pending' },
   }
-  return configs[status] ?? configs.pending
+  return configs[status] ?? defaultLatestStatusConfig
 })
 
 const formatDate = (date: string) => {

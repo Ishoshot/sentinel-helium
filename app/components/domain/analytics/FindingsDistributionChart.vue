@@ -39,7 +39,7 @@ const chartData = computed<ChartData>(() => ({
   ],
 }))
 
-const chartOptions: ChartOptions = {
+const chartOptions = {
   cutout: '70%',
   plugins: {
     legend: {
@@ -50,7 +50,7 @@ const chartOptions: ChartOptions = {
       },
     },
   },
-}
+} as unknown as ChartOptions
 </script>
 
 <template>

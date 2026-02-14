@@ -156,9 +156,18 @@ function formatIsoDate(value: Date): string {
   return `${year}-${month}-${day}`
 }
 
-function normalizePickerDate(value: Date | Date[] | null | undefined): string | null {
+function normalizePickerDate(
+  value: Date | Date[] | (Date | null)[] | null | undefined
+): string | null {
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
     return formatIsoDate(value)
+  }
+
+  if (Array.isArray(value)) {
+    const firstDate = value.find((item) => item instanceof Date && !Number.isNaN(item.getTime()))
+    if (firstDate) {
+      return formatIsoDate(firstDate)
+    }
   }
 
   return null
@@ -167,7 +176,7 @@ function normalizePickerDate(value: Date | Date[] | null | undefined): string | 
 const dateFromPickerValue = computed(() => parseIsoDate(props.dateRange.from))
 const dateToPickerValue = computed(() => parseIsoDate(props.dateRange.to))
 
-function handleFromDateChange(value: Date | Date[] | null | undefined): void {
+function handleFromDateChange(value: Date | Date[] | (Date | null)[] | null | undefined): void {
   const nextFrom = normalizePickerDate(value)
   let nextTo = props.dateRange.to
 
@@ -178,7 +187,7 @@ function handleFromDateChange(value: Date | Date[] | null | undefined): void {
   dateRange.value = { from: nextFrom, to: nextTo }
 }
 
-function handleToDateChange(value: Date | Date[] | null | undefined): void {
+function handleToDateChange(value: Date | Date[] | (Date | null)[] | null | undefined): void {
   const nextTo = normalizePickerDate(value)
   const currentFrom = props.dateRange.from
 
