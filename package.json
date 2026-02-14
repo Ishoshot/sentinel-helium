@@ -3,13 +3,15 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "build": "node scripts/with-herd-ca.mjs nuxt build",
+    "dev": "node scripts/with-herd-ca.mjs nuxt dev",
+    "generate": "node scripts/with-herd-ca.mjs nuxt generate",
+    "preview": "node scripts/with-herd-ca.mjs nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "node scripts/with-herd-ca.mjs nuxt typecheck",
+    "check": "pnpm lint && pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@nuxt/a11y": "1.0.0-alpha.1",
