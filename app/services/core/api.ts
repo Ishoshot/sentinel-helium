@@ -1,6 +1,33 @@
 import type { ApiErrorResponse } from '~/types'
 import { ErrorCategory, HttpStatus, StorageKey } from '~/types'
 
+const AUTH_PRESENCE_COOKIE_KEY = 'sentinel_auth'
+const AUTH_PRESENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
+
+function setAuthPresenceCookie(isAuthenticated: boolean): void {
+  if (import.meta.server) {
+    return
+  }
+
+  const cookieParts = [
+    `${AUTH_PRESENCE_COOKIE_KEY}=${isAuthenticated ? '1' : '0'}`,
+    'Path=/',
+    'SameSite=Lax',
+    isAuthenticated ? `Max-Age=${AUTH_PRESENCE_COOKIE_MAX_AGE_SECONDS}` : 'Max-Age=0',
+  ]
+
+  if (window.location.protocol === 'https:') {
+    cookieParts.push('Secure')
+  }
+
+  document.cookie = cookieParts.join('; ')
+}
+
+function getAuthPresenceCookieValue(): string | null {
+  const authPresence = useCookie<string | null>(AUTH_PRESENCE_COOKIE_KEY)
+  return authPresence.value
+}
+
 /**
  * Get the stored auth token
  */
@@ -15,6 +42,7 @@ export function getToken(): string | null {
 export function setToken(token: string): void {
   if (import.meta.server) return
   localStorage.setItem(StorageKey.AuthToken, token)
+  setAuthPresenceCookie(true)
 }
 
 /**
@@ -23,6 +51,7 @@ export function setToken(token: string): void {
 export function clearToken(): void {
   if (import.meta.server) return
   localStorage.removeItem(StorageKey.AuthToken)
+  setAuthPresenceCookie(false)
 }
 
 /**
@@ -30,6 +59,24 @@ export function clearToken(): void {
  */
 export function hasToken(): boolean {
   return !!getToken()
+}
+
+/**
+ * Check if auth presence cookie indicates an authenticated user.
+ * Used for SSR-safe initial rendering on public pages.
+ */
+export function hasAuthPresenceCookie(): boolean {
+  return getAuthPresenceCookieValue() === '1'
+}
+
+/**
+ * Sync auth presence cookie with local token state and return token presence.
+ * Used after mount to keep SSR hint and client state aligned.
+ */
+export function syncAuthPresenceWithToken(): boolean {
+  const hasAuthToken = hasToken()
+  setAuthPresenceCookie(hasAuthToken)
+  return hasAuthToken
 }
 
 /**

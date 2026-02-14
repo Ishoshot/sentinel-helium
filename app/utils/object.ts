@@ -5,19 +5,24 @@
  * @param defaultValue Value to return if path doesn't exist
  */
 export function getNestedValue(
-  obj: any,
+  obj: unknown,
   path: string,
-  defaultValue: any = undefined
-): any {
-  const keys = path.split(".");
-  let result = obj;
+  defaultValue: unknown = undefined
+): unknown {
+  const keys = path.split('.')
+  let result: unknown = obj
 
   for (const key of keys) {
     if (result === null || result === undefined) {
-      return defaultValue;
+      return defaultValue
     }
-    result = result[key];
+
+    if (typeof result !== 'object') {
+      return defaultValue
+    }
+
+    result = (result as Record<string, unknown>)[key]
   }
 
-  return result === undefined ? defaultValue : result;
+  return result === undefined ? defaultValue : result
 }

@@ -101,6 +101,7 @@ export interface Run {
     model: string;
     provider: string;
     duration_ms: number;
+    findings_count?: number;
   } | null;
   policy_snapshot: {
     policy_version: number;

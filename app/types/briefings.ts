@@ -108,6 +108,12 @@ export interface BriefingGeneration {
   excerpts?: BriefingExcerpts | null;
   output_formats?: readonly BriefingOutputFormat[];
   ai_generation?: BriefingAiGeneration | null;
+  metadata?: {
+    model?: string | null;
+    tokens_used?: number | null;
+    duration_ms?: number | null;
+    [key: string]: unknown;
+  } | null;
   error_message: string | null;
   expires_at: string | null;
   created_at: string;

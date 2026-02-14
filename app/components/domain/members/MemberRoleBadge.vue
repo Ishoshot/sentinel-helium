@@ -15,9 +15,9 @@ const props = defineProps<Props>()
 
 // Map role to badge variant
 const badgeVariant = computed(() => {
-  const variants: Record<MemberRole, 'primary' | 'default'> = {
-    owner: 'primary',
-    admin: 'primary',
+  const variants: Record<MemberRole, 'accent' | 'default'> = {
+    owner: 'accent',
+    admin: 'accent',
     member: 'default',
   }
   return variants[props.role]
