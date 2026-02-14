@@ -106,6 +106,7 @@ const sortedPlans = computed(() =>
 );
 
 const highlightedTier: PlanTier = "illuminate";
+type ViewPlan = Readonly<(typeof plans.value)[number]>;
 
 const usageProgress = computed(() => {
   if (!usage.value || !currentPlan.value) return null;
@@ -181,7 +182,7 @@ const trialEndsLabel = computed(() => {
   return formatDate(subscription.value.trial_ends_at);
 });
 
-const planActionLabel = (plan: Plan) => {
+const planActionLabel = (plan: ViewPlan) => {
   if (currentPlan.value?.id === plan.id) return "Current";
   if (!hasPricingForInterval(plan, billingInterval.value)) {
     return "Contact sales";
@@ -195,7 +196,7 @@ const planActionLabel = (plan: Plan) => {
   return "Upgrade";
 };
 
-const planActionDisabled = (plan: Plan) => {
+const planActionDisabled = (plan: ViewPlan) => {
   if (currentPlan.value?.id === plan.id) return true;
   if (!canManage.value) return true;
   if (plan.tier === "foundation") {
@@ -219,7 +220,7 @@ function formatTierLabel(tier: string) {
   return tier.charAt(0).toUpperCase() + tier.slice(1);
 }
 
-function hasPricingForInterval(plan: Plan, interval: BillingInterval) {
+function hasPricingForInterval(plan: ViewPlan, interval: BillingInterval) {
   if (!plan.currency) return false;
   if (interval === "yearly") {
     return !!plan.price_yearly;
@@ -240,7 +241,7 @@ const yearlySavingsLabel = computed(() => {
   return savings;
 });
 
-function getPlanPrice(plan: Plan) {
+function getPlanPrice(plan: ViewPlan) {
   if (!plan.currency) return "Custom";
   if (billingInterval.value === "yearly") {
     return plan.price_yearly ? `$${plan.price_yearly}` : "Custom";
@@ -248,7 +249,7 @@ function getPlanPrice(plan: Plan) {
   return plan.price_monthly ? `$${plan.price_monthly}` : "Custom";
 }
 
-function getPlanPeriod(plan: Plan) {
+function getPlanPeriod(plan: ViewPlan) {
   if (!plan.currency) return "";
   return billingInterval.value === "yearly" ? "/yr" : "/mo";
 }
@@ -271,7 +272,7 @@ function getSortedFeatures(features: Record<string, boolean>) {
   });
 }
 
-async function handlePlanAction(plan: Plan) {
+async function handlePlanAction(plan: ViewPlan) {
   if (planActionDisabled(plan)) return;
   promoCodeError.value = null;
   pendingPlanId.value = plan.id;
@@ -480,8 +481,7 @@ watch(showPromotionModal, (isOpen) => {
 
           <!-- Subtle pattern overlay -->
           <div
-            class="absolute inset-0 opacity-[0.03]"
-            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"
+            class="hero-pattern-overlay absolute inset-0 opacity-[0.03]"
           />
 
           <!-- Glow effects -->
@@ -1155,6 +1155,10 @@ watch(showPromotionModal, (isOpen) => {
 </template>
 
 <style scoped>
+.hero-pattern-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

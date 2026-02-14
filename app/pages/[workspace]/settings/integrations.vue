@@ -262,8 +262,7 @@ function goToRepositories() {
 
       <!-- Grid pattern overlay -->
       <div
-        class="absolute inset-0 opacity-[0.03]"
-        style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"
+        class="integrations-grid-pattern absolute inset-0 opacity-[0.03]"
       />
 
       <div class="relative">
@@ -530,3 +529,10 @@ function goToRepositories() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.integrations-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+  background-size: 24px 24px;
+}
+</style>

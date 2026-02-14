@@ -5,7 +5,8 @@ import { useRuns } from '~/composables/reviews/useRuns'
 import { useDataFilter } from '~/composables/shared/useDataFilter'
 import type { Repository } from '~/types'
 import DomainReviewsRunsTable from '~/components/domain/reviews/RunsTable.vue'
-import DomainReviewsRunFilterBar from '~/components/domain/reviews/RunFilterBar.vue'
+import DomainReviewsRunsCompactFilterBar from '~/components/domain/reviews/RunsCompactFilterBar.vue'
+import { logError } from '~/utils/logger'
 
 definePageMeta({
   middleware: ['auth', 'workspace'],
@@ -45,8 +46,14 @@ const {
 })
 
 // Bindings for FilterBar
-const currentStatus = computed(() => filters.value.status ?? null)
-const currentRisk = computed(() => filters.value.risk ?? null)
+const currentStatus = computed<string | null>(() => {
+  const status = filters.value.status
+  return typeof status === 'string' ? status : null
+})
+const currentRisk = computed<string | null>(() => {
+  const risk = filters.value.risk
+  return typeof risk === 'string' ? risk : null
+})
 
 const handleStatusChange = (value: string | null) => setFilter('status', value)
 const handleRiskChange = (value: string | null) => setFilter('risk', value)
@@ -64,7 +71,7 @@ onMounted(async () => {
       repository.value = await githubService.getRepository(workspaceId.value, repositoryId.value)
     } catch (e) {
       // Handle error (likely 404 or permission)
-      console.error('Failed to fetch repository', e)
+      logError('Failed to fetch repository', e)
     } finally {
       isLoadingRepo.value = false
     }
@@ -179,7 +186,7 @@ const goBack = () => {
           class="space-y-6"
         >
           <!-- Filter Bar -->
-          <DomainReviewsRunFilterBar
+          <DomainReviewsRunsCompactFilterBar
             :search="search"
             :status="currentStatus"
             :risk="currentRisk"

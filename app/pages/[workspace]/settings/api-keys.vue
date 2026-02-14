@@ -157,8 +157,7 @@ function getProviderLabel(provider: string | null) {
 
         <!-- Code pattern overlay -->
         <div
-          class="absolute inset-0 opacity-[0.03]"
-          style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 20h40v1H0zM20 0v40h1V0z\'/%3E%3C/g%3E%3C/svg%3E');"
+          class="hero-code-pattern absolute inset-0 opacity-[0.03]"
         />
 
         <!-- Content -->
@@ -488,6 +487,10 @@ function getProviderLabel(provider: string | null) {
 </template>
 
 <style scoped>
+.hero-code-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 20h40v1H0zM20 0v40h1V0z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
 .divide-y > div {
   animation: row-enter 0.4s ease-out both;
 }
