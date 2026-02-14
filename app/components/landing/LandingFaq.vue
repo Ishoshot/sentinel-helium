@@ -39,7 +39,7 @@ const faqs = [
   >
     <div class="relative max-w-3xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center mb-12">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center mb-12">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Frequently asked questions
         </h2>
@@ -51,9 +51,10 @@ const faqs = [
       <!-- FAQ items -->
       <div class="divide-y divide-zinc-800/50">
         <details
-          v-for="faq in faqs"
+          v-for="(faq, index) in faqs"
           :key="faq.question"
-          class="group py-5"
+          class="animate-fade-in-up [animation-fill-mode:both] group py-5"
+          :style="{ animationDelay: `${120 + (index * 70)}ms` }"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between text-base font-semibold text-white">
             <span>{{ faq.question }}</span>
@@ -69,7 +70,7 @@ const faqs = [
       </div>
 
       <!-- Contact CTA -->
-      <div class="mt-12 text-center pt-8 border-t border-zinc-800/50">
+      <div class="animate-fade-in-up [animation-delay:520ms] [animation-fill-mode:both] mt-12 text-center pt-8 border-t border-zinc-800/50">
         <p class="text-zinc-400 mb-4">
           Still have questions?
         </p>

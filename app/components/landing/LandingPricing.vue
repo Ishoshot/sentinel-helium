@@ -9,10 +9,7 @@ import { usePlans } from '~/composables/billing/usePlans'
 
 const { plans, fetchPlans, comparisonFeatures } = usePlans()
 
-// Fetch plans on mount
-onMounted(() => {
-  fetchPlans()
-})
+await fetchPlans()
 
 // Transform plans to the format expected by the template
 const tiers = computed(() => plans.value.map(plan => ({
@@ -37,7 +34,7 @@ const previewFeatures = computed(() => (comparisonFeatures.value ?? []).slice(0,
   >
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="text-center max-w-3xl mx-auto mb-16 animate-fade-in-up [animation-fill-mode:both]">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Spend more time shipping, not configuring
         </h2>
@@ -49,9 +46,10 @@ const previewFeatures = computed(() => (comparisonFeatures.value ?? []).slice(0,
       <!-- Pricing cards -->
       <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-20">
         <div
-          v-for="tier in tiers"
+          v-for="(tier, index) in tiers"
           :key="tier.name"
-          class="relative rounded-2xl p-6 transition-all duration-300"
+          class="animate-fade-in-up [animation-fill-mode:both] relative rounded-2xl p-6 transition-all duration-300"
+          :style="{ animationDelay: `${index * 90}ms` }"
           :class="tier.highlighted
             ? 'bg-gradient-to-b from-teal-500/20 to-teal-600/5 ring-1 ring-teal-500/50 shadow-xl shadow-teal-500/10 scale-[1.02]'
             : 'bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50'"

@@ -4,7 +4,7 @@
  * Links, copyright, and large brand wordmark
  */
 
-const currentYear = new Date().getFullYear()
+const currentYear = useState<number>('landing-footer-current-year', () => new Date().getUTCFullYear())
 
 const productLinks = [
   { label: 'Features', href: '/#product' },
@@ -36,7 +36,7 @@ const socialLinks = [
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           <!-- Brand column -->
-          <div class="col-span-2 md:col-span-1">
+          <div class="animate-fade-in-up [animation-fill-mode:both] col-span-2 md:col-span-1">
             <div class="mb-4">
               <SentinelLogo size="lg" />
             </div>
@@ -62,7 +62,7 @@ const socialLinks = [
           </div>
 
           <!-- Product links -->
-          <div>
+          <div class="animate-fade-in-up [animation-delay:100ms] [animation-fill-mode:both]">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Product
             </h4>
@@ -80,7 +80,7 @@ const socialLinks = [
           </div>
 
           <!-- Company links -->
-          <div>
+          <div class="animate-fade-in-up [animation-delay:180ms] [animation-fill-mode:both]">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Company
             </h4>
@@ -98,7 +98,7 @@ const socialLinks = [
           </div>
 
           <!-- Legal links -->
-          <div>
+          <div class="animate-fade-in-up [animation-delay:260ms] [animation-fill-mode:both]">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-4">
               Legal
             </h4>
@@ -119,7 +119,7 @@ const socialLinks = [
         </div>
 
         <!-- Bottom bar -->
-        <div class="mt-12 pt-8 border-t border-zinc-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="animate-fade-in-up [animation-delay:340ms] [animation-fill-mode:both] mt-12 pt-8 border-t border-zinc-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="text-sm text-zinc-600">
             &copy; {{ currentYear }} Sentinel. All rights reserved.
           </div>
@@ -131,7 +131,7 @@ const socialLinks = [
     </div>
 
     <!-- Large brand wordmark -->
-    <div class="relative h-24 lg:h-36 overflow-hidden pointer-events-none select-none">
+    <div class="animate-fade-in [animation-delay:420ms] [animation-fill-mode:both] relative h-24 lg:h-36 overflow-hidden pointer-events-none select-none">
       <!-- Top fade gradient -->
       <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#0f0f12] to-transparent z-10" />
 
