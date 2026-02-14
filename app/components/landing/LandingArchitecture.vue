@@ -75,7 +75,7 @@ const darkColorConfig: Record<CardColor, { border: string; badge: string; stripe
 
     <div class="relative z-10 max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center max-w-3xl mx-auto mb-20">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center max-w-3xl mx-auto mb-20">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Built for reliability at scale
         </h2>
@@ -92,10 +92,11 @@ const darkColorConfig: Record<CardColor, { border: string; badge: string; stripe
             <div
               v-for="column in columns"
               :key="column.id"
-              class="architecture-column"
+              class="architecture-column animate-fade-in-up [animation-fill-mode:both]"
               :style="{
                 '--col': column.id,
                 '--col-z': `${(column.id - 1) * 25}px`,
+                animationDelay: `${120 + ((column.id - 1) * 100)}ms`,
               }"
             >
               <!-- Cards -->
@@ -188,14 +189,15 @@ const darkColorConfig: Record<CardColor, { border: string; badge: string; stripe
       <!-- Stats -->
       <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6">
         <div
-          v-for="stat in [
+          v-for="(stat, index) in [
             { value: '< 30s', label: 'Avg review time' },
             { value: '99.9%', label: 'Uptime SLA' },
             { value: '6', label: 'AI providers' },
             { value: 'BYOK', label: 'Your API keys' },
           ]"
           :key="stat.label"
-          class="text-center"
+          class="animate-fade-in-up [animation-fill-mode:both] text-center"
+          :style="{ animationDelay: `${520 + (index * 90)}ms` }"
         >
           <div class="text-3xl font-bold text-white">
             {{ stat.value }}

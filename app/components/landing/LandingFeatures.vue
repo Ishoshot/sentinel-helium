@@ -37,7 +37,7 @@ const simpleFeatures = [
   >
     <div class="relative max-w-7xl mx-auto px-6">
       <!-- Section header -->
-      <div class="max-w-3xl mb-16">
+      <div class="max-w-3xl mb-16 animate-fade-in-up [animation-fill-mode:both]">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Speed, simplicity, and quality without the headaches
         </h2>
@@ -50,9 +50,10 @@ const simpleFeatures = [
       <div class="grid lg:grid-cols-3 gap-6 mb-16">
         <!-- Feature cards -->
         <div
-          v-for="feature in mainFeatures"
+          v-for="(feature, index) in mainFeatures"
           :key="feature.title"
-          class="landing-feature-card p-6"
+          class="landing-feature-card animate-fade-in-up [animation-fill-mode:both] p-6"
+          :style="{ animationDelay: `${index * 90}ms` }"
         >
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
@@ -74,13 +75,14 @@ const simpleFeatures = [
       <!-- Simple features grid -->
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
-          v-for="feature in simpleFeatures"
+          v-for="(feature, index) in simpleFeatures"
           :key="feature.title"
-          class="flex items-start gap-3 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-colors"
+          class="group animate-fade-in-up [animation-fill-mode:both] flex items-start gap-3 p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700/50 transition-colors"
+          :style="{ animationDelay: `${180 + (index * 70)}ms` }"
         >
           <Icon
             :name="feature.icon"
-            class="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5"
+            class="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5 transition-transform duration-300 group-hover:-translate-y-0.5"
           />
           <div>
             <h4 class="text-base font-semibold text-white">

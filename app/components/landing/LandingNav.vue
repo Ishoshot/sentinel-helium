@@ -62,7 +62,7 @@ const ctaText = computed(() => {
 
 <template>
   <header
-    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 animate-fade-in-down [animation-fill-mode:both]"
     :class="props.scrolled
       ? 'bg-[#0a0a0c]/90 backdrop-blur-xl border-b border-zinc-800/50'
       : 'bg-transparent'"
@@ -99,13 +99,6 @@ const ctaText = computed(() => {
               class="w-5 h-5"
             />
           </button>
-          <NuxtLink
-            v-if="!isAuthenticated"
-            to="/login"
-            class="hidden sm:block px-3 py-2 text-sm transition-colors duration-200 text-zinc-400 hover:text-white"
-          >
-            Sign in
-          </NuxtLink>
           <NuxtLink
             :to="dashboardUrl"
             class="landing-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-lg"

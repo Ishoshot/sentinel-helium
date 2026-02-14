@@ -32,7 +32,7 @@ const darkStatusColors: Record<string, string> = {
   <section class="lg:hidden py-24 bg-[#09090b] overflow-hidden">
     <div class="max-w-7xl mx-auto px-6">
       <!-- Header -->
-      <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="animate-fade-in-up [animation-fill-mode:both] text-center max-w-3xl mx-auto mb-16">
         <h2 class="text-3xl lg:text-4xl font-semibold tracking-tight text-white">
           Built for reliability at scale
         </h2>
@@ -45,8 +45,7 @@ const darkStatusColors: Record<string, string> = {
       <div class="relative">
         <!-- Background grid pattern -->
         <div
-          class="absolute inset-0 opacity-[0.02]"
-          style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 20px 20px;"
+          class="architecture-mobile-grid absolute inset-0 opacity-[0.02]"
         />
 
         <!-- Connection lines (SVG overlay) -->
@@ -113,7 +112,7 @@ const darkStatusColors: Record<string, string> = {
               v-for="(item, itemIndex) in layer.items"
               :key="item.id"
               class="architecture-card-mobile cursor-pointer group relative bg-[#111113] rounded-xl border border-zinc-800/50 shadow-lg shadow-black/20 overflow-hidden transition-all duration-300 hover:border-zinc-700/50 hover:scale-[1.02]"
-              :style="{ animationDelay: `${(layerIndex * 200) + (itemIndex * 100)}ms` }"
+              :style="{ '--delay': `${(layerIndex * 200) + (itemIndex * 100)}ms` }"
             >
               <!-- Card header -->
               <div class="relative px-4 py-3 border-b border-zinc-800/50 flex items-center justify-between">
@@ -181,7 +180,7 @@ const darkStatusColors: Record<string, string> = {
 
       <!-- Bottom stats -->
       <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div class="text-center">
+        <div class="animate-fade-in-up [animation-delay:260ms] [animation-fill-mode:both] text-center">
           <div class="text-3xl font-bold text-white">
             &lt; 30s
           </div>
@@ -189,7 +188,7 @@ const darkStatusColors: Record<string, string> = {
             Avg review time
           </div>
         </div>
-        <div class="text-center">
+        <div class="animate-fade-in-up [animation-delay:340ms] [animation-fill-mode:both] text-center">
           <div class="text-3xl font-bold text-white">
             99.9%
           </div>
@@ -197,7 +196,7 @@ const darkStatusColors: Record<string, string> = {
             Uptime SLA
           </div>
         </div>
-        <div class="text-center">
+        <div class="animate-fade-in-up [animation-delay:420ms] [animation-fill-mode:both] text-center">
           <div class="text-3xl font-bold text-white">
             6
           </div>
@@ -205,7 +204,7 @@ const darkStatusColors: Record<string, string> = {
             AI providers
           </div>
         </div>
-        <div class="text-center">
+        <div class="animate-fade-in-up [animation-delay:500ms] [animation-fill-mode:both] text-center">
           <div class="text-3xl font-bold text-white">
             BYOK
           </div>
@@ -219,6 +218,11 @@ const darkStatusColors: Record<string, string> = {
 </template>
 
 <style scoped>
+.architecture-mobile-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 .architecture-card-mobile {
   animation: fadeInUp 0.3s ease-out forwards;
   opacity: 0;
