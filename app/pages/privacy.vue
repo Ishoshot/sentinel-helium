@@ -26,7 +26,7 @@ useHead({
   },
 })
 
-const isAuthenticated = hasAuthPresenceCookie()
+const isAuthenticated = ref(hasAuthPresenceCookie())
 const scrolled = ref(false)
 
 onMounted(() => {
@@ -35,7 +35,7 @@ onMounted(() => {
   initScrollSpy()
 
   requestAnimationFrame(() => {
-    syncAuthPresenceWithToken()
+    isAuthenticated.value = syncAuthPresenceWithToken()
   })
 })
 

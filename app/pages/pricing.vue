@@ -32,7 +32,7 @@ const { plans, fetchPlans, comparisonFeatures } = usePlans()
 
 await fetchPlans()
 
-const isAuthenticated = hasAuthPresenceCookie()
+const isAuthenticated = ref(hasAuthPresenceCookie())
 const scrolled = ref(false)
 
 onMounted(() => {
@@ -40,7 +40,7 @@ onMounted(() => {
   handleScroll()
 
   requestAnimationFrame(() => {
-    syncAuthPresenceWithToken()
+    isAuthenticated.value = syncAuthPresenceWithToken()
   })
 })
 

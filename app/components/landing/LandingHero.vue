@@ -4,9 +4,39 @@
  * Headline and CTAs
  */
 
-defineProps<{
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
+
+const props = defineProps<{
   visible: boolean
+  isAuthenticated?: boolean
 }>()
+
+const workspaceStore = useWorkspaceStore()
+
+const ctaUrl = computed(() => {
+  if (!props.isAuthenticated) {
+    return '/login'
+  }
+
+  if (workspaceStore.hasCurrentWorkspace) {
+    return `/${workspaceStore.currentWorkspaceSlug}`
+  }
+
+  if (workspaceStore.workspaces.length > 0) {
+    const firstWorkspace = [...workspaceStore.workspaces]
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .at(0)
+    if (firstWorkspace) {
+      return `/${firstWorkspace.slug}`
+    }
+  }
+
+  return '/login'
+})
+
+const ctaText = computed(() => {
+  return props.isAuthenticated ? 'Dashboard' : 'Get started'
+})
 </script>
 
 <template>
@@ -29,10 +59,10 @@ defineProps<{
 
     <div class="animate-fade-in-up [animation-delay:220ms] [animation-fill-mode:both] mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
       <NuxtLink
-        to="/login"
+        :to="ctaUrl"
         class="group w-full sm:w-auto landing-btn-primary inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-xl"
       >
-        Get started
+        {{ ctaText }}
         <Icon
           name="ph:arrow-right-bold"
           class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"

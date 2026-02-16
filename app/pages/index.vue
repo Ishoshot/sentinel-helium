@@ -66,7 +66,7 @@ useHead({
 
 const { fetchWorkspaces } = useWorkspaces()
 
-const isAuthenticated = hasAuthPresenceCookie()
+const isAuthenticated = ref(hasAuthPresenceCookie())
 
 // Scroll-based header state
 const scrolled = ref(false)
@@ -78,7 +78,8 @@ onMounted(() => {
 
   requestAnimationFrame(() => {
     const hasToken = syncAuthPresenceWithToken()
-    if (isAuthenticated && hasToken) {
+    isAuthenticated.value = hasToken
+    if (hasToken) {
       void fetchWorkspaces()
     }
   })
@@ -111,7 +112,7 @@ function handleScroll() {
       />
 
       <div class="relative max-w-8xl mx-auto px-6 my-10">
-        <LandingHero :visible="true" />
+        <LandingHero :visible="true" :is-authenticated="isAuthenticated" />
 
         <!-- Floating UI Mockups -->
         <div class="mt-16 lg:mt-24 relative">
@@ -146,7 +147,7 @@ function handleScroll() {
     <LandingFaq />
 
     <!-- Final CTA Section -->
-    <LandingCta />
+    <LandingCta :is-authenticated="isAuthenticated" />
 
     <!-- Footer -->
     <LandingFooter />

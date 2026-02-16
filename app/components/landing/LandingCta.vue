@@ -1,8 +1,41 @@
 <script setup lang="ts">
+import { useWorkspaceStore } from '~/stores/useWorkspaceStore'
+
 /**
  * Landing page final call-to-action section
  * Premium dark theme with dramatic teal glow
  */
+
+const props = defineProps<{
+  isAuthenticated?: boolean
+}>()
+
+const workspaceStore = useWorkspaceStore()
+
+const ctaUrl = computed(() => {
+  if (!props.isAuthenticated) {
+    return '/login'
+  }
+
+  if (workspaceStore.hasCurrentWorkspace) {
+    return `/${workspaceStore.currentWorkspaceSlug}`
+  }
+
+  if (workspaceStore.workspaces.length > 0) {
+    const firstWorkspace = [...workspaceStore.workspaces]
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .at(0)
+    if (firstWorkspace) {
+      return `/${firstWorkspace.slug}`
+    }
+  }
+
+  return '/login'
+})
+
+const ctaText = computed(() => {
+  return props.isAuthenticated ? 'Dashboard' : 'Get started free'
+})
 </script>
 
 <template>
@@ -28,10 +61,10 @@
 
       <div class="animate-fade-in-up [animation-delay:220ms] [animation-fill-mode:both] mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
         <NuxtLink
-          to="/login"
+          :to="ctaUrl"
           class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-200"
         >
-          Get started free
+          {{ ctaText }}
           <Icon
             name="ph:arrow-right-bold"
             class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
