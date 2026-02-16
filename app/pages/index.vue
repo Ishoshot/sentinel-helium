@@ -112,7 +112,10 @@ function handleScroll() {
       />
 
       <div class="relative max-w-8xl mx-auto px-6 my-10">
-        <LandingHero :visible="true" :is-authenticated="isAuthenticated" />
+        <LandingHero
+          :visible="true"
+          :is-authenticated="isAuthenticated"
+        />
 
         <!-- Floating UI Mockups -->
         <div class="mt-16 lg:mt-24 relative">
