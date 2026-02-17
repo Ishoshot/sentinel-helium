@@ -53,6 +53,8 @@ const chartOptions: ChartOptions = {
     type="line"
     :data="chartData"
     :options="chartOptions"
+    icon="lucide:star"
+    icon-color="text-amber-400"
     title="Code Quality Score"
     description="Quality score based on finding severity (100 = perfect)"
     height="400px"

@@ -66,6 +66,7 @@ const chartOptions: ChartOptions = {
     type="line"
     :data="chartData"
     :options="chartOptions"
+    icon="lucide:activity"
     title="Run Activity"
     description="Successful and failed runs over time"
     height="400px"

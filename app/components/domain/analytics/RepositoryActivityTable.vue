@@ -18,9 +18,15 @@ defineProps<Props>()
   <BaseCard padding="none">
     <div class="p-5">
       <div class="mb-4">
-        <h3 class="text-base font-medium text-text-primary">
-          Repository Activity
-        </h3>
+        <div class="flex items-center gap-2">
+          <Icon
+            name="lucide:git-fork"
+            class="w-4 h-4 text-accent"
+          />
+          <h3 class="text-base font-medium text-text-primary">
+            Repository Activity
+          </h3>
+        </div>
         <p class="mt-1 text-sm text-text-muted">
           Most active repositories by review count
         </p>

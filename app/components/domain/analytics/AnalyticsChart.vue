@@ -13,11 +13,14 @@ interface Props {
   options?: ChartOptions
   title?: string
   description?: string
+  icon?: string
+  iconColor?: string
   height?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   height: '400px',
+  iconColor: 'text-accent',
 })
 
 const defaultOptions: ChartOptions = {
@@ -111,12 +114,20 @@ const chartOptions = computed(() => {
         v-if="title || description"
         class="mb-4"
       >
-        <h3
+        <div
           v-if="title"
-          class="text-base font-medium text-text-primary"
+          class="flex items-center gap-2"
         >
-          {{ title }}
-        </h3>
+          <Icon
+            v-if="icon"
+            :name="icon"
+            class="w-4 h-4"
+            :class="iconColor"
+          />
+          <h3 class="text-base font-medium text-text-primary">
+            {{ title }}
+          </h3>
+        </div>
         <p
           v-if="description"
           class="mt-1 text-sm text-text-muted"

@@ -327,22 +327,20 @@ const teamMembers = computed(() => {
       <div class="xl:col-span-2">
         <BaseCard class="h-full">
           <!-- Header -->
-          <div class="flex items-center justify-between pb-4 border-b border-border-subtle">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="flex items-center gap-2">
                 <Icon
                   name="lucide:activity"
-                  class="w-4.5 h-4.5 text-accent"
+                  class="w-4 h-4 text-accent"
                 />
-              </div>
-              <div>
-                <h2 class="text-sm font-semibold text-text-primary">
+                <h3 class="text-base font-medium text-text-primary">
                   Recent Activity
-                </h2>
-                <p class="text-xs text-text-muted mt-0.5">
-                  Latest updates from your workspace
-                </p>
+                </h3>
               </div>
+              <p class="mt-1 text-sm text-text-muted">
+                Latest updates from your workspace
+              </p>
             </div>
             <span
               v-if="activityCount > 0"
@@ -355,7 +353,7 @@ const teamMembers = computed(() => {
           <!-- Activity Feed -->
           <div
             v-if="recentActivity.length > 0"
-            class="mt-5"
+            class="space-y-2"
           >
             <DomainWorkspaceActivityItem
               v-for="(activity, index) in recentActivity"
