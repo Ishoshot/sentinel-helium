@@ -43,10 +43,15 @@ const statusOptions = computed(() => [
     action: () => emit('update:status', RunStatus.Completed),
     icon: props.status === RunStatus.Completed ? 'lucide:check' : undefined
   },
-  { 
-    label: 'Failed', 
+  {
+    label: 'Failed',
     action: () => emit('update:status', RunStatus.Failed),
     icon: props.status === RunStatus.Failed ? 'lucide:check' : undefined
+  },
+  {
+    label: 'Skipped',
+    action: () => emit('update:status', RunStatus.Skipped),
+    icon: props.status === RunStatus.Skipped ? 'lucide:check' : undefined
   }
 ])
 
