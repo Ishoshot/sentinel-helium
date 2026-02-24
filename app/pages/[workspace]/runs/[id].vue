@@ -326,6 +326,25 @@ const severityTabs = computed<{ label: string; value: FindingSeverity | 'all'; c
                 />
               </NuxtLink>
             </div>
+            <div
+              v-else-if="run.metadata.skip_reason?.toLowerCase() === 'superseded' && run.repository_id"
+              class="mt-4"
+            >
+              <NuxtLink
+                :to="`/${workspaceSlug}/repositories/${run.repository_id}/runs`"
+                class="inline-flex items-center gap-2 rounded-lg bg-warning/10 px-4 py-2 text-sm font-semibold text-warning transition-colors hover:bg-warning/20"
+              >
+                <Icon
+                  name="lucide:fast-forward"
+                  class="size-4"
+                />
+                View Latest Run
+                <Icon
+                  name="lucide:arrow-right"
+                  class="size-4"
+                />
+              </NuxtLink>
+            </div>
           </div>
         </div>
       </div>
