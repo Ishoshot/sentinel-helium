@@ -55,6 +55,14 @@ UI note: "Review" can be used as UX language for Runs.
 
 ---
 
+## Type Safety Rule
+
+- Avoid magic strings for shared state/status/category values.
+- Prefer enums or typed constants under `app/types`.
+- Reuse existing types before adding new ones.
+
+---
+
 ## Design and UX Constraints
 
 - Calm, clear, predictable interfaces.
