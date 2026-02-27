@@ -1,0 +1,18 @@
+[agents]
+max_threads = 4
+
+[agents."review-correctness"]
+description = "Focused reviewer for logic correctness, reactivity bugs, and behavioral regressions in a Nuxt/Vue frontend. Detects broken flows, state mismanagement, and type-safety violations with high signal and low noise."
+config_file = "agents/review-correctness.toml"
+
+[agents."review-architecture"]
+description = "Focused reviewer for architecture and convention compliance in a Nuxt/Vue frontend. Verifies layer boundaries, composable/service/component patterns, naming, and type safety without pedantic style policing."
+config_file = "agents/review-architecture.toml"
+
+[agents."review-tests"]
+description = "Focused reviewer for type safety, lint compliance, and verification coverage in a Nuxt/Vue frontend. Checks TypeScript strictness, ESLint compliance, and whether changed behavior has adequate verification."
+config_file = "agents/review-tests.toml"
+
+[agents."review-security"]
+description = "Focused security reviewer for XSS risks, auth token handling, route guard correctness, and sensitive data exposure in a Nuxt/Vue frontend. Catches real client-side security issues, not hypotheticals."
+config_file = "agents/review-security.toml"
